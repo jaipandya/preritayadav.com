@@ -1,4 +1,5 @@
 import "@/lib/shapeTypes";
+import { defaultShapeUtils, defaultBindingUtils } from "tldraw";
 import { ProjectCardShapeUtil } from "@/components/shapes/ProjectCardShapeUtil";
 import { HandDrawnButtonShapeUtil } from "@/components/shapes/HandDrawnButtonShapeUtil";
 import { AnnotationShapeUtil } from "@/components/shapes/AnnotationShapeUtil";
@@ -8,6 +9,7 @@ import { ImagePlaceholderShapeUtil } from "@/components/shapes/ImagePlaceholderS
 import { BrowserFrameShapeUtil } from "@/components/shapes/BrowserFrameShapeUtil";
 
 export const customShapeUtils = [
+  ...defaultShapeUtils,
   ProjectCardShapeUtil,
   HandDrawnButtonShapeUtil,
   AnnotationShapeUtil,
@@ -16,3 +18,5 @@ export const customShapeUtils = [
   ImagePlaceholderShapeUtil,
   BrowserFrameShapeUtil,
 ];
+
+export const customBindingUtils = [...defaultBindingUtils];

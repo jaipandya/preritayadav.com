@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { createTLStore, getSnapshot, loadSnapshot } from "tldraw";
-import { customShapeUtils } from "@/lib/shapes";
+import { customShapeUtils, customBindingUtils } from "@/lib/shapes";
 import { debounce } from "@/lib/debounce";
 
 export type LoadingState =
@@ -20,7 +20,10 @@ export function useCanvasPersistence(pageKey: string) {
   const [needsInitialLayout, setNeedsInitialLayout] = useState(false);
 
   useEffect(() => {
-    const s = createTLStore({ shapeUtils: customShapeUtils });
+    const s = createTLStore({
+      shapeUtils: customShapeUtils,
+      bindingUtils: customBindingUtils,
+    });
     setStore(s);
 
     const persisted = localStorage.getItem(persistenceKey);

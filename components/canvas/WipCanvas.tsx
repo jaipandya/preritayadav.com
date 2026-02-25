@@ -1,11 +1,12 @@
 "use client";
 
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import {
   Tldraw,
   type Editor,
   type TLUiOverrides,
+  type TLEditorComponents,
 } from "tldraw";
 import "tldraw/tldraw.css";
 import { customShapeUtils } from "@/lib/shapes";
@@ -40,6 +41,13 @@ export function WipCanvas({
     useCanvasPersistence(pageKey);
   const pointerDownPos = useRef<{ x: number; y: number } | null>(null);
   const layoutCreated = useRef(false);
+
+  const components = useMemo<TLEditorComponents>(
+    () => ({
+      InFrontOfTheCanvas: () => <CanvasUI onReset={reset} />,
+    }),
+    [reset]
+  );
 
   const handleMount = useCallback(
     (editor: Editor) => {
@@ -131,8 +139,8 @@ export function WipCanvas({
           hideUi
           onMount={handleMount}
           overrides={uiOverrides}
+          components={components}
         />
-        <CanvasUI onReset={reset} />
       </div>
     </BrowserChrome>
   );
