@@ -159,6 +159,97 @@ export function createLandingLayout(editor: Editor) {
     y += project.mediaType === "image" ? 300 : 220;
   }
 
+  // --- BLOG SECTION ---
+  editor.createShape({
+    type: "annotation",
+    x: LEFT_PAD,
+    y,
+    props: {
+      w: 300,
+      h: 40,
+      text: "From the blog",
+      fontSize: 22,
+      showArrow: true,
+      arrowDirection: "down",
+    },
+    meta: { componentType: "annotation", variationId: "blog-heading" },
+  });
+
+  y += 70;
+
+  const blogPosts = [
+    {
+      title: "Hatch Conference 2023",
+      description: "A few notes from the Design Conference in Berlin",
+      href: "https://medium.com/@preritayadav/hatch-conference-2023-a-few-notes-from-the-design-conference-in-berlin-2c2d1cf5d7de",
+    },
+    {
+      title: "10kdesigners Masterclass",
+      description: "My experience at the UX/UI design cohort",
+      href: "https://medium.com/@preritayadav/10kdesigners-ux-ui-masterclass-my-experience-at-the-design-cohort-3fcee5ce74a0",
+    },
+    {
+      title: "UX Research Case Study",
+      description: "Research on India's most popular programming community",
+      href: "https://medium.com/design-bootcamp/case-study-ux-research-on-indias-most-popular-programming-community-4fed6a1fc476",
+    },
+    {
+      title: "Event Landing Page",
+      description: "Designing an event landing page — a case study",
+      href: "https://medium.com/design-bootcamp/event-landing-page-a-case-study-2e7a7595309f",
+    },
+    {
+      title: "Fitness App Research",
+      description: "Creating a survey and user interview for a fitness app",
+      href: "https://medium.com/design-bootcamp/case-study-creating-a-survey-and-user-interview-for-a-fitness-app-a52b3fa7d843",
+    },
+  ];
+
+  for (const post of blogPosts) {
+    editor.createShape({
+      type: "annotation",
+      x: LEFT_PAD,
+      y,
+      props: {
+        w: CANVAS_W - LEFT_PAD * 2,
+        h: 22,
+        text: post.title,
+        fontSize: 16,
+        showArrow: false,
+        arrowDirection: "right",
+      },
+      meta: {
+        componentType: "annotation",
+        variationId: `blog-${post.title.toLowerCase().replace(/\s+/g, "-")}`,
+        href: post.href,
+      },
+    });
+
+    y += 24;
+
+    editor.createShape({
+      type: "annotation",
+      x: LEFT_PAD + 10,
+      y,
+      props: {
+        w: CANVAS_W - LEFT_PAD * 2 - 10,
+        h: 18,
+        text: post.description,
+        fontSize: 12,
+        showArrow: false,
+        arrowDirection: "right",
+      },
+      meta: {
+        componentType: "annotation",
+        variationId: `blog-desc-${post.title.toLowerCase().replace(/\s+/g, "-")}`,
+      },
+    });
+
+    y += 40;
+  }
+
+  y += 20;
+
   // --- DESIGN PHILOSOPHY ---
   editor.createShape({
     type: "annotation",
@@ -306,86 +397,15 @@ export function createLandingLayout(editor: Editor) {
 
   y += 150;
 
-  // --- OUTSIDE WORK ---
-  editor.createShape({
-    type: "annotation",
-    x: LEFT_PAD,
-    y,
-    props: {
-      w: 200,
-      h: 30,
-      text: "Outside work",
-      fontSize: 20,
-      showArrow: false,
-      arrowDirection: "right",
-    },
-    meta: { componentType: "annotation", variationId: "outside-work-title" },
-  });
-
-  y += 50;
-
-  const hobbies: Array<{
-    icon: "design" | "analytics" | "content" | "communication";
-    label: string;
-    description: string;
-  }> = [
-    { icon: "design", label: "Painting", description: "Watercolour & illustration" },
-    { icon: "analytics", label: "Photography", description: "Travel & street photography" },
-    { icon: "content", label: "Writing", description: "Essays & creative fiction" },
-    { icon: "communication", label: "Workshops", description: "Community design meetups" },
-  ];
-
-  hobbies.forEach((hobby, i) => {
-    const col = i % 2;
-    const row = Math.floor(i / 2);
-    const xPos = LEFT_PAD + col * 260;
-    const yPos = y + row * 130;
-
-    editor.createShape({
-      type: "skill-icon",
-      x: xPos,
-      y: yPos,
-      props: {
-        w: 60,
-        h: 70,
-        icon: hobby.icon,
-        label: hobby.label,
-      },
-      meta: {
-        componentType: "skill-icon",
-        variationId: `hobby-${hobby.label.toLowerCase()}`,
-      },
-    });
-
-    editor.createShape({
-      type: "annotation",
-      x: xPos + 70,
-      y: yPos + 20,
-      props: {
-        w: 170,
-        h: 40,
-        text: hobby.description,
-        fontSize: 13,
-        showArrow: false,
-        arrowDirection: "right",
-      },
-      meta: {
-        componentType: "annotation",
-        variationId: `hobby-desc-${hobby.label.toLowerCase()}`,
-      },
-    });
-  });
-
-  y += 280;
-
   // --- FOOTER ---
   const footerIcons: Array<{
     icon: "analytics" | "design" | "content" | "communication";
     label: string;
+    href: string;
   }> = [
-    { icon: "design", label: "About" },
-    { icon: "content", label: "Work" },
-    { icon: "communication", label: "Email" },
+    { icon: "design", label: "About", href: "/contact" },
+    { icon: "content", label: "Work", href: "/" },
+    { icon: "communication", label: "Email", href: "mailto:hello@preritayadav.com" },
   ];
 
   footerIcons.forEach((item, i) => {
@@ -402,6 +422,7 @@ export function createLandingLayout(editor: Editor) {
       meta: {
         componentType: "skill-icon",
         variationId: `footer-${item.label.toLowerCase()}`,
+        href: item.href,
       },
     });
   });

@@ -109,10 +109,9 @@ export function createContactLayout(editor: Editor) {
   y += 40;
 
   const socials = [
-    { label: "LinkedIn", url: "#" },
-    { label: "Dribbble", url: "#" },
-    { label: "Twitter", url: "#" },
-    { label: "GitHub", url: "#" },
+    { label: "LinkedIn", url: "https://www.linkedin.com/in/preritayadav/" },
+    { label: "Medium", url: "https://medium.com/@preritayadav" },
+    { label: "X", url: "https://x.com/preritayadav" },
   ];
 
   socials.forEach((social, i) => {
@@ -124,6 +123,7 @@ export function createContactLayout(editor: Editor) {
       meta: {
         componentType: "button",
         variationId: `contact-social-${social.label.toLowerCase()}`,
+        href: social.url,
       },
     });
   });

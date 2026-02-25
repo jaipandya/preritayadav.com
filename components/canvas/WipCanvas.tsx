@@ -127,8 +127,8 @@ export function WipCanvas({
           for (const shape of shapesAtPoint) {
             const href = getHref(shape);
             if (href) {
-              if (href.startsWith("mailto:")) {
-                window.location.href = href;
+              if (href.startsWith("mailto:") || href.startsWith("http")) {
+                window.open(href, href.startsWith("mailto:") ? "_self" : "_blank");
               } else {
                 router.push(href);
               }
