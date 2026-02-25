@@ -10,6 +10,7 @@ import {
 } from "tldraw";
 import "tldraw/tldraw.css";
 import { customShapeUtils } from "@/lib/shapes";
+import { BrowseTool } from "@/lib/BrowseTool";
 import { useCanvasPersistence } from "./useCanvasPersistence";
 import { CanvasUI } from "./CanvasUI";
 import { BrowserChrome } from "./BrowserChrome";
@@ -29,6 +30,8 @@ const uiOverrides: TLUiOverrides = {
   },
 };
 
+const customTools = [BrowseTool];
+
 export function WipCanvas({
   pageKey,
   onCreateLayout,
@@ -39,8 +42,8 @@ export function WipCanvas({
   const router = useRouter();
   const { store, loadingState, reset, needsInitialLayout } =
     useCanvasPersistence(pageKey);
-  const pointerDownPos = useRef<{ x: number; y: number } | null>(null);
   const layoutCreated = useRef(false);
+  const pointerDownPos = useRef<{ x: number; y: number } | null>(null);
 
   const components = useMemo<TLEditorComponents>(
     () => ({
@@ -56,13 +59,17 @@ export function WipCanvas({
         onCreateLayout(editor);
       }
 
+      // Set browse as the default tool
+      editor.setCurrentTool("browse");
+
+      // Listen for pointer events to handle navigation in browse mode
       editor.on("event", (event) => {
         if (event.type === "pointer" && event.name === "pointer_down") {
           pointerDownPos.current = { x: event.point.x, y: event.point.y };
         }
 
         if (event.type === "pointer" && event.name === "pointer_up") {
-          if (editor.getCurrentToolId() !== "select") return;
+          if (editor.getCurrentToolId() !== "browse") return;
           if (!pointerDownPos.current) return;
 
           const dx = event.point.x - pointerDownPos.current.x;
@@ -72,7 +79,11 @@ export function WipCanvas({
 
           if (dist > DRAG_THRESHOLD) return;
 
-          const shapesAtPoint = editor.getShapesAtPoint(event.point);
+          const pagePoint = editor.screenToPage(event.point);
+          const shapesAtPoint = editor.getShapesAtPoint(pagePoint, {
+            hitInside: true,
+            margin: 0,
+          });
           for (const shape of shapesAtPoint) {
             const href = getHref(shape);
             if (href) {
@@ -136,6 +147,7 @@ export function WipCanvas({
         <Tldraw
           store={store}
           shapeUtils={customShapeUtils}
+          tools={customTools}
           hideUi
           onMount={handleMount}
           overrides={uiOverrides}
