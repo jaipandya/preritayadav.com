@@ -1,12 +1,13 @@
 "use client";
 
-import { useCallback, useRef, useMemo } from "react";
+import { useCallback, useRef, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Tldraw,
   type Editor,
   type TLUiOverrides,
   type TLEditorComponents,
+  DefaultSizeStyle,
 } from "tldraw";
 import "tldraw/tldraw.css";
 import { customShapeUtils } from "@/lib/shapes";
@@ -45,6 +46,7 @@ export function WipCanvas({
     useCanvasPersistence(pageKey);
   const layoutCreated = useRef(false);
   const pointerDownPos = useRef<{ x: number; y: number } | null>(null);
+  const [canvasReady, setCanvasReady] = useState(false);
 
   const components = useMemo<TLEditorComponents>(
     () => ({
@@ -59,6 +61,9 @@ export function WipCanvas({
         layoutCreated.current = true;
         onCreateLayout(editor);
       }
+
+      // Set thin stroke for the draw tool
+      editor.setStyleForNextShapes(DefaultSizeStyle, "s");
 
       // Set browse as the default tool
       editor.setCurrentTool("browse");
@@ -122,12 +127,18 @@ export function WipCanvas({
           for (const shape of shapesAtPoint) {
             const href = getHref(shape);
             if (href) {
-              router.push(href);
+              if (href.startsWith("mailto:")) {
+                window.location.href = href;
+              } else {
+                router.push(href);
+              }
               return;
             }
           }
         }
       });
+
+      setCanvasReady(true);
     },
     [router, needsInitialLayout, onCreateLayout]
   );
@@ -173,8 +184,8 @@ export function WipCanvas({
   return (
     <BrowserChrome>
       <div
-        className="canvas-fade-in"
-        style={{ width: "100%", height: "100%", position: "relative" }}
+        className={canvasReady ? "canvas-fade-in" : undefined}
+        style={{ width: "100%", height: "100%", position: "relative", opacity: canvasReady ? undefined : 0 }}
         role="application"
         aria-label="Prerita Yadav's interactive portfolio canvas"
       >

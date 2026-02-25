@@ -10,12 +10,13 @@ import {
   type TLShape,
   type RecordProps,
   type TLResizeInfo,
+  type TLEventInfo,
   resizeBox,
   useIsEditing,
   useEditor,
 } from "tldraw";
 import { wobblyRect } from "@/lib/variationSeed";
-import { useCallback, useRef, useEffect } from "react";
+import { useCallback, useRef, useEffect, useState } from "react";
 
 type HandDrawnButtonShape = TLShape<"hand-drawn-button">;
 
@@ -25,6 +26,8 @@ function ButtonComponent({ shape }: { shape: HandDrawnButtonShape }) {
   const isEditing = useIsEditing(shape.id);
   const editor = useEditor();
   const inputRef = useRef<HTMLInputElement>(null);
+  const [hovered, setHovered] = useState(false);
+  const [pressed, setPressed] = useState(false);
 
   useEffect(() => {
     if (isEditing && inputRef.current) {
@@ -32,6 +35,46 @@ function ButtonComponent({ shape }: { shape: HandDrawnButtonShape }) {
       inputRef.current.select();
     }
   }, [isEditing]);
+
+  // Track hover & pressed via tldraw's event system
+  useEffect(() => {
+    const handleEvent = (event: TLEventInfo) => {
+      if (event.type !== "pointer") return;
+
+      if (event.name === "pointer_move") {
+        const pagePoint = editor.screenToPage(event.point);
+        const shapesAtPoint = editor.getShapesAtPoint(pagePoint, {
+          hitInside: true,
+          margin: 0,
+        });
+        const isOver = shapesAtPoint.some((s) => s.id === shape.id);
+        setHovered(isOver);
+        if (!isOver) setPressed(false);
+      }
+
+      if (event.name === "pointer_down") {
+        const pagePoint = editor.screenToPage(event.point);
+        const shapesAtPoint = editor.getShapesAtPoint(pagePoint, {
+          hitInside: true,
+          margin: 0,
+        });
+        if (shapesAtPoint.some((s) => s.id === shape.id)) {
+          setPressed(true);
+        }
+      }
+
+      if (event.name === "pointer_up") {
+        setPressed(false);
+      }
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    editor.on("event", handleEvent as any);
+    return () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      editor.off("event", handleEvent as any);
+    };
+  }, [editor, shape.id]);
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,6 +97,13 @@ function ButtonComponent({ shape }: { shape: HandDrawnButtonShape }) {
     [editor]
   );
 
+  const fillColor = pressed
+    ? "rgba(26, 26, 26, 0.12)"
+    : hovered
+      ? "rgba(26, 26, 26, 0.06)"
+      : "none";
+  const strokeWidth = hovered || pressed ? 2 : 1.5;
+
   return (
     <HTMLContainer
       style={{
@@ -63,10 +113,18 @@ function ButtonComponent({ shape }: { shape: HandDrawnButtonShape }) {
         fontFamily: "'Loranthus', cursive",
         cursor: "pointer",
         pointerEvents: "all",
+        transform: pressed ? "scale(0.96)" : "none",
+        transition: "transform 0.15s ease",
       }}
     >
       <svg width={w} height={h} style={{ position: "absolute", top: 0, left: 0 }}>
-        <path d={borderPath} fill="none" stroke="#1a1a1a" strokeWidth={1.5} />
+        <path
+          d={borderPath}
+          fill={fillColor}
+          stroke="#1a1a1a"
+          strokeWidth={strokeWidth}
+          style={{ transition: "fill 0.15s ease, stroke-width 0.15s ease" }}
+        />
       </svg>
       <div
         style={{
