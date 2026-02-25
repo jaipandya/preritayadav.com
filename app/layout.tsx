@@ -5,6 +5,10 @@ export const metadata: Metadata = {
   title: "Prerita Yadav — Portfolio",
   description:
     "Work-in-progress portfolio of Prerita Yadav. An unconventional canvas-based experience.",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default function RootLayout({
