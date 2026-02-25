@@ -382,6 +382,6 @@ export function createLandingLayout(editor: Editor) {
     },
   });
 
-  // Set camera to top of page
-  editor.setCamera({ x: -(CANVAS_W / 2) + window.innerWidth / 2, y: 0, z: 1 });
+  const vb = editor.getViewportScreenBounds();
+  editor.setCamera({ x: -(CANVAS_W / 2) + vb.width / 2, y: 0, z: 1 });
 }
