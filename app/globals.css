@@ -16,7 +16,7 @@
 }
 
 body {
-  background: var(--color-background);
+  background: #f5f5f0;
   color: var(--color-foreground);
   font-family: var(--font-loranthus);
   margin: 0;
@@ -36,18 +36,22 @@ body {
   background-color: #ffffff !important;
 }
 
-/* Hide tldraw's menu button (bottom-left N icon) */
+/* Hide tldraw default UI chrome */
 .tlui-menu-zone,
-.tlui-menu-zone__controls {
-  display: none !important;
-}
-
-/* Hide tldraw debug panel */
-.tlui-debug-panel {
+.tlui-menu-zone__controls,
+.tlui-debug-panel,
+.tlui-navigation-panel,
+.tlui-layout,
+.tl-watermark_SEE-LICENSE {
   display: none !important;
 }
 
 /* Ensure shapes render crisply */
 .tl-shape {
   will-change: transform;
+}
+
+/* Browse tool cursor: default pointer */
+.tl-container[data-state="browse"] {
+  cursor: default !important;
 }
