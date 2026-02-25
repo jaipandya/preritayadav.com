@@ -6,24 +6,6 @@ const LEFT_PAD = 20;
 export function createLandingLayout(editor: Editor) {
   let y = 30;
 
-  // --- NAV BAR ---
-  editor.createShape({
-    type: "annotation",
-    x: LEFT_PAD,
-    y,
-    props: {
-      w: 200,
-      h: 30,
-      text: "preritayadav.com",
-      fontSize: 16,
-      showArrow: false,
-      arrowDirection: "right",
-    },
-    meta: { componentType: "annotation", variationId: "nav-brand" },
-  });
-
-  y += 80;
-
   // --- HERO SECTION ---
   editor.createShape({
     type: "annotation",

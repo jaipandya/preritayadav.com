@@ -29,6 +29,11 @@ function AnnotationComponent({ shape }: { shape: AnnotationShape }) {
   const aw = (seededRandom(`${id}-aw`) - 0.5) * 4;
   const ah = (seededRandom(`${id}-ah`) - 0.5) * 4;
 
+  // Estimate text width to position inline arrows after the text
+  const charW = fontSize * 0.55;
+  const firstLine = text.split("\n")[0];
+  const textEndX = Math.min(firstLine.length * charW + 8, w * 0.85);
+
   let arrowPath = "";
   if (showArrow) {
     switch (arrowDirection) {
@@ -38,9 +43,12 @@ function AnnotationComponent({ shape }: { shape: AnnotationShape }) {
       case "left":
         arrowPath = `M ${w * 0.3} ${h * 0.5 + ah} Q ${w * 0.15 + aw} ${h * 0.3 + ah} 0 ${h * 0.5} M 8 ${h * 0.5 - 6} L 0 ${h * 0.5} L 8 ${h * 0.5 + 6}`;
         break;
-      case "down":
-        arrowPath = `M ${w * 0.5 + aw} ${h * 0.7} Q ${w * 0.5 + aw} ${h * 0.85} ${w * 0.5} ${h} M ${w * 0.5 - 6} ${h - 8} L ${w * 0.5} ${h} L ${w * 0.5 + 6} ${h - 8}`;
+      case "down": {
+        const ax = textEndX + aw;
+        const midY = fontSize * 0.5;
+        arrowPath = `M ${ax} ${midY} Q ${ax + 6} ${midY + (h - midY) * 0.5} ${ax} ${h} M ${ax - 6} ${h - 8} L ${ax} ${h} L ${ax + 6} ${h - 8}`;
         break;
+      }
       case "up":
         arrowPath = `M ${w * 0.5 + aw} ${h * 0.3} Q ${w * 0.5 + aw} ${h * 0.15} ${w * 0.5} 0 M ${w * 0.5 - 6} 8 L ${w * 0.5} 0 L ${w * 0.5 + 6} 8`;
         break;

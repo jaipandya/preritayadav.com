@@ -17,6 +17,7 @@ import { BrowserChrome } from "./BrowserChrome";
 import { getHref, isNavigable } from "@/lib/canvasMeta";
 
 const DRAG_THRESHOLD = 5;
+const CANVAS_W = 560;
 
 const uiOverrides: TLUiOverrides = {
   tools(_editor, tools) {
@@ -61,6 +62,21 @@ export function WipCanvas({
 
       // Set browse as the default tool
       editor.setCurrentTool("browse");
+
+      // Cmd+0 / Ctrl+0 to reset zoom
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if ((e.metaKey || e.ctrlKey) && e.key === "0") {
+          e.preventDefault();
+          const camera = editor.getCamera();
+          const vb = editor.getViewportScreenBounds();
+          editor.setCamera({
+            x: -(CANVAS_W / 2) + vb.width / 2,
+            y: camera.y,
+            z: 1,
+          });
+        }
+      };
+      document.addEventListener("keydown", handleKeyDown);
 
       // Listen for pointer events to handle navigation in browse mode
       editor.on("event", (event) => {
