@@ -56,6 +56,33 @@ body {
   cursor: default !important;
 }
 
+/* Eraser tool cursor: monochrome eraser icon, locked so it never changes on hover.
+   Must set cursor directly on .tl-container (not via CSS var) because tldraw's
+   cursor: var(--tl-cursor) lives on .tl-canvas (a child), not .tl-container itself.
+   With cursor set on the container, children can safely inherit it. */
+.tl-container[data-state^="eraser"] {
+  cursor: url("data:image/svg+xml,<svg height='32' width='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'><defs><filter id='shadow' y='-40%' x='-40%' width='180px' height='180%' color-interpolation-filters='sRGB'><feDropShadow dx='1' dy='1' stdDeviation='1.2' flood-opacity='.5'/></filter></defs><g filter='url(%23shadow)'><rect x='9' y='13' width='14' height='7' rx='1.5' fill='white' stroke='black' stroke-width='1'/><rect x='9' y='13' width='5' height='7' rx='1.5' fill='%23555' stroke='black' stroke-width='1'/><line x1='14' y1='13' x2='14' y2='20' stroke='black' stroke-width='0.8'/></g></svg>") 16 17, auto !important;
+}
+.tl-container[data-state^="eraser"] * {
+  cursor: inherit !important;
+}
+
+/* Draw/pencil tool cursor: pencil icon pointing to lower-left (hotspot at tip) */
+.tl-container[data-state^="draw"] {
+  cursor: url("data:image/svg+xml,<svg height='32' width='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'><defs><filter id='shadow' y='-40%' x='-40%' width='180px' height='180%' color-interpolation-filters='sRGB'><feDropShadow dx='1' dy='1' stdDeviation='1.2' flood-opacity='.5'/></filter></defs><g transform='rotate(45 16 16)' filter='url(%23shadow)'><rect x='13' y='7' width='6' height='14' rx='0.5' fill='white' stroke='black' stroke-width='1'/><rect x='13' y='7' width='6' height='4' rx='0.5' fill='%23ddd' stroke='none'/><rect x='13' y='10' width='6' height='2' fill='%23aaa' stroke='none'/><polygon points='13,21 19,21 16,25' fill='%23eee' stroke='black' stroke-width='1' stroke-linejoin='round'/><polygon points='14.5,23.5 17.5,23.5 16,25' fill='%23333'/></g></svg>") 10 22, crosshair !important;
+}
+.tl-container[data-state^="draw"] * {
+  cursor: inherit !important;
+}
+
+/* Text tool cursor: T-shape matching the tool icon, locked */
+.tl-container[data-state^="text"] {
+  cursor: url("data:image/svg+xml,<svg height='32' width='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'><defs><filter id='shadow' y='-40%' x='-40%' width='180px' height='180%' color-interpolation-filters='sRGB'><feDropShadow dx='1' dy='1' stdDeviation='1.2' flood-opacity='.5'/></filter></defs><g fill='none' filter='url(%23shadow)'><line x1='10' y1='10' x2='22' y2='10' stroke='white' stroke-width='3.5' stroke-linecap='round'/><line x1='16' y1='10' x2='16' y2='22' stroke='white' stroke-width='3.5' stroke-linecap='round'/><line x1='13' y1='22' x2='19' y2='22' stroke='white' stroke-width='3.5' stroke-linecap='round'/><line x1='10' y1='10' x2='22' y2='10' stroke='%23231f1f' stroke-width='1.8' stroke-linecap='round'/><line x1='16' y1='10' x2='16' y2='22' stroke='%23231f1f' stroke-width='1.8' stroke-linecap='round'/><line x1='13' y1='22' x2='19' y2='22' stroke='%23231f1f' stroke-width='1.8' stroke-linecap='round'/></g></svg>") 16 10, text !important;
+}
+.tl-container[data-state^="text"] * {
+  cursor: inherit !important;
+}
+
 /* Loading spinner */
 @keyframes spin {
   to {

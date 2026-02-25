@@ -54,25 +54,27 @@ export function BrowserChrome({ children }: { children: React.ReactNode }) {
             display: "flex",
             alignItems: "center",
             padding: "0 16px",
-            gap: 8,
             pointerEvents: "auto",
             flexShrink: 0,
             fontFamily: "'Loranthus', sans-serif",
           }}
         >
-          <svg width={52} height={chromeH} style={{ flexShrink: 0 }}>
-            <circle cx={12} cy={chromeH / 2} r={dotR} fill="none" stroke="#1a1a1a" strokeWidth={1.2} />
-            <circle cx={26} cy={chromeH / 2} r={dotR} fill="none" stroke="#1a1a1a" strokeWidth={1.2} />
-            <circle cx={40} cy={chromeH / 2} r={dotR} fill="none" stroke="#1a1a1a" strokeWidth={1.2} />
-          </svg>
+          {/* Left: traffic lights — flex:1 so they mirror the right spacer */}
+          <div style={{ flex: 1, display: "flex", alignItems: "center" }}>
+            <svg width={52} height={chromeH}>
+              <circle cx={12} cy={chromeH / 2} r={dotR} fill="none" stroke="#1a1a1a" strokeWidth={1.2} />
+              <circle cx={26} cy={chromeH / 2} r={dotR} fill="none" stroke="#1a1a1a" strokeWidth={1.2} />
+              <circle cx={40} cy={chromeH / 2} r={dotR} fill="none" stroke="#1a1a1a" strokeWidth={1.2} />
+            </svg>
+          </div>
 
+          {/* Center: address bar */}
           <div
             style={{
-              flex: 1,
-              maxWidth: 360,
+              width: 360,
               height: 26,
               position: "relative",
-              marginLeft: 12,
+              flexShrink: 0,
             }}
           >
             <svg
@@ -91,13 +93,15 @@ export function BrowserChrome({ children }: { children: React.ReactNode }) {
                 fontSize: 13,
                 padding: "4px 10px",
                 opacity: 0.6,
+                textAlign: "center",
               }}
             >
               {displayUrl}
             </div>
           </div>
 
-          <div style={{ marginLeft: "auto" }} />
+          {/* Right: spacer — flex:1 mirrors the left to keep address bar centered */}
+          <div style={{ flex: 1 }} />
         </div>
 
         {/* Top navigation */}

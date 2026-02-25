@@ -87,14 +87,18 @@ export function WipCanvas({
       editor.on("event", (event) => {
         // Update cursor when hovering over navigable shapes
         if (event.type === "pointer" && event.name === "pointer_move") {
-          if (editor.getCurrentToolId() !== "browse") return;
+          const container = document.querySelector(".tl-container") as HTMLElement | null;
+          if (editor.getCurrentToolId() !== "browse") {
+            // Clean up any inline cursor left by browse mode
+            container?.style.removeProperty("cursor");
+            return;
+          }
           const pagePoint = editor.screenToPage(event.point);
           const shapesAtPoint = editor.getShapesAtPoint(pagePoint, {
             hitInside: true,
             margin: 0,
           });
           const overLink = shapesAtPoint.some((s) => isNavigable(s));
-          const container = document.querySelector(".tl-container") as HTMLElement | null;
           if (container) {
             if (overLink) {
               container.style.setProperty("cursor", "pointer", "important");
