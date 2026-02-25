@@ -1,6 +1,8 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { TopNav } from "@/components/ui/TopNav";
+import { Footer } from "@/components/ui/Footer";
 
 const BROWSER_MAX_WIDTH = 840;
 const MARGIN_Y = 24;
@@ -98,10 +100,16 @@ export function BrowserChrome({ children }: { children: React.ReactNode }) {
           <div style={{ marginLeft: "auto" }} />
         </div>
 
+        {/* Top navigation */}
+        <TopNav />
+
         {/* Canvas viewport */}
         <div style={{ flex: 1, position: "relative", pointerEvents: "auto", overflow: "hidden" }}>
           {children}
         </div>
+
+        {/* Footer */}
+        <Footer />
       </div>
     </div>
   );

@@ -82,6 +82,11 @@ export function createTypographyLayout(editor: Editor) {
 
     y += 22;
 
+    // Calculate height roughly based on text wrapping
+    // 43 chars, roughly 0.5 aspect ratio, canvas width is 520
+    const approxLines = Math.max(1, Math.ceil((43 * size * 0.5) / (CANVAS_W - LEFT_PAD * 2)));
+    const shapeHeight = approxLines * size * 1.5;
+
     // Sample text at this size
     editor.createShape({
       type: "annotation",
@@ -89,7 +94,7 @@ export function createTypographyLayout(editor: Editor) {
       y,
       props: {
         w: CANVAS_W - LEFT_PAD * 2,
-        h: size + 16,
+        h: shapeHeight + 16,
         text: "The quick brown fox jumps over the lazy dog",
         fontSize: size,
         showArrow: false,
@@ -101,7 +106,10 @@ export function createTypographyLayout(editor: Editor) {
       },
     });
 
-    y += size + 30;
+    // Advance y by the actual height of the shape plus a proportional gap
+    // Very large fonts get a bigger gap so they don't overlap, smaller font sizes less gap
+    const gap = size > 40 ? 80 : size > 30 ? 40 : 25;
+    y += shapeHeight + gap;
   }
 
   // Position camera

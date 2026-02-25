@@ -458,32 +458,6 @@ export function createLandingLayout(editor: Editor) {
     },
   });
 
-  y += 50;
-
-  editor.createShape({
-    type: "hand-drawn-button",
-    x: LEFT_PAD,
-    y,
-    props: { w: 150, h: 36, label: "UI Components" },
-    meta: {
-      componentType: "button",
-      variationId: "footer-ui-components",
-      href: "/ui-components",
-    },
-  });
-
-  editor.createShape({
-    type: "hand-drawn-button",
-    x: LEFT_PAD + 170,
-    y,
-    props: { w: 140, h: 36, label: "Typography" },
-    meta: {
-      componentType: "button",
-      variationId: "footer-typography",
-      href: "/typography",
-    },
-  });
-
   const vb = editor.getViewportScreenBounds();
   editor.setCamera({ x: -(CANVAS_W / 2) + vb.width / 2, y: 0, z: 1 });
 }

@@ -56,6 +56,8 @@ function AnnotationComponent({ shape }: { shape: AnnotationShape }) {
   const aw = (seededRandom(`${id}-aw`) - 0.5) * 4;
   const ah = (seededRandom(`${id}-ah`) - 0.5) * 4;
 
+  const dynamicLineHeight = fontSize > 36 ? 1.6 : fontSize > 24 ? 1.4 : 1.2;
+
   // Estimate text width to position inline arrows after the text
   const charW = fontSize * 0.55;
   const firstLine = text.split("\n")[0];
@@ -131,7 +133,7 @@ function AnnotationComponent({ shape }: { shape: AnnotationShape }) {
             width: "100%",
             height: "100%",
             fontSize,
-            lineHeight: 1.3,
+            lineHeight: dynamicLineHeight,
             fontFamily: "'Loranthus', cursive",
             border: "none",
             outline: "1px dashed #999",
@@ -147,7 +149,7 @@ function AnnotationComponent({ shape }: { shape: AnnotationShape }) {
         <div
           style={{
             fontSize,
-            lineHeight: 1.3,
+            lineHeight: dynamicLineHeight,
             whiteSpace: "pre-wrap",
             ...(hasLink
               ? {
