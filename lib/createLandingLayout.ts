@@ -22,14 +22,6 @@ export function createLandingLayout(editor: Editor) {
     meta: { componentType: "annotation", variationId: "nav-brand" },
   });
 
-  editor.createShape({
-    type: "hand-drawn-button",
-    x: CANVAS_W - 80,
-    y: y + 2,
-    props: { w: 70, h: 28, label: "Login" },
-    meta: { componentType: "button", variationId: "nav-login" },
-  });
-
   y += 80;
 
   // --- HERO SECTION ---
@@ -65,7 +57,7 @@ export function createLandingLayout(editor: Editor) {
     meta: { componentType: "annotation", variationId: "hero-title" },
   });
 
-  y += 55;
+  y += 75;
 
   editor.createShape({
     type: "annotation",
@@ -82,7 +74,7 @@ export function createLandingLayout(editor: Editor) {
     meta: { componentType: "annotation", variationId: "hero-sub" },
   });
 
-  y += 68;
+  y += 85;
 
   editor.createShape({
     type: "hand-drawn-button",
@@ -101,7 +93,7 @@ export function createLandingLayout(editor: Editor) {
   // --- MY LATEST WORK ---
   editor.createShape({
     type: "annotation",
-    x: CANVAS_W / 2 - 120,
+    x: LEFT_PAD,
     y,
     props: {
       w: 300,
@@ -188,7 +180,7 @@ export function createLandingLayout(editor: Editor) {
   // --- DESIGN BRIEF INTERSTITIAL ---
   editor.createShape({
     type: "annotation",
-    x: CANVAS_W / 2 - 100,
+    x: LEFT_PAD,
     y,
     props: {
       w: 280,
@@ -308,7 +300,7 @@ export function createLandingLayout(editor: Editor) {
   // --- OUTSIDE WORK ---
   editor.createShape({
     type: "annotation",
-    x: CANVAS_W / 2 - 80,
+    x: LEFT_PAD,
     y,
     props: {
       w: 200,
@@ -325,7 +317,7 @@ export function createLandingLayout(editor: Editor) {
 
   editor.createShape({
     type: "annotation",
-    x: LEFT_PAD + 120,
+    x: LEFT_PAD,
     y,
     props: {
       w: 300,

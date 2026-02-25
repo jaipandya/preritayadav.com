@@ -95,9 +95,7 @@ export function BrowserChrome({ children }: { children: React.ReactNode }) {
             </div>
           </div>
 
-          <div style={{ marginLeft: "auto", fontSize: 13, opacity: 0.5 }}>
-            Login
-          </div>
+          <div style={{ marginLeft: "auto" }} />
         </div>
 
         {/* Canvas viewport */}
