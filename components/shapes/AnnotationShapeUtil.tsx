@@ -11,10 +11,120 @@ import {
   type RecordProps,
   type TLResizeInfo,
   resizeBox,
+  useIsEditing,
+  useEditor,
 } from "tldraw";
 import { seededRandom } from "@/lib/variationSeed";
+import { useCallback, useRef, useEffect } from "react";
 
 type AnnotationShape = TLShape<"annotation">;
+
+function AnnotationComponent({ shape }: { shape: AnnotationShape }) {
+  const { w, h, text, fontSize, showArrow, arrowDirection } = shape.props;
+  const id = shape.id;
+  const isEditing = useIsEditing(id);
+  const editor = useEditor();
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const aw = (seededRandom(`${id}-aw`) - 0.5) * 4;
+  const ah = (seededRandom(`${id}-ah`) - 0.5) * 4;
+
+  let arrowPath = "";
+  if (showArrow) {
+    switch (arrowDirection) {
+      case "right":
+        arrowPath = `M ${w * 0.7} ${h * 0.5 + ah} Q ${w * 0.85 + aw} ${h * 0.3 + ah} ${w} ${h * 0.5} M ${w - 8} ${h * 0.5 - 6} L ${w} ${h * 0.5} L ${w - 8} ${h * 0.5 + 6}`;
+        break;
+      case "left":
+        arrowPath = `M ${w * 0.3} ${h * 0.5 + ah} Q ${w * 0.15 + aw} ${h * 0.3 + ah} 0 ${h * 0.5} M 8 ${h * 0.5 - 6} L 0 ${h * 0.5} L 8 ${h * 0.5 + 6}`;
+        break;
+      case "down":
+        arrowPath = `M ${w * 0.5 + aw} ${h * 0.7} Q ${w * 0.5 + aw} ${h * 0.85} ${w * 0.5} ${h} M ${w * 0.5 - 6} ${h - 8} L ${w * 0.5} ${h} L ${w * 0.5 + 6} ${h - 8}`;
+        break;
+      case "up":
+        arrowPath = `M ${w * 0.5 + aw} ${h * 0.3} Q ${w * 0.5 + aw} ${h * 0.15} ${w * 0.5} 0 M ${w * 0.5 - 6} 8 L ${w * 0.5} 0 L ${w * 0.5 + 6} 8`;
+        break;
+    }
+  }
+
+  useEffect(() => {
+    if (isEditing && textareaRef.current) {
+      textareaRef.current.focus();
+      textareaRef.current.select();
+    }
+  }, [isEditing]);
+
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      editor.updateShape({
+        id,
+        type: "annotation",
+        props: { text: e.target.value },
+      });
+    },
+    [editor, id]
+  );
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === "Escape") {
+        editor.setEditingShape(null);
+      }
+      e.stopPropagation();
+    },
+    [editor]
+  );
+
+  return (
+    <HTMLContainer
+      style={{
+        width: w,
+        height: h,
+        position: "relative",
+        fontFamily: "'Loranthus', cursive",
+        pointerEvents: "all",
+      }}
+    >
+      {isEditing ? (
+        <textarea
+          ref={textareaRef}
+          value={text}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+          onPointerDown={(e) => e.stopPropagation()}
+          style={{
+            width: "100%",
+            height: "100%",
+            fontSize,
+            lineHeight: 1.3,
+            fontFamily: "'Loranthus', cursive",
+            border: "none",
+            outline: "1px dashed #999",
+            background: "rgba(255,255,200,0.15)",
+            resize: "none",
+            padding: 0,
+            margin: 0,
+            whiteSpace: "pre-wrap",
+            color: "#1a1a1a",
+          }}
+        />
+      ) : (
+        <div style={{ fontSize, lineHeight: 1.3, whiteSpace: "pre-wrap" }}>
+          {text}
+        </div>
+      )}
+      {showArrow && (
+        <svg
+          width={w}
+          height={h}
+          style={{ position: "absolute", top: 0, left: 0, pointerEvents: "none" }}
+        >
+          <path d={arrowPath} fill="none" stroke="#1a1a1a" strokeWidth={1.5} strokeLinecap="round" />
+        </svg>
+      )}
+    </HTMLContainer>
+  );
+}
 
 export class AnnotationShapeUtil extends ShapeUtil<AnnotationShape> {
   static override type = "annotation" as const;
@@ -51,59 +161,16 @@ export class AnnotationShapeUtil extends ShapeUtil<AnnotationShape> {
     return true;
   }
 
+  override canEdit() {
+    return true;
+  }
+
   override onResize(shape: AnnotationShape, info: TLResizeInfo<AnnotationShape>) {
     return resizeBox(shape, info);
   }
 
   component(shape: AnnotationShape) {
-    const { w, h, text, fontSize, showArrow, arrowDirection } = shape.props;
-    const id = shape.id;
-
-    const aw = (seededRandom(`${id}-aw`) - 0.5) * 4;
-    const ah = (seededRandom(`${id}-ah`) - 0.5) * 4;
-
-    let arrowPath = "";
-    if (showArrow) {
-      switch (arrowDirection) {
-        case "right":
-          arrowPath = `M ${w * 0.7} ${h * 0.5 + ah} Q ${w * 0.85 + aw} ${h * 0.3 + ah} ${w} ${h * 0.5} M ${w - 8} ${h * 0.5 - 6} L ${w} ${h * 0.5} L ${w - 8} ${h * 0.5 + 6}`;
-          break;
-        case "left":
-          arrowPath = `M ${w * 0.3} ${h * 0.5 + ah} Q ${w * 0.15 + aw} ${h * 0.3 + ah} 0 ${h * 0.5} M 8 ${h * 0.5 - 6} L 0 ${h * 0.5} L 8 ${h * 0.5 + 6}`;
-          break;
-        case "down":
-          arrowPath = `M ${w * 0.5 + aw} ${h * 0.7} Q ${w * 0.5 + aw} ${h * 0.85} ${w * 0.5} ${h} M ${w * 0.5 - 6} ${h - 8} L ${w * 0.5} ${h} L ${w * 0.5 + 6} ${h - 8}`;
-          break;
-        case "up":
-          arrowPath = `M ${w * 0.5 + aw} ${h * 0.3} Q ${w * 0.5 + aw} ${h * 0.15} ${w * 0.5} 0 M ${w * 0.5 - 6} 8 L ${w * 0.5} 0 L ${w * 0.5 + 6} 8`;
-          break;
-      }
-    }
-
-    return (
-      <HTMLContainer
-        style={{
-          width: w,
-          height: h,
-          position: "relative",
-          fontFamily: "'Loranthus', cursive",
-          pointerEvents: "all",
-        }}
-      >
-        <div style={{ fontSize, lineHeight: 1.3, whiteSpace: "pre-wrap" }}>
-          {text}
-        </div>
-        {showArrow && (
-          <svg
-            width={w}
-            height={h}
-            style={{ position: "absolute", top: 0, left: 0, pointerEvents: "none" }}
-          >
-            <path d={arrowPath} fill="none" stroke="#1a1a1a" strokeWidth={1.5} strokeLinecap="round" />
-          </svg>
-        )}
-      </HTMLContainer>
-    );
+    return <AnnotationComponent shape={shape} />;
   }
 
   indicator(shape: AnnotationShape) {
