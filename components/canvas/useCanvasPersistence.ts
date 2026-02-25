@@ -58,9 +58,17 @@ export function useCanvasPersistence(pageKey: string) {
   }, [persistenceKey]);
 
   const reset = useCallback(() => {
-    localStorage.removeItem(persistenceKey);
-    window.location.reload();
-  }, [persistenceKey]);
+    // Clear all prerita-wip-* keys, not just the current page
+    const keysToRemove: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith("prerita-wip-")) {
+        keysToRemove.push(key);
+      }
+    }
+    keysToRemove.forEach((key) => localStorage.removeItem(key));
+    window.location.href = "/";
+  }, []);
 
   return { store, loadingState, reset, needsInitialLayout };
 }

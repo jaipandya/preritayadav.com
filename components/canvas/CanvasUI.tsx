@@ -4,8 +4,11 @@ import { track, useEditor } from "tldraw";
 
 function BrowseIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#1a1a1a" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 2l0 10.5 3.5-3 2.5 4.5 2-1-2.5-4.5 4-0.5z" />
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#1a1a1a" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M5.5 9V4a1 1 0 0 1 2 0v5" />
+      <path d="M7.5 3.5a1 1 0 0 1 2 0V9" />
+      <path d="M9.5 4.5a1 1 0 0 1 2 0V9" />
+      <path d="M11.5 6a1 1 0 0 1 2 0v3.5a5 5 0 0 1-5 5h-.5a5 5 0 0 1-5-5V7a1 1 0 0 1 2 0v2" />
     </svg>
   );
 }

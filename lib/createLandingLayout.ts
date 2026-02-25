@@ -30,7 +30,7 @@ export function createLandingLayout(editor: Editor) {
     meta: { componentType: "button", variationId: "nav-login" },
   });
 
-  y += 60;
+  y += 80;
 
   // --- HERO SECTION ---
   editor.createShape({
@@ -96,7 +96,7 @@ export function createLandingLayout(editor: Editor) {
     },
   });
 
-  y += 70;
+  y += 100;
 
   // --- MY LATEST WORK ---
   editor.createShape({
@@ -114,7 +114,7 @@ export function createLandingLayout(editor: Editor) {
     meta: { componentType: "annotation", variationId: "latest-work-heading" },
   });
 
-  y += 60;
+  y += 80;
 
   // --- PROJECT CARDS ---
   const projects = [
@@ -182,7 +182,7 @@ export function createLandingLayout(editor: Editor) {
       },
     });
 
-    y += project.mediaType === "image" ? 280 : 200;
+    y += project.mediaType === "image" ? 300 : 220;
   }
 
   // --- DESIGN BRIEF INTERSTITIAL ---
@@ -201,7 +201,7 @@ export function createLandingLayout(editor: Editor) {
     meta: { componentType: "annotation", variationId: "design-brief" },
   });
 
-  y += 70;
+  y += 90;
 
   // --- TEAM / PEOPLE SECTION ---
   editor.createShape({
@@ -218,7 +218,7 @@ export function createLandingLayout(editor: Editor) {
     meta: { componentType: "team-avatars", variationId: "team-section" },
   });
 
-  y += 220;
+  y += 250;
 
   // --- SKILLS / SERVICES SECTION ---
   editor.createShape({
@@ -266,7 +266,7 @@ export function createLandingLayout(editor: Editor) {
     });
   });
 
-  y += 150;
+  y += 180;
 
   // --- TESTIMONIAL / FEATURED ---
   editor.createShape({
@@ -303,7 +303,7 @@ export function createLandingLayout(editor: Editor) {
     },
   });
 
-  y += 180;
+  y += 210;
 
   // --- OUTSIDE WORK ---
   editor.createShape({

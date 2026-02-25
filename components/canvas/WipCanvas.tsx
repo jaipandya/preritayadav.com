@@ -107,11 +107,9 @@ export function WipCanvas({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontFamily: "'Loranthus', cursive",
-            fontSize: 18,
           }}
         >
-          Loading...
+          <div className="canvas-spinner" />
         </div>
       </BrowserChrome>
     );
@@ -140,6 +138,7 @@ export function WipCanvas({
   return (
     <BrowserChrome>
       <div
+        className="canvas-fade-in"
         style={{ width: "100%", height: "100%", position: "relative" }}
         role="application"
         aria-label="Prerita Yadav's interactive portfolio canvas"
