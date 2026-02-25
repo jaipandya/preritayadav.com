@@ -14,7 +14,7 @@ import { BrowseTool } from "@/lib/BrowseTool";
 import { useCanvasPersistence } from "./useCanvasPersistence";
 import { CanvasUI } from "./CanvasUI";
 import { BrowserChrome } from "./BrowserChrome";
-import { getHref } from "@/lib/canvasMeta";
+import { getHref, isNavigable } from "@/lib/canvasMeta";
 
 const DRAG_THRESHOLD = 5;
 
@@ -64,6 +64,25 @@ export function WipCanvas({
 
       // Listen for pointer events to handle navigation in browse mode
       editor.on("event", (event) => {
+        // Update cursor when hovering over navigable shapes
+        if (event.type === "pointer" && event.name === "pointer_move") {
+          if (editor.getCurrentToolId() !== "browse") return;
+          const pagePoint = editor.screenToPage(event.point);
+          const shapesAtPoint = editor.getShapesAtPoint(pagePoint, {
+            hitInside: true,
+            margin: 0,
+          });
+          const overLink = shapesAtPoint.some((s) => isNavigable(s));
+          const container = document.querySelector(".tl-container") as HTMLElement | null;
+          if (container) {
+            if (overLink) {
+              container.style.setProperty("cursor", "pointer", "important");
+            } else {
+              container.style.removeProperty("cursor");
+            }
+          }
+        }
+
         if (event.type === "pointer" && event.name === "pointer_down") {
           pointerDownPos.current = { x: event.point.x, y: event.point.y };
         }

@@ -99,9 +99,9 @@ export function createLandingLayout(editor: Editor) {
       w: 300,
       h: 40,
       text: "My latest work",
-      fontSize: 18,
+      fontSize: 22,
       showArrow: true,
-      arrowDirection: "right",
+      arrowDirection: "down",
     },
     meta: { componentType: "annotation", variationId: "latest-work-heading" },
   });
@@ -177,23 +177,49 @@ export function createLandingLayout(editor: Editor) {
     y += project.mediaType === "image" ? 300 : 220;
   }
 
-  // --- DESIGN BRIEF INTERSTITIAL ---
+  // --- DESIGN PHILOSOPHY ---
   editor.createShape({
     type: "annotation",
     x: LEFT_PAD,
     y,
     props: {
-      w: 280,
+      w: 350,
       h: 50,
-      text: "Design brief",
+      text: "My design philosophy",
       fontSize: 20,
-      showArrow: true,
+      showArrow: false,
       arrowDirection: "right",
     },
-    meta: { componentType: "annotation", variationId: "design-brief" },
+    meta: { componentType: "annotation", variationId: "design-philosophy" },
   });
 
-  y += 90;
+  y += 50;
+
+  const philosophyLines = [
+    "User-first — every decision starts with empathy",
+    "Iterative — ship, learn, refine, repeat",
+    "Accessible — design that works for everyone",
+  ];
+
+  for (const line of philosophyLines) {
+    editor.createShape({
+      type: "annotation",
+      x: LEFT_PAD + 10,
+      y,
+      props: {
+        w: 400,
+        h: 24,
+        text: line,
+        fontSize: 13,
+        showArrow: false,
+        arrowDirection: "right",
+      },
+      meta: { componentType: "annotation", variationId: "design-philosophy-line" },
+    });
+    y += 28;
+  }
+
+  y += 30;
 
   // --- TEAM / PEOPLE SECTION ---
   editor.createShape({
@@ -221,7 +247,7 @@ export function createLandingLayout(editor: Editor) {
       w: 400,
       h: 30,
       text: "Crafted with purpose and care",
-      fontSize: 14,
+      fontSize: 16,
       showArrow: false,
       arrowDirection: "right",
     },
@@ -269,7 +295,7 @@ export function createLandingLayout(editor: Editor) {
       w: CANVAS_W - LEFT_PAD * 2,
       h: 30,
       text: "What people say about my work",
-      fontSize: 14,
+      fontSize: 16,
       showArrow: false,
       arrowDirection: "right",
     },
@@ -279,23 +305,24 @@ export function createLandingLayout(editor: Editor) {
   y += 40;
 
   editor.createShape({
-    type: "browser-frame",
-    x: LEFT_PAD,
+    type: "annotation",
+    x: LEFT_PAD + 10,
     y,
     props: {
-      w: CANVAS_W - LEFT_PAD * 2,
-      h: 160,
-      url: "testimonials.preritayadav.com",
-      contentType: "placeholder",
-      src: "",
+      w: CANVAS_W - LEFT_PAD * 2 - 20,
+      h: 100,
+      text: "\"Prerita has a rare ability to translate complex problems into elegant, intuitive designs. Her attention to detail and user empathy made our product a joy to use.\"\n— Arun Mehta, Product Lead at Thinktree",
+      fontSize: 14,
+      showArrow: false,
+      arrowDirection: "right",
     },
     meta: {
-      componentType: "browser-frame",
-      variationId: "testimonial-frame",
+      componentType: "annotation",
+      variationId: "testimonial-quote",
     },
   });
 
-  y += 210;
+  y += 150;
 
   // --- OUTSIDE WORK ---
   editor.createShape({
@@ -313,24 +340,61 @@ export function createLandingLayout(editor: Editor) {
     meta: { componentType: "annotation", variationId: "outside-work-title" },
   });
 
-  y += 40;
+  y += 50;
 
-  editor.createShape({
-    type: "annotation",
-    x: LEFT_PAD,
-    y,
-    props: {
-      w: 300,
-      h: 100,
-      text: "Painting & illustration\nOpen source contributions\nTravel photography\nCommunity workshops\nReading & writing",
-      fontSize: 14,
-      showArrow: false,
-      arrowDirection: "right",
-    },
-    meta: { componentType: "annotation", variationId: "outside-interests" },
+  const hobbies: Array<{
+    icon: "design" | "analytics" | "content" | "communication";
+    label: string;
+    description: string;
+  }> = [
+    { icon: "design", label: "Painting", description: "Watercolour & illustration" },
+    { icon: "analytics", label: "Photography", description: "Travel & street photography" },
+    { icon: "content", label: "Writing", description: "Essays & creative fiction" },
+    { icon: "communication", label: "Workshops", description: "Community design meetups" },
+  ];
+
+  hobbies.forEach((hobby, i) => {
+    const col = i % 2;
+    const row = Math.floor(i / 2);
+    const xPos = LEFT_PAD + col * 260;
+    const yPos = y + row * 130;
+
+    editor.createShape({
+      type: "skill-icon",
+      x: xPos,
+      y: yPos,
+      props: {
+        w: 60,
+        h: 70,
+        icon: hobby.icon,
+        label: hobby.label,
+      },
+      meta: {
+        componentType: "skill-icon",
+        variationId: `hobby-${hobby.label.toLowerCase()}`,
+      },
+    });
+
+    editor.createShape({
+      type: "annotation",
+      x: xPos + 70,
+      y: yPos + 20,
+      props: {
+        w: 170,
+        h: 40,
+        text: hobby.description,
+        fontSize: 13,
+        showArrow: false,
+        arrowDirection: "right",
+      },
+      meta: {
+        componentType: "annotation",
+        variationId: `hobby-desc-${hobby.label.toLowerCase()}`,
+      },
+    });
   });
 
-  y += 120;
+  y += 280;
 
   // --- FOOTER ---
   const footerIcons: Array<{
@@ -345,7 +409,7 @@ export function createLandingLayout(editor: Editor) {
   footerIcons.forEach((item, i) => {
     editor.createShape({
       type: "skill-icon",
-      x: CANVAS_W / 2 - 150 + i * 110,
+      x: LEFT_PAD + i * 110,
       y,
       props: {
         w: 80,
@@ -363,8 +427,25 @@ export function createLandingLayout(editor: Editor) {
   y += 110;
 
   editor.createShape({
+    type: "annotation",
+    x: LEFT_PAD,
+    y,
+    props: {
+      w: 300,
+      h: 24,
+      text: "Let's work together!",
+      fontSize: 14,
+      showArrow: false,
+      arrowDirection: "right",
+    },
+    meta: { componentType: "annotation", variationId: "footer-closing" },
+  });
+
+  y += 35;
+
+  editor.createShape({
     type: "hand-drawn-button",
-    x: CANVAS_W / 2 - 70,
+    x: LEFT_PAD,
     y,
     props: { w: 140, h: 36, label: "Contact me" },
     meta: {

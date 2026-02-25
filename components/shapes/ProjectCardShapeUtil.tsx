@@ -25,6 +25,7 @@ function ProjectCardComponent({ shape }: { shape: ProjectCardShape }) {
   const borderPath = wobblyRect(id, w, h, 2);
   const isEditing = useIsEditing(id);
   const editor = useEditor();
+  const hasLink = typeof (shape.meta as Record<string, unknown>)?.href === "string";
   const titleRef = useRef<HTMLInputElement>(null);
 
   const isVideo = mediaType === "video";
@@ -68,6 +69,7 @@ function ProjectCardComponent({ shape }: { shape: ProjectCardShape }) {
         position: "relative",
         fontFamily: "'Loranthus', cursive",
         pointerEvents: "all",
+        cursor: hasLink ? "pointer" : undefined,
       }}
     >
       <svg width={w} height={h} style={{ position: "absolute", top: 0, left: 0 }}>
