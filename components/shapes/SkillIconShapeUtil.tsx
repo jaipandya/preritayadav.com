@@ -119,6 +119,7 @@ export class SkillIconShapeUtil extends ShapeUtil<SkillIconShape> {
   component(shape: SkillIconShape) {
     const { w, h, icon, label } = shape.props;
     const iconSize = Math.min(w, h - 30);
+    const hasLink = typeof (shape.meta as Record<string, unknown>)?.href === "string";
 
     return (
       <HTMLContainer
@@ -131,6 +132,7 @@ export class SkillIconShapeUtil extends ShapeUtil<SkillIconShape> {
           flexDirection: "column",
           alignItems: "center",
           pointerEvents: "all",
+          cursor: hasLink ? "pointer" : undefined,
         }}
       >
         <svg width={iconSize} height={iconSize}>
