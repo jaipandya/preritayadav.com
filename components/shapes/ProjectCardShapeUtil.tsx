@@ -67,7 +67,7 @@ function ProjectCardComponent({ shape }: { shape: ProjectCardShape }) {
         width: w,
         height: h,
         position: "relative",
-        fontFamily: "'Loranthus', cursive",
+        fontFamily: "'Loranthus', sans-serif",
         pointerEvents: "all",
         cursor: hasLink ? "pointer" : undefined,
       }}
@@ -87,7 +87,7 @@ function ProjectCardComponent({ shape }: { shape: ProjectCardShape }) {
               onPointerDown={(e) => e.stopPropagation()}
               style={{
                 fontSize: 18,
-                fontFamily: "'Loranthus', cursive",
+                fontFamily: "'Loranthus', sans-serif",
                 border: "none",
                 outline: "1px dashed #999",
                 background: "rgba(255,255,200,0.15)",
@@ -108,7 +108,7 @@ function ProjectCardComponent({ shape }: { shape: ProjectCardShape }) {
             onPointerDown={(e) => e.stopPropagation()}
             style={{
               fontSize: 13,
-              fontFamily: "'Loranthus', cursive",
+              fontFamily: "'Loranthus', sans-serif",
               border: "none",
               outline: "1px dashed #999",
               background: "rgba(255,255,200,0.15)",

@@ -171,7 +171,7 @@ export function WipCanvas({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontFamily: "'Loranthus', cursive",
+            fontFamily: "'Loranthus', sans-serif",
             fontSize: 18,
           }}
         >

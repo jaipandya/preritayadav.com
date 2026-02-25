@@ -19,7 +19,7 @@ export default function ErrorPage({
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            fontFamily: "'Loranthus', cursive",
+            fontFamily: "'Loranthus', sans-serif",
             gap: 16,
           }}
         >
@@ -33,7 +33,7 @@ export default function ErrorPage({
               marginTop: 16,
               padding: "10px 28px",
               fontSize: 16,
-              fontFamily: "'Loranthus', cursive",
+              fontFamily: "'Loranthus', sans-serif",
               background: "none",
               border: "1.5px solid #1a1a1a",
               borderRadius: 6,

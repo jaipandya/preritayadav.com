@@ -66,7 +66,7 @@ export class BrowserFrameShapeUtil extends ShapeUtil<BrowserFrameShape> {
           width: w,
           height: h,
           position: "relative",
-          fontFamily: "'Loranthus', cursive",
+          fontFamily: "'Loranthus', sans-serif",
           pointerEvents: "all",
         }}
       >

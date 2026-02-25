@@ -14,7 +14,7 @@ export function Footer() {
   const linePath = wobblyLine("footer-hr", 4, 0, 520, 0, 1.5);
 
   const linkStyle: React.CSSProperties = {
-    fontFamily: "'Loranthus', cursive",
+    fontFamily: "'Loranthus', sans-serif",
     fontSize: 12,
     color: "#1a1a1a",
     textDecoration: "none",
@@ -51,7 +51,7 @@ export function Footer() {
       >
         <span
           style={{
-            fontFamily: "'Loranthus', cursive",
+            fontFamily: "'Loranthus', sans-serif",
             fontSize: 11,
             color: "#1a1a1a",
             opacity: 0.5,

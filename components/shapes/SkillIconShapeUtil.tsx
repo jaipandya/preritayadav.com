@@ -127,7 +127,7 @@ export class SkillIconShapeUtil extends ShapeUtil<SkillIconShape> {
           width: w,
           height: h,
           position: "relative",
-          fontFamily: "'Loranthus', cursive",
+          fontFamily: "'Loranthus', sans-serif",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",

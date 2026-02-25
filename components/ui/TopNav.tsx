@@ -42,7 +42,7 @@ export function TopNav() {
   }
 
   const linkStyle = (active: boolean): React.CSSProperties => ({
-    fontFamily: "'Loranthus', cursive",
+    fontFamily: "'Loranthus', sans-serif",
     fontSize: 13,
     color: "#1a1a1a",
     textDecoration: "none",
@@ -134,7 +134,7 @@ export function TopNav() {
                   style={{
                     display: "block",
                     padding: "6px 12px",
-                    fontFamily: "'Loranthus', cursive",
+                    fontFamily: "'Loranthus', sans-serif",
                     fontSize: 13,
                     color: "#1a1a1a",
                     textDecoration: "none",

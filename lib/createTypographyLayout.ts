@@ -108,7 +108,7 @@ export function createTypographyLayout(editor: Editor) {
 
     // Advance y by the actual height of the shape plus a proportional gap
     // Very large fonts get a bigger gap so they don't overlap, smaller font sizes less gap
-    const gap = size > 40 ? 80 : size > 30 ? 40 : 25;
+    const gap = size > 40 ? 90 : size > 30 ? 40 : 25;
     y += shapeHeight + gap;
   }
 

@@ -81,7 +81,7 @@ export const CanvasUI = track(function CanvasUI({
         borderRadius: 12,
         background: "rgba(255,255,255,0.95)",
         border: "1.5px solid #1a1a1a",
-        fontFamily: "'Loranthus', cursive",
+        fontFamily: "'Loranthus', sans-serif",
         boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
       }}
       onPointerDown={(e) => e.stopPropagation()}
@@ -102,7 +102,7 @@ export const CanvasUI = track(function CanvasUI({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontFamily: "'Loranthus', cursive",
+            fontFamily: "'Loranthus', sans-serif",
           }}
         >
           {tool.icon}
@@ -173,7 +173,7 @@ export const CanvasUI = track(function CanvasUI({
           background: "transparent",
           cursor: "pointer",
           fontSize: 13,
-          fontFamily: "'Loranthus', cursive",
+          fontFamily: "'Loranthus', sans-serif",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",

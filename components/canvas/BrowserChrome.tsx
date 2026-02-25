@@ -57,7 +57,7 @@ export function BrowserChrome({ children }: { children: React.ReactNode }) {
             gap: 8,
             pointerEvents: "auto",
             flexShrink: 0,
-            fontFamily: "'Loranthus', cursive",
+            fontFamily: "'Loranthus', sans-serif",
           }}
         >
           <svg width={52} height={chromeH} style={{ flexShrink: 0 }}>

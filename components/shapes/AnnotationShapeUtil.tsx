@@ -118,7 +118,7 @@ function AnnotationComponent({ shape }: { shape: AnnotationShape }) {
         width: w,
         height: h,
         position: "relative",
-        fontFamily: "'Loranthus', cursive",
+        fontFamily: "'Loranthus', sans-serif",
         pointerEvents: "all",
       }}
     >
@@ -134,7 +134,7 @@ function AnnotationComponent({ shape }: { shape: AnnotationShape }) {
             height: "100%",
             fontSize,
             lineHeight: dynamicLineHeight,
-            fontFamily: "'Loranthus', cursive",
+            fontFamily: "'Loranthus', sans-serif",
             border: "none",
             outline: "1px dashed #999",
             background: "rgba(255,255,200,0.15)",

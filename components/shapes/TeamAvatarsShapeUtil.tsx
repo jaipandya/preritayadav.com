@@ -94,7 +94,7 @@ export class TeamAvatarsShapeUtil extends ShapeUtil<TeamAvatarsShape> {
           width: w,
           height: h,
           position: "relative",
-          fontFamily: "'Loranthus', cursive",
+          fontFamily: "'Loranthus', sans-serif",
           pointerEvents: "all",
         }}
       >
