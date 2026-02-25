@@ -25,6 +25,7 @@ export const CanvasUI = track(function CanvasUI({
         left: "50%",
         transform: "translateX(-50%)",
         zIndex: 1000,
+        pointerEvents: "all",
         display: "flex",
         gap: 4,
         padding: "6px 10px",

@@ -1,7 +1,5 @@
 "use client";
 
-import { wobblyRect, wobblyCircle } from "@/lib/variationSeed";
-
 export function BrowserChrome({ children }: { children: React.ReactNode }) {
   const chromeH = 44;
   const dotR = 5;
@@ -33,14 +31,12 @@ export function BrowserChrome({ children }: { children: React.ReactNode }) {
           fontFamily: "'Loranthus', cursive",
         }}
       >
-        {/* Window dots */}
         <svg width={52} height={chromeH} style={{ flexShrink: 0 }}>
           <circle cx={12} cy={chromeH / 2} r={dotR} fill="none" stroke="#1a1a1a" strokeWidth={1.2} />
           <circle cx={26} cy={chromeH / 2} r={dotR} fill="none" stroke="#1a1a1a" strokeWidth={1.2} />
           <circle cx={40} cy={chromeH / 2} r={dotR} fill="none" stroke="#1a1a1a" strokeWidth={1.2} />
         </svg>
 
-        {/* URL bar */}
         <div
           style={{
             flex: 1,
@@ -57,16 +53,7 @@ export function BrowserChrome({ children }: { children: React.ReactNode }) {
             viewBox="0 0 420 26"
             style={{ position: "absolute", top: 0, left: 0 }}
           >
-            <rect
-              x={1}
-              y={1}
-              width={418}
-              height={24}
-              rx={4}
-              fill="none"
-              stroke="#1a1a1a"
-              strokeWidth={1}
-            />
+            <rect x={1} y={1} width={418} height={24} rx={4} fill="none" stroke="#1a1a1a" strokeWidth={1} />
           </svg>
           <div
             style={{
@@ -86,10 +73,12 @@ export function BrowserChrome({ children }: { children: React.ReactNode }) {
         </div>
       </div>
 
-      {/* Canvas viewport */}
-      <div style={{ flex: 1, position: "relative" }}>{children}</div>
+      {/* Canvas viewport - pass-through pointer events */}
+      <div style={{ flex: 1, position: "relative", pointerEvents: "auto" }}>
+        {children}
+      </div>
 
-      {/* Left + Right + Bottom border lines */}
+      {/* Border frame lines - decorative only */}
       <div
         style={{
           position: "fixed",
@@ -98,6 +87,8 @@ export function BrowserChrome({ children }: { children: React.ReactNode }) {
           bottom: 0,
           width: 1.5,
           background: "#1a1a1a",
+          pointerEvents: "none",
+          zIndex: 502,
         }}
       />
       <div
@@ -108,6 +99,8 @@ export function BrowserChrome({ children }: { children: React.ReactNode }) {
           bottom: 0,
           width: 1.5,
           background: "#1a1a1a",
+          pointerEvents: "none",
+          zIndex: 502,
         }}
       />
       <div
@@ -118,9 +111,10 @@ export function BrowserChrome({ children }: { children: React.ReactNode }) {
           right: 0,
           height: 1.5,
           background: "#1a1a1a",
+          pointerEvents: "none",
+          zIndex: 502,
         }}
       />
-      {/* Top border */}
       <div
         style={{
           position: "fixed",
@@ -129,7 +123,8 @@ export function BrowserChrome({ children }: { children: React.ReactNode }) {
           right: 0,
           height: 1.5,
           background: "#1a1a1a",
-          zIndex: 502,
+          zIndex: 503,
+          pointerEvents: "none",
         }}
       />
     </div>

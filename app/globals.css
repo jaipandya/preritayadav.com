@@ -31,7 +31,23 @@ body {
   font-family: "Loranthus", cursive !important;
 }
 
-/* Hide tldraw's default watermark */
-.tlui-watermark_SEE-LICENSE {
+/* Clean white canvas background */
+.tl-background {
+  background-color: #ffffff !important;
+}
+
+/* Hide tldraw's menu button (bottom-left N icon) */
+.tlui-menu-zone,
+.tlui-menu-zone__controls {
   display: none !important;
+}
+
+/* Hide tldraw debug panel */
+.tlui-debug-panel {
+  display: none !important;
+}
+
+/* Ensure shapes render crisply */
+.tl-shape {
+  will-change: transform;
 }
