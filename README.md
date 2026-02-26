@@ -81,6 +81,12 @@ All custom shapes live in `components/shapes/` and are registered in `lib/shapes
 | `ImagePlaceholderShapeUtil.tsx` | Placeholder image frame |
 | `BrowserFrameShapeUtil.tsx` | Mini browser-window frame as a canvas shape |
 
+Shared behaviour across shapes is centralised in `lib/useShapeInteraction.ts`:
+- **`useShapeHover(editor, shapeId, enabled?)`** — tracks hover/press state via tldraw's event system, active only in browse mode so shapes don't react when drawing tools are selected.
+- **`useFocusOnEdit(isEditing, ref)`** — auto-focuses and selects an input/textarea when editing begins.
+
+Link detection uses `isNavigable(shape)` from `lib/canvasMeta.ts` everywhere (rather than inline `meta.href` checks).
+
 **To add a new shape:**
 1. Create `components/shapes/MyShapeUtil.tsx` — copy an existing simple shape as a starting point
 2. Register it in the `customShapeUtils` array in `lib/shapes.ts`
@@ -95,6 +101,7 @@ Each page's initial content is defined in a `lib/create*Layout.ts` file. These r
 
 ```
 lib/
+  layoutHelpers.ts             ← Shared constants (CANVAS_W, LEFT_PAD) and helpers (centerCamera, createBackButton)
   createLandingLayout.ts       ← Home page
   createContactLayout.ts       ← Contact page
   createBlogLayout.ts          ← Blog post pages
@@ -103,6 +110,8 @@ lib/
   createTypographyLayout.ts    ← Meta: typography
   createUiComponentsLayout.ts  ← Meta: UI components
 ```
+
+`lib/layoutHelpers.ts` exports the shared canvas width, padding, camera centering, and a `createBackButton` helper used by all layouts that include a "← Back home" button.
 
 **To change what appears on a page**, edit the relevant `create*Layout.ts` file. Shape coordinates are in tldraw's canvas space (origin top-left, x increases right, y increases down).
 
@@ -122,7 +131,7 @@ The toolbar exposes a curated subset of tldraw's built-in tools: `select`, `draw
 
 Custom SVG cursors are defined in `app/globals.css`. They use the `data-state` attribute that tldraw sets on `.tl-container` to know which tool is active (e.g. `data-state="eraser.idle"`).
 
-**Important:** The cursor must be set with `!important` directly on `.tl-container`, not via tldraw's `--tl-cursor` CSS variable. This is because tldraw's `cursor: var(--tl-cursor)` rule is on the inner `.tl-canvas` child element, not the container. Setting it on the container + `* { cursor: inherit !important }` on children ensures the cursor is locked across all child elements.
+**Important:** The cursor must be set with `!important` directly on `.tl-container`, not via tldraw's `--tl-cursor` CSS variable. This is because tldraw's `cursor: var(--tl-cursor)` rule is on the inner `.tl-canvas` child element, not the container. The inherit rule is scoped to `.tl-canvas` and `.tl-canvas *` (not all descendants of `.tl-container`) so that the toolbar buttons in `.tl-canvas__in-front` retain their own `cursor: pointer`.
 
 | Tool | Cursor |
 |---|---|
