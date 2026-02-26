@@ -76,25 +76,19 @@ export function BrowserChrome({ children }: { children: React.ReactNode }) {
               height: 26,
               position: "relative",
               marginLeft: 12,
+              border: "1px solid #1a1a1a",
+              borderRadius: 4,
+              boxSizing: "border-box",
             }}
           >
-            <svg
-              width="100%"
-              height={26}
-              preserveAspectRatio="none"
-              viewBox="0 0 360 26"
-              style={{ position: "absolute", top: 0, left: 0 }}
-            >
-              <rect x={1} y={1} width={358} height={24} rx={4} fill="none" stroke="#1a1a1a" strokeWidth={1} />
-            </svg>
             <div
               style={{
-                position: "relative",
-                zIndex: 1,
+                height: "100%",
+                display: "flex",
+                alignItems: "center",
                 fontSize: 13,
-                padding: "4px 10px",
+                padding: "0 10px",
                 opacity: 0.6,
-                textAlign: "center",
                 overflow: "hidden",
                 whiteSpace: "nowrap",
                 textOverflow: "ellipsis",
