@@ -31,11 +31,14 @@ function AnnotationComponent({ shape }: { shape: AnnotationShape }) {
   const hasLink = isNavigable(shape);
   const [hovered, setHovered] = useState(false);
 
-  // Track hover via tldraw's event system for linked annotations
   useEffect(() => {
     if (!hasLink) return;
     const handleEvent = (event: TLEventInfo) => {
       if (event.type !== "pointer") return;
+      if (editor.getCurrentToolId() !== "browse") {
+        setHovered(false);
+        return;
+      }
       if (event.name === "pointer_move") {
         const pagePoint = editor.screenToPage(event.point);
         const shapesAtPoint = editor.getShapesAtPoint(pagePoint, {

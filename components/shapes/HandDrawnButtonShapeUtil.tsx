@@ -36,10 +36,15 @@ function ButtonComponent({ shape }: { shape: HandDrawnButtonShape }) {
     }
   }, [isEditing]);
 
-  // Track hover & pressed via tldraw's event system
   useEffect(() => {
     const handleEvent = (event: TLEventInfo) => {
       if (event.type !== "pointer") return;
+      const tool = editor.getCurrentToolId();
+      if (tool !== "browse") {
+        setHovered(false);
+        setPressed(false);
+        return;
+      }
 
       if (event.name === "pointer_move") {
         const pagePoint = editor.screenToPage(event.point);
