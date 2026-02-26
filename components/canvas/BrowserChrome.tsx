@@ -59,8 +59,8 @@ export function BrowserChrome({ children }: { children: React.ReactNode }) {
             fontFamily: "'Loranthus', sans-serif",
           }}
         >
-          {/* Left: traffic lights — flex:1 so they mirror the right spacer */}
-          <div style={{ flex: 1, display: "flex", alignItems: "center" }}>
+          {/* Left: traffic lights */}
+          <div style={{ display: "flex", alignItems: "center", flexShrink: 0 }}>
             <svg width={52} height={chromeH}>
               <circle cx={12} cy={chromeH / 2} r={dotR} fill="none" stroke="#1a1a1a" strokeWidth={1.2} />
               <circle cx={26} cy={chromeH / 2} r={dotR} fill="none" stroke="#1a1a1a" strokeWidth={1.2} />
@@ -68,15 +68,14 @@ export function BrowserChrome({ children }: { children: React.ReactNode }) {
             </svg>
           </div>
 
-          {/* Center: address bar */}
+          {/* Address bar — fills remaining space up to the right edge */}
           <div
             style={{
-              width: "50%",
-              maxWidth: 360,
+              flex: 1,
               minWidth: 0,
               height: 26,
               position: "relative",
-              flexShrink: 1,
+              marginLeft: 12,
             }}
           >
             <svg
@@ -96,14 +95,16 @@ export function BrowserChrome({ children }: { children: React.ReactNode }) {
                 padding: "4px 10px",
                 opacity: 0.6,
                 textAlign: "center",
+                overflow: "hidden",
+                whiteSpace: "nowrap",
+                textOverflow: "ellipsis",
               }}
             >
               {displayUrl}
             </div>
           </div>
 
-          {/* Right: spacer — flex:1 mirrors the left to keep address bar centered */}
-          <div style={{ flex: 1 }} />
+
         </div>
 
         {/* Top navigation */}
