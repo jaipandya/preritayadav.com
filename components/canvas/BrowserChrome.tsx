@@ -36,7 +36,7 @@ export function BrowserChrome({ children }: { children: React.ReactNode }) {
         style={{
           width: "100%",
           maxWidth: BROWSER_MAX_WIDTH,
-          height: `calc(100vh - ${MARGIN_Y * 2}px)`,
+          height: `calc(100dvh - ${MARGIN_Y * 2}px)`,
           display: "flex",
           flexDirection: "column",
           border: "1.5px solid #1a1a1a",

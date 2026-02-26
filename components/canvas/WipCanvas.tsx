@@ -68,6 +68,18 @@ export function WipCanvas({
       // Set browse as the default tool
       editor.setCurrentTool("browse");
 
+      // On mobile, zoom out so the canvas content fits better on the small screen
+      const isMobile = window.innerWidth < 768;
+      if (isMobile) {
+        const vb = editor.getViewportScreenBounds();
+        const z = 0.5;
+        editor.setCamera({
+          x: vb.width / 2 - (CANVAS_W / 2) * z,
+          y: 0,
+          z,
+        });
+      }
+
       // Cmd+0 / Ctrl+0 to reset zoom
       const handleKeyDown = (e: KeyboardEvent) => {
         if ((e.metaKey || e.ctrlKey) && e.key === "0") {
