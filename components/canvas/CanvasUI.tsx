@@ -133,7 +133,7 @@ export const CanvasUI = track(function CanvasUI({
           justifyContent: "center",
         }}
       >
-        ↩
+        <span style={{ display: "inline-block", transform: "scaleY(-1)" }}>↩</span>
       </button>
       <button
         title="Redo"
@@ -151,7 +151,7 @@ export const CanvasUI = track(function CanvasUI({
           justifyContent: "center",
         }}
       >
-        ↪
+        <span style={{ display: "inline-block", transform: "scaleY(-1)" }}>↪</span>
       </button>
 
       <div
