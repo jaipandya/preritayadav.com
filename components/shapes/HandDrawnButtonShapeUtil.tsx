@@ -10,13 +10,13 @@ import {
   type TLShape,
   type RecordProps,
   type TLResizeInfo,
-  type TLEventInfo,
   resizeBox,
   useIsEditing,
   useEditor,
 } from "tldraw";
 import { wobblyRect } from "@/lib/variationSeed";
-import { useCallback, useRef, useEffect, useState } from "react";
+import { useCallback, useRef } from "react";
+import { useShapeHover, useFocusOnEdit } from "@/lib/useShapeInteraction";
 
 type HandDrawnButtonShape = TLShape<"hand-drawn-button">;
 
@@ -26,60 +26,9 @@ function ButtonComponent({ shape }: { shape: HandDrawnButtonShape }) {
   const isEditing = useIsEditing(shape.id);
   const editor = useEditor();
   const inputRef = useRef<HTMLInputElement>(null);
-  const [hovered, setHovered] = useState(false);
-  const [pressed, setPressed] = useState(false);
+  const { hovered, pressed } = useShapeHover(editor, shape.id);
 
-  useEffect(() => {
-    if (isEditing && inputRef.current) {
-      inputRef.current.focus();
-      inputRef.current.select();
-    }
-  }, [isEditing]);
-
-  useEffect(() => {
-    const handleEvent = (event: TLEventInfo) => {
-      if (event.type !== "pointer") return;
-      const tool = editor.getCurrentToolId();
-      if (tool !== "browse") {
-        setHovered(false);
-        setPressed(false);
-        return;
-      }
-
-      if (event.name === "pointer_move") {
-        const pagePoint = editor.screenToPage(event.point);
-        const shapesAtPoint = editor.getShapesAtPoint(pagePoint, {
-          hitInside: true,
-          margin: 0,
-        });
-        const isOver = shapesAtPoint.some((s) => s.id === shape.id);
-        setHovered(isOver);
-        if (!isOver) setPressed(false);
-      }
-
-      if (event.name === "pointer_down") {
-        const pagePoint = editor.screenToPage(event.point);
-        const shapesAtPoint = editor.getShapesAtPoint(pagePoint, {
-          hitInside: true,
-          margin: 0,
-        });
-        if (shapesAtPoint.some((s) => s.id === shape.id)) {
-          setPressed(true);
-        }
-      }
-
-      if (event.name === "pointer_up") {
-        setPressed(false);
-      }
-    };
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    editor.on("event", handleEvent as any);
-    return () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      editor.off("event", handleEvent as any);
-    };
-  }, [editor, shape.id]);
+  useFocusOnEdit(isEditing, inputRef);
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {

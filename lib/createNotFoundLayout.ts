@@ -1,7 +1,5 @@
 import type { Editor } from "tldraw";
-
-const CANVAS_W = 560;
-const LEFT_PAD = 20;
+import { CANVAS_W, LEFT_PAD, centerCamera } from "./layoutHelpers";
 
 export function createNotFoundLayout(editor: Editor) {
   let y = 80;
@@ -69,6 +67,5 @@ export function createNotFoundLayout(editor: Editor) {
     },
   });
 
-  const vb = editor.getViewportScreenBounds();
-  editor.setCamera({ x: -(CANVAS_W / 2) + vb.width / 2, y: 0, z: 1 });
+  centerCamera(editor);
 }

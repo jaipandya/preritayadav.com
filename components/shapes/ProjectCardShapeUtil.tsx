@@ -15,7 +15,9 @@ import {
   useEditor,
 } from "tldraw";
 import { wobblyRect, wobblyLine } from "@/lib/variationSeed";
-import { useCallback, useRef, useEffect } from "react";
+import { useCallback, useRef } from "react";
+import { isNavigable } from "@/lib/canvasMeta";
+import { useFocusOnEdit } from "@/lib/useShapeInteraction";
 
 type ProjectCardShape = TLShape<"project-card">;
 
@@ -25,19 +27,14 @@ function ProjectCardComponent({ shape }: { shape: ProjectCardShape }) {
   const borderPath = wobblyRect(id, w, h, 2);
   const isEditing = useIsEditing(id);
   const editor = useEditor();
-  const hasLink = typeof (shape.meta as Record<string, unknown>)?.href === "string";
+  const hasLink = isNavigable(shape);
   const titleRef = useRef<HTMLInputElement>(null);
 
   const isVideo = mediaType === "video";
   const mediaW = isVideo ? 80 : w - 40;
   const mediaH = isVideo ? 80 : h * 0.5;
 
-  useEffect(() => {
-    if (isEditing && titleRef.current) {
-      titleRef.current.focus();
-      titleRef.current.select();
-    }
-  }, [isEditing]);
+  useFocusOnEdit(isEditing, titleRef);
 
   const handleTitleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {

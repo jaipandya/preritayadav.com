@@ -1,23 +1,10 @@
 import type { Editor } from "tldraw";
-
-const CANVAS_W = 560;
-const LEFT_PAD = 20;
+import { CANVAS_W, LEFT_PAD, centerCamera, createBackButton } from "./layoutHelpers";
 
 export function createContactLayout(editor: Editor) {
   let y = 40;
 
-  // Back button
-  editor.createShape({
-    type: "hand-drawn-button",
-    x: LEFT_PAD,
-    y,
-    props: { w: 120, h: 32, label: "← Back home" },
-    meta: {
-      componentType: "button",
-      variationId: "contact-back",
-      href: "/",
-    },
-  });
+  createBackButton(editor, LEFT_PAD, y, "contact-back");
 
   y += 70;
 
@@ -148,6 +135,5 @@ export function createContactLayout(editor: Editor) {
     },
   });
 
-  const vb = editor.getViewportScreenBounds();
-  editor.setCamera({ x: -(CANVAS_W / 2) + vb.width / 2, y: 0, z: 1 });
+  centerCamera(editor);
 }

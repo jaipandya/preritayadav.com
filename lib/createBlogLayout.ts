@@ -1,7 +1,5 @@
 import type { Editor } from "tldraw";
-
-const CANVAS_W = 560;
-const LEFT_PAD = 20;
+import { CANVAS_W, LEFT_PAD, centerCamera, createBackButton } from "./layoutHelpers";
 
 interface BlogData {
   title: string;
@@ -50,34 +48,13 @@ export function createBlogLayout(editor: Editor, slug: string) {
       meta: { componentType: "annotation", variationId: "blog-not-found" },
     });
 
-    editor.createShape({
-      type: "hand-drawn-button",
-      x: LEFT_PAD,
-      y: 100,
-      props: { w: 140, h: 36, label: "← Back home" },
-      meta: {
-        componentType: "button",
-        variationId: "blog-back-404",
-        href: "/",
-      },
-    });
+    createBackButton(editor, LEFT_PAD, 100, "blog-back-404", { w: 140, h: 36 });
     return;
   }
 
   let y = 40;
 
-  // Back button
-  editor.createShape({
-    type: "hand-drawn-button",
-    x: LEFT_PAD,
-    y,
-    props: { w: 120, h: 32, label: "← Back home" },
-    meta: {
-      componentType: "button",
-      variationId: `blog-${slug}-back`,
-      href: "/",
-    },
-  });
+  createBackButton(editor, LEFT_PAD, y, `blog-${slug}-back`);
 
   y += 60;
 
@@ -160,6 +137,5 @@ export function createBlogLayout(editor: Editor, slug: string) {
     },
   });
 
-  const vb = editor.getViewportScreenBounds();
-  editor.setCamera({ x: -(CANVAS_W / 2) + vb.width / 2, y: 0, z: 1 });
+  centerCamera(editor);
 }

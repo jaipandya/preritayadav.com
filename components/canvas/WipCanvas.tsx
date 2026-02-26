@@ -16,9 +16,9 @@ import { useCanvasPersistence } from "./useCanvasPersistence";
 import { CanvasUI } from "./CanvasUI";
 import { BrowserChrome } from "./BrowserChrome";
 import { getHref, isNavigable } from "@/lib/canvasMeta";
+import { CANVAS_W } from "@/lib/layoutHelpers";
 
 const DRAG_THRESHOLD = 5;
-const CANVAS_W = 560;
 
 const uiOverrides: TLUiOverrides = {
   tools(_editor, tools) {

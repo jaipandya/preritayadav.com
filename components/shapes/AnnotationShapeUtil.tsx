@@ -15,9 +15,9 @@ import {
   useEditor,
 } from "tldraw";
 import { seededRandom } from "@/lib/variationSeed";
-import { useCallback, useRef, useEffect, useState } from "react";
-import type { TLEventInfo } from "tldraw";
+import { useCallback, useRef } from "react";
 import { isNavigable } from "@/lib/canvasMeta";
+import { useShapeHover, useFocusOnEdit } from "@/lib/useShapeInteraction";
 
 type AnnotationShape = TLShape<"annotation">;
 
@@ -29,32 +29,7 @@ function AnnotationComponent({ shape }: { shape: AnnotationShape }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const hasLink = isNavigable(shape);
-  const [hovered, setHovered] = useState(false);
-
-  useEffect(() => {
-    if (!hasLink) return;
-    const handleEvent = (event: TLEventInfo) => {
-      if (event.type !== "pointer") return;
-      if (editor.getCurrentToolId() !== "browse") {
-        setHovered(false);
-        return;
-      }
-      if (event.name === "pointer_move") {
-        const pagePoint = editor.screenToPage(event.point);
-        const shapesAtPoint = editor.getShapesAtPoint(pagePoint, {
-          hitInside: true,
-          margin: 0,
-        });
-        setHovered(shapesAtPoint.some((s) => s.id === shape.id));
-      }
-    };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    editor.on("event", handleEvent as any);
-    return () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      editor.off("event", handleEvent as any);
-    };
-  }, [editor, shape.id, hasLink]);
+  const { hovered } = useShapeHover(editor, id, hasLink);
 
   const aw = (seededRandom(`${id}-aw`) - 0.5) * 4;
   const ah = (seededRandom(`${id}-ah`) - 0.5) * 4;
@@ -87,12 +62,7 @@ function AnnotationComponent({ shape }: { shape: AnnotationShape }) {
     }
   }
 
-  useEffect(() => {
-    if (isEditing && textareaRef.current) {
-      textareaRef.current.focus();
-      textareaRef.current.select();
-    }
-  }, [isEditing]);
+  useFocusOnEdit(isEditing, textareaRef);
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {

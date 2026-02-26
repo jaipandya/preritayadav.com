@@ -13,6 +13,7 @@ import {
   resizeBox,
 } from "tldraw";
 import { wobblyRect, seededRandom } from "@/lib/variationSeed";
+import { isNavigable } from "@/lib/canvasMeta";
 
 type SkillIconShape = TLShape<"skill-icon">;
 
@@ -119,7 +120,7 @@ export class SkillIconShapeUtil extends ShapeUtil<SkillIconShape> {
   component(shape: SkillIconShape) {
     const { w, h, icon, label } = shape.props;
     const iconSize = Math.min(w, h - 30);
-    const hasLink = typeof (shape.meta as Record<string, unknown>)?.href === "string";
+    const hasLink = isNavigable(shape);
 
     return (
       <HTMLContainer
