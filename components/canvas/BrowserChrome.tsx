@@ -71,10 +71,12 @@ export function BrowserChrome({ children }: { children: React.ReactNode }) {
           {/* Center: address bar */}
           <div
             style={{
-              width: 360,
+              width: "50%",
+              maxWidth: 360,
+              minWidth: 0,
               height: 26,
               position: "relative",
-              flexShrink: 0,
+              flexShrink: 1,
             }}
           >
             <svg
