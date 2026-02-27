@@ -7,6 +7,8 @@ import { wobblyRect } from "@/lib/variationSeed";
 
 const NAV_LINKS = [
   { href: "/", label: "Home" },
+  { href: "/work", label: "Work" },
+  { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ];
 

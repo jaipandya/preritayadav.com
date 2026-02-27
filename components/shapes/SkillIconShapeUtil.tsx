@@ -131,7 +131,7 @@ export class SkillIconShapeUtil extends ShapeUtil<SkillIconShape> {
           fontFamily: "'Loranthus', sans-serif",
           display: "flex",
           flexDirection: "column",
-          alignItems: "center",
+          alignItems: "flex-start",
           pointerEvents: "all",
           cursor: hasLink ? "pointer" : undefined,
         }}
@@ -139,7 +139,7 @@ export class SkillIconShapeUtil extends ShapeUtil<SkillIconShape> {
         <svg width={iconSize} height={iconSize}>
           {this.renderIcon(icon, shape.id, iconSize)}
         </svg>
-        <div style={{ fontSize: 13, marginTop: 4, textAlign: "center" }}>
+        <div style={{ fontSize: 13, marginTop: 4, width: iconSize, textAlign: "center" }}>
           {label}
         </div>
       </HTMLContainer>

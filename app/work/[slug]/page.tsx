@@ -4,9 +4,9 @@ import { use, useCallback } from "react";
 import type { Editor } from "tldraw";
 import { WipCanvas } from "@/components/canvas/WipCanvas";
 import { AccessibleNav } from "@/components/ui/AccessibleNav";
-import { createProjectLayout } from "@/lib/createProjectLayout";
+import { createWorkDetailLayout } from "@/lib/createWorkDetailLayout";
 
-export default function ProjectPage({
+export default function WorkDetailPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
@@ -15,7 +15,7 @@ export default function ProjectPage({
 
   const handleCreateLayout = useCallback(
     (editor: Editor) => {
-      createProjectLayout(editor, slug);
+      createWorkDetailLayout(editor, slug);
     },
     [slug]
   );
@@ -24,12 +24,14 @@ export default function ProjectPage({
     <div id="main-content" style={{ width: "100vw", height: "100vh" }}>
       <AccessibleNav
         links={[
-          { href: "/", label: "Back to Home" },
+          { href: "/work", label: "Back to Work" },
+          { href: "/", label: "Home" },
+          { href: "/about", label: "About" },
           { href: "/contact", label: "Contact" },
         ]}
       />
       <WipCanvas
-        pageKey={`project-${slug}`}
+        pageKey={`work-${slug}`}
         onCreateLayout={handleCreateLayout}
       />
     </div>

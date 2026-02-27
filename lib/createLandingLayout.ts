@@ -1,5 +1,6 @@
 import type { Editor } from "tldraw";
 import { CANVAS_W, LEFT_PAD, centerCamera } from "./layoutHelpers";
+import { getFeaturedWork } from "./workData";
 
 export function createLandingLayout(editor: Editor) {
   let y = 30;
@@ -29,7 +30,7 @@ export function createLandingLayout(editor: Editor) {
     props: {
       w: 500,
       h: 50,
-      text: "I am Prerita",
+      text: "I'm Prerita.",
       fontSize: 38,
       showArrow: false,
       arrowDirection: "right",
@@ -46,7 +47,7 @@ export function createLandingLayout(editor: Editor) {
     props: {
       w: 350,
       h: 60,
-      text: "UX Designer & Creative Thinker\nBuilding experiences that matter\nCurrently open to new opportunities",
+      text: "Product Designer & Creative Thinker\nCrafting intuitive, human-centered experiences",
       fontSize: 14,
       showArrow: false,
       arrowDirection: "right",
@@ -60,7 +61,7 @@ export function createLandingLayout(editor: Editor) {
     type: "hand-drawn-button",
     x: LEFT_PAD,
     y,
-    props: { w: 120, h: 34, label: "Contact me" },
+    props: { w: 120, h: 34, label: "Let's talk" },
     meta: {
       componentType: "button",
       variationId: "hero-cta",
@@ -70,7 +71,7 @@ export function createLandingLayout(editor: Editor) {
 
   y += 100;
 
-  // --- MY LATEST WORK ---
+  // --- SELECTED WORK ---
   editor.createShape({
     type: "annotation",
     x: LEFT_PAD,
@@ -78,84 +79,54 @@ export function createLandingLayout(editor: Editor) {
     props: {
       w: 300,
       h: 40,
-      text: "My latest work",
+      text: "Featured work",
       fontSize: 22,
       showArrow: true,
       arrowDirection: "down",
     },
-    meta: { componentType: "annotation", variationId: "latest-work-heading" },
+    meta: { componentType: "annotation", variationId: "selected-work-heading" },
   });
 
   y += 80;
 
-  // --- PROJECT CARDS ---
-  const projects = [
-    {
-      number: "01",
-      title: "Redesigning the Checkout",
-      description: "Redesigning the checkout experience for a leading e-commerce platform",
-      mediaType: "image" as const,
-      slug: "redesigning-checkout",
-    },
-    {
-      number: "02",
-      title: "Design System",
-      description: "Building a comprehensive design system from scratch",
-      mediaType: "video" as const,
-      slug: "design-system",
-    },
-    {
-      number: "03",
-      title: "Mobile App",
-      description: "A mobile-first approach to food delivery service",
-      mediaType: "image" as const,
-      slug: "mobile-app",
-    },
-    {
-      number: "04",
-      title: "Brand Identity",
-      description: "Creating a bold brand identity for a tech startup",
-      mediaType: "video" as const,
-      slug: "brand-identity",
-    },
-    {
-      number: "05",
-      title: "Analytics Dashboard",
-      description: "Data visualization and reporting dashboard for enterprise",
-      mediaType: "image" as const,
-      slug: "dashboard",
-    },
-    {
-      number: "06",
-      title: "Marketing Site",
-      description: "High-converting landing pages and marketing website",
-      mediaType: "video" as const,
-      slug: "marketing-site",
-    },
-  ];
+  const featured = getFeaturedWork();
 
-  for (const project of projects) {
+  for (const item of featured) {
     editor.createShape({
       type: "project-card",
       x: LEFT_PAD,
       y,
       props: {
         w: CANVAS_W - LEFT_PAD * 2,
-        h: project.mediaType === "image" ? 260 : 180,
-        number: project.number,
-        title: project.title,
-        description: project.description,
-        mediaType: project.mediaType,
+        h: 180,
+        number: item.number,
+        title: item.company,
+        description: item.tagline,
+        mediaType: item.illustrationType,
       },
       meta: {
         componentType: "project-card",
-        variationId: `project-${project.slug}`,
-        href: `/project/${project.slug}`,
+        variationId: `work-${item.slug}`,
+        href: `/work/${item.slug}`,
       },
     });
 
-    y += project.mediaType === "image" ? 300 : 220;
+    y += 220;
   }
+
+  editor.createShape({
+    type: "hand-drawn-button",
+    x: LEFT_PAD,
+    y,
+    props: { w: 150, h: 34, label: "View all work →" },
+    meta: {
+      componentType: "button",
+      variationId: "see-all-work",
+      href: "/work",
+    },
+  });
+
+  y += 70;
 
   // --- BLOG SECTION ---
   editor.createShape({
@@ -165,7 +136,7 @@ export function createLandingLayout(editor: Editor) {
     props: {
       w: 300,
       h: 40,
-      text: "From the blog",
+      text: "Writing & ideas",
       fontSize: 22,
       showArrow: true,
       arrowDirection: "down",
@@ -193,7 +164,7 @@ export function createLandingLayout(editor: Editor) {
     },
     {
       title: "Event Landing Page",
-      description: "Designing an event landing page — a case study",
+      description: "Designing an event landing page: a case study",
       href: "https://medium.com/design-bootcamp/event-landing-page-a-case-study-2e7a7595309f",
     },
     {
@@ -227,10 +198,10 @@ export function createLandingLayout(editor: Editor) {
 
     editor.createShape({
       type: "annotation",
-      x: LEFT_PAD + 10,
+      x: LEFT_PAD,
       y,
       props: {
-        w: CANVAS_W - LEFT_PAD * 2 - 10,
+        w: CANVAS_W - LEFT_PAD * 2,
         h: 18,
         text: post.description,
         fontSize: 12,
@@ -256,7 +227,7 @@ export function createLandingLayout(editor: Editor) {
     props: {
       w: 350,
       h: 50,
-      text: "My design philosophy",
+      text: "My design principles",
       fontSize: 20,
       showArrow: false,
       arrowDirection: "right",
@@ -267,15 +238,15 @@ export function createLandingLayout(editor: Editor) {
   y += 50;
 
   const philosophyLines = [
-    "User-first — every decision starts with empathy",
-    "Iterative — ship, learn, refine, repeat",
-    "Accessible — design that works for everyone",
+    "User-first: starting with deep empathy",
+    "Iterative: building, testing, and refining",
+    "Inclusive: designing for all, without compromise",
   ];
 
   for (const line of philosophyLines) {
     editor.createShape({
       type: "annotation",
-      x: LEFT_PAD + 10,
+      x: LEFT_PAD,
       y,
       props: {
         w: 400,
@@ -300,8 +271,8 @@ export function createLandingLayout(editor: Editor) {
     props: {
       w: CANVAS_W - LEFT_PAD * 2,
       h: 200,
-      title: "Worked with amazing folks",
-      subtitle: "Designers, developers & product managers",
+      title: "Who I collaborate with",
+      subtitle: "Founders, engineers & product teams",
       count: 7,
     },
     meta: { componentType: "team-avatars", variationId: "team-section" },
@@ -317,7 +288,7 @@ export function createLandingLayout(editor: Editor) {
     props: {
       w: 400,
       h: 30,
-      text: "Crafted with purpose and care",
+      text: "Core capabilities",
       fontSize: 16,
       showArrow: false,
       arrowDirection: "right",
@@ -331,11 +302,11 @@ export function createLandingLayout(editor: Editor) {
     icon: "analytics" | "design" | "content" | "communication";
     label: string;
   }> = [
-    { icon: "analytics", label: "Research" },
-    { icon: "design", label: "Design" },
-    { icon: "content", label: "Content" },
-    { icon: "communication", label: "Strategy" },
-  ];
+      { icon: "analytics", label: "Research" },
+      { icon: "design", label: "Design" },
+      { icon: "content", label: "Content" },
+      { icon: "communication", label: "Strategy" },
+    ];
 
   skills.forEach((skill, i) => {
     editor.createShape({
@@ -365,7 +336,7 @@ export function createLandingLayout(editor: Editor) {
     props: {
       w: CANVAS_W - LEFT_PAD * 2,
       h: 30,
-      text: "What people say about my work",
+      text: "Kind words",
       fontSize: 16,
       showArrow: false,
       arrowDirection: "right",
@@ -377,12 +348,12 @@ export function createLandingLayout(editor: Editor) {
 
   editor.createShape({
     type: "annotation",
-    x: LEFT_PAD + 10,
+    x: LEFT_PAD,
     y,
     props: {
-      w: CANVAS_W - LEFT_PAD * 2 - 20,
+      w: CANVAS_W - LEFT_PAD * 2,
       h: 100,
-      text: "\"Prerita has a rare ability to translate complex problems into elegant, intuitive designs. Her attention to detail and user empathy made our product a joy to use.\"\n— Arun Mehta, Product Lead at Thinktree",
+      text: "\"Prerita seamlessly bridges the gap between deep UX research and high-fidelity product prototyping. Her strategic approach to product design makes complex, ambiguous problems feel effortless to solve.\"",
       fontSize: 14,
       showArrow: false,
       arrowDirection: "right",
@@ -401,10 +372,10 @@ export function createLandingLayout(editor: Editor) {
     label: string;
     href: string;
   }> = [
-    { icon: "design", label: "About", href: "/contact" },
-    { icon: "content", label: "Work", href: "/" },
-    { icon: "communication", label: "Email", href: "mailto:hello@preritayadav.com" },
-  ];
+      { icon: "design", label: "About", href: "/about" },
+      { icon: "content", label: "Work", href: "/work" },
+      { icon: "communication", label: "Email", href: "mailto:hello@preritayadav.com" },
+    ];
 
   footerIcons.forEach((item, i) => {
     editor.createShape({
@@ -434,7 +405,7 @@ export function createLandingLayout(editor: Editor) {
     props: {
       w: 300,
       h: 24,
-      text: "Let's work together!",
+      text: "Let's build something great.",
       fontSize: 14,
       showArrow: false,
       arrowDirection: "right",
@@ -448,7 +419,7 @@ export function createLandingLayout(editor: Editor) {
     type: "hand-drawn-button",
     x: LEFT_PAD,
     y,
-    props: { w: 140, h: 36, label: "Contact me" },
+    props: { w: 140, h: 36, label: "Say hello" },
     meta: {
       componentType: "button",
       variationId: "footer-cta",

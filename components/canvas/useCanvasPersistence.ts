@@ -67,7 +67,7 @@ export function useCanvasPersistence(pageKey: string) {
       }
     }
     keysToRemove.forEach((key) => localStorage.removeItem(key));
-    window.location.href = "/";
+    window.location.reload();
   }, []);
 
   return { store, loadingState, reset, needsInitialLayout };

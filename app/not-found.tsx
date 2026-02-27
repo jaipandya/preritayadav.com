@@ -4,7 +4,7 @@ import { WipCanvas } from "@/components/canvas/WipCanvas";
 import { AccessibleNav } from "@/components/ui/AccessibleNav";
 import { createNotFoundLayout } from "@/lib/createNotFoundLayout";
 
-const navLinks = [{ href: "/", label: "Home" }];
+const navLinks = [{ href: "/", label: "Home" }, { href: "/about", label: "About" }];
 
 export default function NotFound() {
   return (

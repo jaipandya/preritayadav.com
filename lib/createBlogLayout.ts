@@ -12,8 +12,8 @@ const blogContent: Record<string, BlogData> = {
     title: "Design Thinking in Practice",
     date: "January 2026",
     body: [
-      "Design thinking is more than a process — it's a mindset. After years of applying it across different industries, I've learned that the real magic happens not in the frameworks, but in the messy spaces between them.",
-      "The double diamond is a helpful metaphor, but in practice, the process is never that clean. You diverge, converge, loop back, and sometimes start over entirely. That's not failure — it's how good design works.",
+      "Design thinking is more than a process: it's a mindset. After years of applying it across different industries, I've learned that the real magic happens not in the frameworks, but in the messy spaces between them.",
+      "The double diamond is a helpful metaphor, but in practice, the process is never that clean. You diverge, converge, loop back, and sometimes start over entirely. That's not failure; it's how good design works.",
       "What I've found most valuable is the emphasis on empathy. When you truly understand the person you're designing for, the solutions almost design themselves. The hard part is earning that understanding.",
       "My advice: don't treat design thinking as a checklist. Treat it as a lens. Use it to ask better questions, challenge assumptions, and stay curious throughout the entire journey.",
     ],
@@ -25,7 +25,7 @@ const blogContent: Record<string, BlogData> = {
       "After conducting hundreds of user interviews and usability tests, I've developed strong opinions about which research methods deliver real insights and which are mostly theatre.",
       "Contextual inquiry is underrated. Watching people use your product in their actual environment reveals things no survey or lab test ever will. The awkwardness is worth it.",
       "Remote unmoderated testing has its place, but it can't replace the richness of a live conversation. I use it for validation, not discovery.",
-      "The most important research skill isn't methodology — it's synthesis. Anyone can collect data. The value is in finding patterns, telling stories, and translating insights into decisions that move the needle.",
+      "The most important research skill isn't methodology. It's synthesis. Anyone can collect data. The value is in finding patterns, telling stories, and translating insights into decisions that move the needle.",
     ],
   },
 };

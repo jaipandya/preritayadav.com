@@ -58,7 +58,7 @@ export class TeamAvatarsShapeUtil extends ShapeUtil<TeamAvatarsShape> {
     const id = shape.id;
     const avatarR = 28;
     const spacing = 68;
-    const startX = 40;
+    const startX = avatarR;
     const avatarY = h - avatarR - 30;
 
     const avatars = Array.from({ length: count }, (_, i) => {
@@ -98,9 +98,9 @@ export class TeamAvatarsShapeUtil extends ShapeUtil<TeamAvatarsShape> {
           pointerEvents: "all",
         }}
       >
-        <div style={{ padding: "12px 20px" }}>
-          <div style={{ fontSize: 14, opacity: 0.5, marginBottom: 4 }}>{title}</div>
-          <div style={{ fontSize: 13, opacity: 0.4 }}>{subtitle}</div>
+        <div style={{ padding: "12px 0" }}>
+          <div style={{ fontSize: 14, color: "#1a1a1a", marginBottom: 4, fontWeight: 500 }}>{title}</div>
+          <div style={{ fontSize: 13, color: "#1a1a1a" }}>{subtitle}</div>
         </div>
         <svg width={w} height={h} style={{ position: "absolute", top: 0, left: 0 }}>
           {avatars}

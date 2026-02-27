@@ -47,5 +47,10 @@ declare module "tldraw" {
       contentType: string;
       src: string;
     };
+    "hand-drawn-illustration": {
+      w: number;
+      h: number;
+      scene: string;
+    };
   }
 }

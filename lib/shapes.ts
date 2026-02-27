@@ -7,6 +7,7 @@ import { TeamAvatarsShapeUtil } from "@/components/shapes/TeamAvatarsShapeUtil";
 import { SkillIconShapeUtil } from "@/components/shapes/SkillIconShapeUtil";
 import { ImagePlaceholderShapeUtil } from "@/components/shapes/ImagePlaceholderShapeUtil";
 import { BrowserFrameShapeUtil } from "@/components/shapes/BrowserFrameShapeUtil";
+import { HandDrawnIllustrationShapeUtil } from "@/components/shapes/HandDrawnIllustrationShapeUtil";
 
 export const customShapeUtils = [
   ...defaultShapeUtils,
@@ -17,6 +18,7 @@ export const customShapeUtils = [
   SkillIconShapeUtil,
   ImagePlaceholderShapeUtil,
   BrowserFrameShapeUtil,
+  HandDrawnIllustrationShapeUtil,
 ];
 
 export const customBindingUtils = [...defaultBindingUtils];
