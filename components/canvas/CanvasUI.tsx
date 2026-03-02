@@ -1,5 +1,6 @@
 "use client";
 
+import { createPortal } from "react-dom";
 import { track, useEditor } from "tldraw";
 
 function BrowseIcon() {
@@ -66,7 +67,7 @@ export const CanvasUI = track(function CanvasUI({
   const editor = useEditor();
   const currentTool = editor.getCurrentToolId();
 
-  return (
+  return createPortal(
     <div
       style={{
         position: "fixed",
@@ -181,6 +182,7 @@ export const CanvasUI = track(function CanvasUI({
       >
         Reset
       </button>
-    </div>
+    </div>,
+    document.body
   );
 });
