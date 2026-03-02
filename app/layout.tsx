@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { Viewport } from "next";
 import "./globals.css";
+import { SoundPreloader } from "@/components/SoundPreloader";
 
 export const metadata: Metadata = {
   title: "Prerita Yadav — Portfolio",
@@ -24,7 +25,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <SoundPreloader />
+        {children}
+      </body>
     </html>
   );
 }

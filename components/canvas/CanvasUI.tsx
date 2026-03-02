@@ -2,6 +2,8 @@
 
 import { createPortal } from "react-dom";
 import { track, useEditor } from "tldraw";
+import { withSound } from "@/lib/sounds";
+import { useSoundEnabled } from "@/lib/useSoundEnabled";
 
 function BrowseIcon() {
   return (
@@ -51,6 +53,26 @@ function EraserIcon() {
   );
 }
 
+function SpeakerOnIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#1a1a1a" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 6H1v4h2l4 3V3L3 6z" />
+      <path d="M11 5a4 4 0 0 1 0 6" />
+      <path d="M13.5 2.5a7 7 0 0 1 0 11" />
+    </svg>
+  );
+}
+
+function SpeakerOffIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#1a1a1a" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 6H1v4h2l4 3V3L3 6z" />
+      <path d="M13 6l-3 4" />
+      <path d="M10 6l3 4" />
+    </svg>
+  );
+}
+
 const toolItems: { id: string; label: string; icon: React.ReactNode }[] = [
   { id: "browse", label: "Browse", icon: <BrowseIcon /> },
   { id: "select", label: "Select", icon: <SelectIcon /> },
@@ -66,6 +88,7 @@ export const CanvasUI = track(function CanvasUI({
 }) {
   const editor = useEditor();
   const currentTool = editor.getCurrentToolId();
+  const [soundEnabled, toggleSound] = useSoundEnabled();
 
   return createPortal(
     <div
@@ -91,7 +114,7 @@ export const CanvasUI = track(function CanvasUI({
         <button
           key={tool.id}
           title={tool.label}
-          onClick={() => editor.setCurrentTool(tool.id)}
+          onClick={withSound("click", () => editor.setCurrentTool(tool.id))}
           style={{
             width: 36,
             height: 36,
@@ -120,7 +143,7 @@ export const CanvasUI = track(function CanvasUI({
 
       <button
         title="Undo"
-        onClick={() => editor.undo()}
+        onClick={withSound("click", () => editor.undo())}
         style={{
           width: 36,
           height: 36,
@@ -138,7 +161,7 @@ export const CanvasUI = track(function CanvasUI({
       </button>
       <button
         title="Redo"
-        onClick={() => editor.redo()}
+        onClick={withSound("click", () => editor.redo())}
         style={{
           width: 36,
           height: 36,
@@ -165,7 +188,7 @@ export const CanvasUI = track(function CanvasUI({
 
       <button
         title="Reset to default"
-        onClick={onReset}
+        onClick={withSound("click", onReset)}
         style={{
           height: 36,
           padding: "0 12px",
@@ -181,6 +204,34 @@ export const CanvasUI = track(function CanvasUI({
         }}
       >
         Reset
+      </button>
+
+      <div
+        style={{
+          width: 1,
+          background: "#ddd",
+          margin: "4px 4px",
+        }}
+      />
+
+      <button
+        title={soundEnabled ? "Mute sounds" : "Unmute sounds"}
+        onClick={toggleSound}
+        style={{
+          width: 36,
+          height: 36,
+          border: "1px solid transparent",
+          borderRadius: 8,
+          background: "transparent",
+          cursor: "pointer",
+          fontSize: 16,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          opacity: soundEnabled ? 1 : 0.4,
+        }}
+      >
+        {soundEnabled ? <SpeakerOnIcon /> : <SpeakerOffIcon />}
       </button>
     </div>,
     document.body

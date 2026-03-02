@@ -17,6 +17,8 @@ import { CanvasUI } from "./CanvasUI";
 import { BrowserChrome } from "./BrowserChrome";
 import { getHref, isNavigable } from "@/lib/canvasMeta";
 import { CANVAS_W } from "@/lib/layoutHelpers";
+import { sounds } from "@/lib/sounds";
+import { attachCanvasSounds } from "@/lib/canvasSounds";
 
 const DRAG_THRESHOLD = 5;
 
@@ -95,6 +97,8 @@ export function WipCanvas({
       };
       document.addEventListener("keydown", handleKeyDown);
 
+      attachCanvasSounds(editor);
+
       // Listen for pointer events to handle navigation in browse mode
       editor.on("event", (event) => {
         // Update cursor when hovering over navigable shapes
@@ -125,6 +129,10 @@ export function WipCanvas({
         }
 
         if (event.type === "pointer" && event.name === "pointer_up") {
+          if (editor.getCurrentToolId() === "select" &&
+              editor.getSelectedShapeIds().length > 0) {
+            sounds.play("select");
+          }
           if (editor.getCurrentToolId() !== "browse") return;
           if (!pointerDownPos.current) return;
 
@@ -143,6 +151,7 @@ export function WipCanvas({
           for (const shape of shapesAtPoint) {
             const href = getHref(shape);
             if (href) {
+              sounds.play("navigate");
               if (href.startsWith("mailto:") || href.startsWith("http")) {
                 window.open(href, href.startsWith("mailto:") ? "_self" : "_blank");
               } else {

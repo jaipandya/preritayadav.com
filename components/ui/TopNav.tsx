@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { wobblyRect } from "@/lib/variationSeed";
+import { sounds } from "@/lib/sounds";
 
 const NAV_LINKS = [
   { href: "/", label: "Home" },
@@ -77,6 +78,7 @@ export function TopNav() {
             key={link.label}
             href={link.href}
             style={linkStyle(active)}
+            onClick={() => sounds.play("navigate")}
             onMouseEnter={(e) => { e.currentTarget.style.opacity = "1"; }}
             onMouseLeave={(e) => { e.currentTarget.style.opacity = active ? "1" : "0.6"; }}
           >
@@ -88,7 +90,7 @@ export function TopNav() {
       {/* Meta dropdown */}
       <div ref={metaRef} style={{ position: "relative" }}>
         <button
-          onClick={() => setMetaOpen((v) => !v)}
+          onClick={() => { if (!metaOpen) sounds.play("menu-open"); setMetaOpen((v) => !v); }}
           style={{
             ...linkStyle(META_LINKS.some((l) => isActive(l.href))),
             background: "none",
@@ -143,6 +145,7 @@ export function TopNav() {
                     opacity: isActive(link.href) ? 1 : 0.6,
                     transition: "opacity 0.15s",
                   }}
+                  onClick={() => sounds.play("menu-item")}
                   onMouseEnter={(e) => { e.currentTarget.style.opacity = "1"; }}
                   onMouseLeave={(e) => { e.currentTarget.style.opacity = isActive(link.href) ? "1" : "0.6"; }}
                 >

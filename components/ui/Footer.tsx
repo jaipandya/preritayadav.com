@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { wobblyLine } from "@/lib/variationSeed";
+import { sounds } from "@/lib/sounds";
 
 const FOOTER_LINKS = [
   { href: "/", label: "Home" },
@@ -66,6 +67,7 @@ export function Footer() {
               key={link.label}
               href={link.href}
               style={linkStyle}
+              onClick={() => sounds.play("navigate")}
               onMouseEnter={(e) => { e.currentTarget.style.opacity = "1"; }}
               onMouseLeave={(e) => { e.currentTarget.style.opacity = "0.6"; }}
             >
