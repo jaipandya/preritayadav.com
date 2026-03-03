@@ -13,12 +13,14 @@ const VOLUMES: Record<SoundType, number> = {
 };
 
 const STORAGE_KEY = "sounds-enabled";
+type HowlLike = import("howler").Howl;
 
 class SoundManager {
   private _enabled: boolean;
-  private _howls: Partial<Record<SoundType, { play(): number }>> = {};
+  private _howls: Partial<Record<SoundType, HowlLike>> = {};
   private _lastType = 0;
   private _lastDraw = 0;
+  private _configuredHowler = false;
 
   constructor() {
     this._enabled = true;
@@ -37,16 +39,29 @@ class SoundManager {
     return this._enabled;
   }
 
-  preloadAll() {
-    if (typeof window === "undefined") return;
+  private getHowler() {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { Howl } = require("howler") as typeof import("howler");
-    const types: SoundType[] = ["click", "navigate", "menu-open", "menu-item", "type", "draw", "erase", "select"];
-    for (const type of types) {
-      if (!this._howls[type]) {
-        this._howls[type] = new Howl({ src: [`/sounds/${type}.mp3`], volume: VOLUMES[type], preload: true });
-      }
+    const howler = require("howler") as typeof import("howler");
+    if (!this._configuredHowler) {
+      // Disable Howler's global auto-unlock WebAudio path; we use HTML5 audio for reliability on first tap.
+      howler.Howler.autoUnlock = false;
+      howler.Howler.html5PoolSize = 32;
+      this._configuredHowler = true;
     }
+    return howler;
+  }
+
+  private ensureHowl(type: SoundType): HowlLike {
+    if (!this._howls[type]) {
+      const { Howl } = this.getHowler();
+      this._howls[type] = new Howl({
+        src: [`/sounds/${type}.mp3`],
+        volume: VOLUMES[type],
+        preload: false,
+        html5: true,
+      });
+    }
+    return this._howls[type]!;
   }
 
   play(type: SoundType) {
@@ -61,12 +76,7 @@ class SoundManager {
       if (now - this._lastDraw < 120) return;
       this._lastDraw = now;
     }
-    if (!this._howls[type]) {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const { Howl } = require("howler") as typeof import("howler");
-      this._howls[type] = new Howl({ src: [`/sounds/${type}.mp3`], volume: VOLUMES[type], preload: true });
-    }
-    this._howls[type]!.play();
+    this.ensureHowl(type).play();
   }
 }
 

@@ -1,79 +1,25 @@
 "use client";
 
+import { useEffect, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { track, useEditor } from "tldraw";
 import { withSound } from "@/lib/sounds";
 import { useSoundEnabled } from "@/lib/useSoundEnabled";
+import { ToolbarIconButton } from "@/components/canvas/ToolbarIconButton";
+import {
+  BrowseIcon,
+  DrawIcon,
+  EraserIcon,
+  RedoIcon,
+  ResetIcon,
+  SelectIcon,
+  SpeakerOffIcon,
+  SpeakerOnIcon,
+  TextIcon,
+  UndoIcon,
+} from "@/components/canvas/toolbarIcons";
 
-function BrowseIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#1a1a1a" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M5.5 9V4a1 1 0 0 1 2 0v5" />
-      <path d="M7.5 3.5a1 1 0 0 1 2 0V9" />
-      <path d="M9.5 4.5a1 1 0 0 1 2 0V9" />
-      <path d="M11.5 6a1 1 0 0 1 2 0v3.5a5 5 0 0 1-5 5h-.5a5 5 0 0 1-5-5V7a1 1 0 0 1 2 0v2" />
-    </svg>
-  );
-}
-
-function SelectIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#1a1a1a" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M4 1l0 12 3.5-3.5 3 5 2-1-3-5 4-.5z" />
-    </svg>
-  );
-}
-
-function DrawIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#1a1a1a" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M2 14l1.5-4L12 1.5 14.5 4 6 12.5z" />
-      <path d="M3.5 10L6 12.5" />
-    </svg>
-  );
-}
-
-function TextIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#1a1a1a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 3h10" />
-      <path d="M8 3v10" />
-      <path d="M5.5 13h5" />
-    </svg>
-  );
-}
-
-function EraserIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#1a1a1a" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M10 2l4 4-7 7H3L1 11l9-9z" />
-      <path d="M6 6l4 4" />
-      <path d="M3 13h10" />
-    </svg>
-  );
-}
-
-function SpeakerOnIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#1a1a1a" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 6H1v4h2l4 3V3L3 6z" />
-      <path d="M11 5a4 4 0 0 1 0 6" />
-      <path d="M13.5 2.5a7 7 0 0 1 0 11" />
-    </svg>
-  );
-}
-
-function SpeakerOffIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#1a1a1a" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 6H1v4h2l4 3V3L3 6z" />
-      <path d="M13 6l-3 4" />
-      <path d="M10 6l3 4" />
-    </svg>
-  );
-}
-
-const toolItems: { id: string; label: string; icon: React.ReactNode }[] = [
+const toolItems: { id: string; label: string; icon: ReactNode }[] = [
   { id: "browse", label: "Browse", icon: <BrowseIcon /> },
   { id: "select", label: "Select", icon: <SelectIcon /> },
   { id: "draw", label: "Draw", icon: <DrawIcon /> },
@@ -89,6 +35,25 @@ export const CanvasUI = track(function CanvasUI({
   const editor = useEditor();
   const currentTool = editor.getCurrentToolId();
   const [soundEnabled, toggleSound] = useSoundEnabled();
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 640px)");
+    const update = () => setIsMobile(media.matches);
+    update();
+    if (typeof media.addEventListener === "function") {
+      media.addEventListener("change", update);
+      return () => media.removeEventListener("change", update);
+    }
+    media.addListener(update);
+    return () => media.removeListener(update);
+  }, []);
+
+  const dividerStyle = {
+    width: 1,
+    background: "#ddd",
+    margin: isMobile ? "4px 2px" : "4px 4px",
+  } as const;
 
   return createPortal(
     <div
@@ -100,7 +65,7 @@ export const CanvasUI = track(function CanvasUI({
         zIndex: 1000,
         pointerEvents: "all",
         display: "flex",
-        gap: 4,
+        gap: isMobile ? 2 : 4,
         padding: "6px 10px",
         borderRadius: 12,
         background: "rgba(255,255,255,0.95)",
@@ -111,128 +76,50 @@ export const CanvasUI = track(function CanvasUI({
       onPointerDown={(e) => e.stopPropagation()}
     >
       {toolItems.map((tool) => (
-        <button
+        <ToolbarIconButton
           key={tool.id}
           title={tool.label}
           onClick={withSound("click", () => editor.setCurrentTool(tool.id))}
-          style={{
-            width: 36,
-            height: 36,
-            border: currentTool === tool.id ? "1.5px solid #1a1a1a" : "1px solid transparent",
-            borderRadius: 8,
-            background: currentTool === tool.id ? "#f0f0f0" : "transparent",
-            cursor: "pointer",
-            fontSize: 16,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontFamily: "'Loranthus', sans-serif",
-          }}
+          active={currentTool === tool.id}
         >
           {tool.icon}
-        </button>
+        </ToolbarIconButton>
       ))}
 
-      <div
-        style={{
-          width: 1,
-          background: "#ddd",
-          margin: "4px 4px",
-        }}
-      />
+      <div style={dividerStyle} />
 
-      <button
+      <ToolbarIconButton
         title="Undo"
         onClick={withSound("click", () => editor.undo())}
-        style={{
-          width: 36,
-          height: 36,
-          border: "1px solid transparent",
-          borderRadius: 8,
-          background: "transparent",
-          cursor: "pointer",
-          fontSize: 16,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
       >
-        <span style={{ display: "inline-block", transform: "scaleY(-1)" }}>↩</span>
-      </button>
-      <button
+        <UndoIcon />
+      </ToolbarIconButton>
+      <ToolbarIconButton
         title="Redo"
         onClick={withSound("click", () => editor.redo())}
-        style={{
-          width: 36,
-          height: 36,
-          border: "1px solid transparent",
-          borderRadius: 8,
-          background: "transparent",
-          cursor: "pointer",
-          fontSize: 16,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
       >
-        <span style={{ display: "inline-block", transform: "scaleY(-1)" }}>↪</span>
-      </button>
+        <RedoIcon />
+      </ToolbarIconButton>
 
-      <div
-        style={{
-          width: 1,
-          background: "#ddd",
-          margin: "4px 4px",
-        }}
-      />
+      <div style={dividerStyle} />
 
-      <button
+      <ToolbarIconButton
         title="Reset to default"
         onClick={withSound("click", onReset)}
-        style={{
-          height: 36,
-          padding: "0 12px",
-          border: "1px solid transparent",
-          borderRadius: 8,
-          background: "transparent",
-          cursor: "pointer",
-          fontSize: 13,
-          fontFamily: "'Loranthus', sans-serif",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
+        iconOnly={isMobile}
       >
-        Reset
-      </button>
+        {isMobile ? <ResetIcon /> : "Reset"}
+      </ToolbarIconButton>
 
-      <div
-        style={{
-          width: 1,
-          background: "#ddd",
-          margin: "4px 4px",
-        }}
-      />
+      <div style={dividerStyle} />
 
-      <button
+      <ToolbarIconButton
         title={soundEnabled ? "Mute sounds" : "Unmute sounds"}
         onClick={toggleSound}
-        style={{
-          width: 36,
-          height: 36,
-          border: "1px solid transparent",
-          borderRadius: 8,
-          background: "transparent",
-          cursor: "pointer",
-          fontSize: 16,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          opacity: soundEnabled ? 1 : 0.4,
-        }}
+        dimmed={!soundEnabled}
       >
         {soundEnabled ? <SpeakerOnIcon /> : <SpeakerOffIcon />}
-      </button>
+      </ToolbarIconButton>
     </div>,
     document.body
   );
