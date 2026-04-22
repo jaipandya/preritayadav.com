@@ -1,6 +1,17 @@
 import type { Editor } from "tldraw";
 import { CANVAS_W, LEFT_PAD, centerCamera } from "./layoutHelpers";
 import { getFeaturedWork } from "./workData";
+import {
+  hero,
+  blogPosts,
+  designPrinciples,
+  team,
+  skills,
+  testimonial,
+  footerIcons,
+  footerClosing,
+  footerCta,
+} from "./landingContent";
 
 export function createLandingLayout(editor: Editor) {
   let y = 30;
@@ -13,7 +24,7 @@ export function createLandingLayout(editor: Editor) {
     props: {
       w: 400,
       h: 24,
-      text: "Hello!",
+      text: hero.greeting,
       fontSize: 16,
       showArrow: false,
       arrowDirection: "right",
@@ -30,7 +41,7 @@ export function createLandingLayout(editor: Editor) {
     props: {
       w: 500,
       h: 50,
-      text: "I'm Prerita.",
+      text: hero.name,
       fontSize: 38,
       showArrow: false,
       arrowDirection: "right",
@@ -47,7 +58,7 @@ export function createLandingLayout(editor: Editor) {
     props: {
       w: 350,
       h: 60,
-      text: "Product Designer & Creative Thinker\nCrafting intuitive, human-centered experiences",
+      text: hero.subtitle,
       fontSize: 14,
       showArrow: false,
       arrowDirection: "right",
@@ -61,11 +72,11 @@ export function createLandingLayout(editor: Editor) {
     type: "hand-drawn-button",
     x: LEFT_PAD,
     y,
-    props: { w: 120, h: 34, label: "Let's talk" },
+    props: { w: 120, h: 34, label: hero.cta.label },
     meta: {
       componentType: "button",
       variationId: "hero-cta",
-      href: "/contact",
+      href: hero.cta.href,
     },
   });
 
@@ -146,34 +157,6 @@ export function createLandingLayout(editor: Editor) {
 
   y += 70;
 
-  const blogPosts = [
-    {
-      title: "Hatch Conference 2023",
-      description: "A few notes from the Design Conference in Berlin",
-      href: "https://medium.com/@preritayadav/hatch-conference-2023-a-few-notes-from-the-design-conference-in-berlin-2c2d1cf5d7de",
-    },
-    {
-      title: "10kdesigners Masterclass",
-      description: "My experience at the UX/UI design cohort",
-      href: "https://medium.com/@preritayadav/10kdesigners-ux-ui-masterclass-my-experience-at-the-design-cohort-3fcee5ce74a0",
-    },
-    {
-      title: "UX Research Case Study",
-      description: "Research on India's most popular programming community",
-      href: "https://medium.com/design-bootcamp/case-study-ux-research-on-indias-most-popular-programming-community-4fed6a1fc476",
-    },
-    {
-      title: "Event Landing Page",
-      description: "Designing an event landing page: a case study",
-      href: "https://medium.com/design-bootcamp/event-landing-page-a-case-study-2e7a7595309f",
-    },
-    {
-      title: "Fitness App Research",
-      description: "Creating a survey and user interview for a fitness app",
-      href: "https://medium.com/design-bootcamp/case-study-creating-a-survey-and-user-interview-for-a-fitness-app-a52b3fa7d843",
-    },
-  ];
-
   for (const post of blogPosts) {
     editor.createShape({
       type: "annotation",
@@ -237,13 +220,7 @@ export function createLandingLayout(editor: Editor) {
 
   y += 50;
 
-  const philosophyLines = [
-    "User-first: starting with deep empathy",
-    "Iterative: building, testing, and refining",
-    "Inclusive: designing for all, without compromise",
-  ];
-
-  for (const line of philosophyLines) {
+  for (const line of designPrinciples) {
     editor.createShape({
       type: "annotation",
       x: LEFT_PAD,
@@ -271,9 +248,9 @@ export function createLandingLayout(editor: Editor) {
     props: {
       w: CANVAS_W - LEFT_PAD * 2,
       h: 200,
-      title: "Who I collaborate with",
-      subtitle: "Founders, engineers & product teams",
-      count: 7,
+      title: team.title,
+      subtitle: team.subtitle,
+      count: team.count,
     },
     meta: { componentType: "team-avatars", variationId: "team-section" },
   });
@@ -297,16 +274,6 @@ export function createLandingLayout(editor: Editor) {
   });
 
   y += 40;
-
-  const skills: Array<{
-    icon: "analytics" | "design" | "content" | "communication";
-    label: string;
-  }> = [
-      { icon: "analytics", label: "Research" },
-      { icon: "design", label: "Design" },
-      { icon: "content", label: "Content" },
-      { icon: "communication", label: "Strategy" },
-    ];
 
   skills.forEach((skill, i) => {
     editor.createShape({
@@ -336,7 +303,7 @@ export function createLandingLayout(editor: Editor) {
     props: {
       w: CANVAS_W - LEFT_PAD * 2,
       h: 30,
-      text: "Kind words",
+      text: testimonial.heading,
       fontSize: 16,
       showArrow: false,
       arrowDirection: "right",
@@ -353,7 +320,7 @@ export function createLandingLayout(editor: Editor) {
     props: {
       w: CANVAS_W - LEFT_PAD * 2,
       h: 100,
-      text: "\"Prerita seamlessly bridges the gap between deep UX research and high-fidelity product prototyping. Her strategic approach to product design makes complex, ambiguous problems feel effortless to solve.\"",
+      text: testimonial.quote,
       fontSize: 14,
       showArrow: false,
       arrowDirection: "right",
@@ -367,16 +334,6 @@ export function createLandingLayout(editor: Editor) {
   y += 150;
 
   // --- FOOTER ---
-  const footerIcons: Array<{
-    icon: "analytics" | "design" | "content" | "communication";
-    label: string;
-    href: string;
-  }> = [
-      { icon: "design", label: "About", href: "/about" },
-      { icon: "content", label: "Work", href: "/work" },
-      { icon: "communication", label: "Email", href: "mailto:hello@preritayadav.com" },
-    ];
-
   footerIcons.forEach((item, i) => {
     editor.createShape({
       type: "skill-icon",
@@ -405,7 +362,7 @@ export function createLandingLayout(editor: Editor) {
     props: {
       w: 300,
       h: 24,
-      text: "Let's build something great.",
+      text: footerClosing,
       fontSize: 14,
       showArrow: false,
       arrowDirection: "right",
@@ -419,11 +376,11 @@ export function createLandingLayout(editor: Editor) {
     type: "hand-drawn-button",
     x: LEFT_PAD,
     y,
-    props: { w: 140, h: 36, label: "Say hello" },
+    props: { w: 140, h: 36, label: footerCta.label },
     meta: {
       componentType: "button",
       variationId: "footer-cta",
-      href: "/contact",
+      href: footerCta.href,
     },
   });
 

@@ -1,5 +1,11 @@
 import type { Editor } from "tldraw";
 import { CANVAS_W, LEFT_PAD, centerCamera, createBackButton } from "./layoutHelpers";
+import {
+  contactTitle,
+  contactSubtitle,
+  contactEmail,
+  socials,
+} from "./contactContent";
 
 export function createContactLayout(editor: Editor) {
   let y = 40;
@@ -16,7 +22,7 @@ export function createContactLayout(editor: Editor) {
     props: {
       w: 400,
       h: 50,
-      text: "Get in touch",
+      text: contactTitle,
       fontSize: 34,
       showArrow: false,
       arrowDirection: "right",
@@ -33,7 +39,7 @@ export function createContactLayout(editor: Editor) {
     props: {
       w: CANVAS_W - LEFT_PAD * 2,
       h: 50,
-      text: "I'm always happy to chat about design, projects,\nor just say hi. Drop me a line!",
+      text: contactSubtitle,
       fontSize: 15,
       showArrow: false,
       arrowDirection: "right",
@@ -67,7 +73,7 @@ export function createContactLayout(editor: Editor) {
     props: {
       w: 300,
       h: 30,
-      text: "hello@preritayadav.com",
+      text: contactEmail,
       fontSize: 16,
       showArrow: false,
       arrowDirection: "right",
@@ -94,12 +100,6 @@ export function createContactLayout(editor: Editor) {
   });
 
   y += 40;
-
-  const socials = [
-    { label: "LinkedIn", url: "https://www.linkedin.com/in/preritayadav/" },
-    { label: "Medium", url: "https://medium.com/@preritayadav" },
-    { label: "X", url: "https://x.com/preritayadav" },
-  ];
 
   socials.forEach((social, i) => {
     editor.createShape({

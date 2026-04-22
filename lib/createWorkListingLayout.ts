@@ -1,6 +1,12 @@
 import type { Editor } from "tldraw";
 import { CANVAS_W, LEFT_PAD, centerCamera, createBackButton } from "./layoutHelpers";
 import { getMainWork, getArchivedWork } from "./workData";
+import {
+  workTitle,
+  workSubtitle,
+  archiveTitle,
+  archiveSubtitle,
+} from "./workListingContent";
 
 export function createWorkListingLayout(editor: Editor) {
   let y = 40;
@@ -16,7 +22,7 @@ export function createWorkListingLayout(editor: Editor) {
     props: {
       w: 400,
       h: 50,
-      text: "Work",
+      text: workTitle,
       fontSize: 36,
       showArrow: false,
       arrowDirection: "right",
@@ -33,7 +39,7 @@ export function createWorkListingLayout(editor: Editor) {
     props: {
       w: CANVAS_W - LEFT_PAD * 2,
       h: 30,
-      text: "Product design, UX research, and design systems across startups and scale-ups.",
+      text: workSubtitle,
       fontSize: 14,
       showArrow: false,
       arrowDirection: "right",
@@ -78,7 +84,7 @@ export function createWorkListingLayout(editor: Editor) {
     props: {
       w: 300,
       h: 40,
-      text: "Archive",
+      text: archiveTitle,
       fontSize: 22,
       showArrow: true,
       arrowDirection: "down",
@@ -95,7 +101,7 @@ export function createWorkListingLayout(editor: Editor) {
     props: {
       w: CANVAS_W - LEFT_PAD * 2,
       h: 24,
-      text: "Earlier projects and personal experiments.",
+      text: archiveSubtitle,
       fontSize: 13,
       showArrow: false,
       arrowDirection: "right",

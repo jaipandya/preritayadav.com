@@ -1,9 +1,15 @@
 "use client";
 
-import { WipCanvas } from "@/components/canvas/WipCanvas";
-import { AccessibleNav } from "@/components/ui/AccessibleNav";
+import { PageShell } from "@/components/PageShell";
 import { createAboutLayout } from "@/lib/createAboutLayout";
 import { workItems } from "@/lib/workData";
+import {
+  aboutTitle,
+  aboutParagraphs,
+  aboutOutro,
+  aboutFooterText,
+  aboutCta,
+} from "@/lib/aboutContent";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -17,12 +23,16 @@ const navLinks = [
 
 export default function AboutPage() {
   return (
-    <div id="main-content" style={{ width: "100vw", height: "100vh" }}>
-      <AccessibleNav links={navLinks} />
-      <WipCanvas
-        pageKey="about"
-        onCreateLayout={createAboutLayout}
-      />
-    </div>
+    <PageShell navLinks={navLinks} pageKey="about" onCreateLayout={createAboutLayout}>
+      <h1>{aboutTitle}</h1>
+      {aboutParagraphs.map((p, i) => (
+        <p key={i}>{p}</p>
+      ))}
+      <p>{aboutOutro}</p>
+      <footer>
+        <p>{aboutFooterText}</p>
+        <a href={aboutCta.href}>{aboutCta.label}</a>
+      </footer>
+    </PageShell>
   );
 }

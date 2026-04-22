@@ -2,9 +2,13 @@
 
 import { use, useCallback } from "react";
 import type { Editor } from "tldraw";
-import { WipCanvas } from "@/components/canvas/WipCanvas";
-import { AccessibleNav } from "@/components/ui/AccessibleNav";
+import { PageShell } from "@/components/PageShell";
 import { createBlogLayout } from "@/lib/createBlogLayout";
+
+const navLinks = [
+  { href: "/", label: "Back to Home" },
+  { href: "/contact", label: "Contact" },
+];
 
 export default function BlogPage({
   params,
@@ -21,17 +25,8 @@ export default function BlogPage({
   );
 
   return (
-    <div id="main-content" style={{ width: "100vw", height: "100vh" }}>
-      <AccessibleNav
-        links={[
-          { href: "/", label: "Back to Home" },
-          { href: "/contact", label: "Contact" },
-        ]}
-      />
-      <WipCanvas
-        pageKey={`blog-${slug}`}
-        onCreateLayout={handleCreateLayout}
-      />
-    </div>
+    <PageShell navLinks={navLinks} pageKey={`blog-${slug}`} onCreateLayout={handleCreateLayout}>
+      <h1>{slug.replace(/-/g, " ")}</h1>
+    </PageShell>
   );
 }

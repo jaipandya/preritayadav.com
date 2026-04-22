@@ -102,6 +102,19 @@ body {
   animation: spin 0.7s linear infinite;
 }
 
+/* Visually hidden but accessible to screen readers and crawlers */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* Fade in tldraw canvas once loaded */
 @keyframes fadeIn {
   from {
