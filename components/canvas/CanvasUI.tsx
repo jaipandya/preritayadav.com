@@ -3,7 +3,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { track, useEditor } from "tldraw";
-import { withSound } from "@/lib/sounds";
+import { sounds, withSound } from "@/lib/sounds";
 import { useSoundEnabled } from "@/lib/useSoundEnabled";
 import { ToolbarIconButton } from "@/components/canvas/ToolbarIconButton";
 import {
@@ -79,7 +79,7 @@ export const CanvasUI = track(function CanvasUI({
         <ToolbarIconButton
           key={tool.id}
           title={tool.label}
-          onClick={withSound("click", () => editor.setCurrentTool(tool.id))}
+          onClick={withSound("tool", () => editor.setCurrentTool(tool.id))}
           active={currentTool === tool.id}
         >
           {tool.icon}
@@ -90,13 +90,13 @@ export const CanvasUI = track(function CanvasUI({
 
       <ToolbarIconButton
         title="Undo"
-        onClick={withSound("click", () => editor.undo())}
+        onClick={withSound("undo", () => editor.undo())}
       >
         <UndoIcon />
       </ToolbarIconButton>
       <ToolbarIconButton
         title="Redo"
-        onClick={withSound("click", () => editor.redo())}
+        onClick={withSound("redo", () => editor.redo())}
       >
         <RedoIcon />
       </ToolbarIconButton>
@@ -105,7 +105,7 @@ export const CanvasUI = track(function CanvasUI({
 
       <ToolbarIconButton
         title="Reset to default"
-        onClick={withSound("click", onReset)}
+        onClick={withSound("reset", onReset)}
         iconOnly={isMobile}
       >
         {isMobile ? <ResetIcon /> : "Reset"}
@@ -115,7 +115,16 @@ export const CanvasUI = track(function CanvasUI({
 
       <ToolbarIconButton
         title={soundEnabled ? "Mute sounds" : "Unmute sounds"}
-        onClick={toggleSound}
+        onClick={() => {
+          if (soundEnabled) {
+            // Playing mute before toggle so the sound plays under the still-enabled gate.
+            sounds.play("mute");
+            toggleSound();
+          } else {
+            toggleSound();
+            sounds.play("unmute");
+          }
+        }}
         dimmed={!soundEnabled}
       >
         {soundEnabled ? <SpeakerOnIcon /> : <SpeakerOffIcon />}

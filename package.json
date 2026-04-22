@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "sounds:build": "node scripts/generate-sounds.mjs",
     "postinstall": "node scripts/patch-tldraw-license.js"
   },
   "dependencies": {

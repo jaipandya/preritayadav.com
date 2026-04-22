@@ -1,15 +1,26 @@
 // Fire-and-forget singleton. Safe from React and non-React code alike.
-type SoundType = "click" | "navigate" | "menu-open" | "menu-item" | "type" | "draw" | "erase" | "select";
+type SoundType =
+  | "tool" | "undo" | "redo" | "reset"
+  | "mute" | "unmute"
+  | "navigate" | "menu-open" | "menu-item"
+  | "type" | "draw" | "erase"
+  | "select" | "text-begin";
 
 const VOLUMES: Record<SoundType, number> = {
-  click: 0.35,
+  tool: 0.35,
+  undo: 0.40,
+  redo: 0.40,
+  reset: 0.45,
+  mute: 0.35,
+  unmute: 0.35,
   navigate: 0.45,
   "menu-open": 0.40,
   "menu-item": 0.30,
   type: 0.25,
   draw: 0.40,
   erase: 0.35,
-  select: 0.40,
+  select: 0.35,
+  "text-begin": 0.35,
 };
 
 const STORAGE_KEY = "sounds-enabled";

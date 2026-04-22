@@ -67,7 +67,8 @@ export function useCanvasPersistence(pageKey: string) {
       }
     }
     keysToRemove.forEach((key) => localStorage.removeItem(key));
-    window.location.reload();
+    // Defer reload so the reset sound (~160ms) has time to play out.
+    setTimeout(() => window.location.reload(), 260);
   }, []);
 
   return { store, loadingState, reset, needsInitialLayout };

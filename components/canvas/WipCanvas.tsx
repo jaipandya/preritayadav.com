@@ -129,9 +129,11 @@ export function WipCanvas({
         }
 
         if (event.type === "pointer" && event.name === "pointer_up") {
-          if (editor.getCurrentToolId() === "select" &&
-              editor.getSelectedShapeIds().length > 0) {
+          const toolId = editor.getCurrentToolId();
+          if (toolId === "select" && editor.getSelectedShapeIds().length > 0) {
             sounds.play("select");
+          } else if (toolId === "text") {
+            sounds.play("text-begin");
           }
           if (editor.getCurrentToolId() !== "browse") return;
           if (!pointerDownPos.current) return;
