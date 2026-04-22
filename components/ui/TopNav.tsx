@@ -24,6 +24,11 @@ export function TopNav() {
   const metaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    sounds.prime("menu");
+    sounds.prime("navigate");
+  }, []);
+
+  useEffect(() => {
     if (!metaOpen) return;
     function handleClick(e: MouseEvent) {
       if (metaRef.current && !metaRef.current.contains(e.target as Node)) {
@@ -34,14 +39,25 @@ export function TopNav() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, [metaOpen]);
 
-  // Close dropdown on navigation
-  useEffect(() => {
-    setMetaOpen(false);
-  }, [pathname]);
-
   function isActive(href: string) {
     if (href === "/") return pathname === "/";
     return pathname.startsWith(href);
+  }
+
+  function playNavigateKeySound(e: React.KeyboardEvent<HTMLElement>) {
+    if (e.key === "Enter") sounds.play("navigate");
+  }
+
+  function playMenuKeySound(e: React.KeyboardEvent<HTMLElement>) {
+    if (e.key === "Enter" || e.key === " ") sounds.play("menu");
+  }
+
+  function playNavigatePointerSound(e: React.PointerEvent<HTMLElement>) {
+    if (e.button === 0) sounds.play("navigate");
+  }
+
+  function playMenuPointerSound(e: React.PointerEvent<HTMLElement>) {
+    if (e.button === 0) sounds.play("menu");
   }
 
   const linkStyle = (active: boolean): React.CSSProperties => ({
@@ -78,7 +94,11 @@ export function TopNav() {
             key={link.label}
             href={link.href}
             style={linkStyle(active)}
-            onClick={() => sounds.play("navigate")}
+            onClick={() => {
+              setMetaOpen(false);
+            }}
+            onPointerDown={playNavigatePointerSound}
+            onKeyDown={playNavigateKeySound}
             onMouseEnter={(e) => { e.currentTarget.style.opacity = "1"; }}
             onMouseLeave={(e) => { e.currentTarget.style.opacity = active ? "1" : "0.6"; }}
           >
@@ -90,7 +110,13 @@ export function TopNav() {
       {/* Meta dropdown */}
       <div ref={metaRef} style={{ position: "relative" }}>
         <button
-          onClick={() => { if (!metaOpen) sounds.play("menu-open"); setMetaOpen((v) => !v); }}
+          onClick={() => setMetaOpen((v) => !v)}
+          onPointerDown={(e) => {
+            if (!metaOpen) playMenuPointerSound(e);
+          }}
+          onKeyDown={(e) => {
+            if (!metaOpen) playMenuKeySound(e);
+          }}
           style={{
             ...linkStyle(META_LINKS.some((l) => isActive(l.href))),
             background: "none",
@@ -145,7 +171,11 @@ export function TopNav() {
                     opacity: isActive(link.href) ? 1 : 0.6,
                     transition: "opacity 0.15s",
                   }}
-                  onClick={() => sounds.play("menu-item")}
+                  onClick={() => {
+                    setMetaOpen(false);
+                  }}
+                  onPointerDown={playMenuPointerSound}
+                  onKeyDown={playMenuKeySound}
                   onMouseEnter={(e) => { e.currentTarget.style.opacity = "1"; }}
                   onMouseLeave={(e) => { e.currentTarget.style.opacity = isActive(link.href) ? "1" : "0.6"; }}
                 >

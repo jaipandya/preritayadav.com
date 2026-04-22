@@ -2,7 +2,7 @@
 type SoundType =
   | "tool" | "undo" | "redo" | "reset"
   | "mute" | "unmute"
-  | "navigate" | "menu-open" | "menu-item"
+  | "navigate" | "menu"
   | "type" | "draw" | "erase"
   | "select" | "text-begin";
 
@@ -13,9 +13,8 @@ const VOLUMES: Record<SoundType, number> = {
   reset: 0.45,
   mute: 0.35,
   unmute: 0.35,
-  navigate: 0.45,
-  "menu-open": 0.40,
-  "menu-item": 0.30,
+  navigate: 0.36,
+  menu: 0.26,
   type: 0.25,
   draw: 0.40,
   erase: 0.35,
@@ -73,6 +72,11 @@ class SoundManager {
       });
     }
     return this._howls[type]!;
+  }
+
+  prime(type: SoundType) {
+    if (typeof window === "undefined") return;
+    this.ensureHowl(type).load();
   }
 
   play(type: SoundType) {

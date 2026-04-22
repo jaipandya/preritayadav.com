@@ -144,7 +144,7 @@ function softClip(samples, threshold = 0.95) {
 // Shared language:
 //   - bandpassed noise (~200–900Hz) for ticks/thumps
 //   - low sine blips (200–500Hz) for commits (navigate, select)
-//   - muted low-band whoosh for menu-open
+//   - muted low-mid plucks for menu interactions
 
 function bandpass(samples, fLo, fHi) {
   return lowpass(highpass(samples, fLo), fHi);
@@ -225,12 +225,26 @@ function designUnmute() {
   return gain(mix(body, tick), 0.55);
 }
 
-// Menu item — quieter low tap
-function designMenuItem() {
-  let s = noise(0.024, 1);
-  s = bandpass(s, 220, 750);
-  envelope(s, { attack: 0.0007, decayCurve: 7 });
-  return gain(s, 0.5);
+// Menu click — shared by single-level and nested menus.
+// Reuses the softer "Meta open" character, but pitched lower so it stays
+// clearly separate from undo / redo's tonal sweeps.
+function designMenu() {
+  const whooshDur = 0.12;
+  const raw = noise(whooshDur, 1);
+  const lpLow = lowpass(raw, 220);
+  const lpHigh = lowpass(raw, 520);
+  const whoosh = new Float32Array(lpLow.length);
+  for (let i = 0; i < whoosh.length; i++) {
+    const t = i / (whoosh.length - 1);
+    whoosh[i] = lpLow[i] * (1 - t) + lpHigh[i] * t;
+  }
+  envelope(whoosh, { attack: 0.018, decayCurve: 3.3 });
+  gain(whoosh, 0.28);
+
+  const blip = sine(0.09, 220, 280, 0.16);
+  envelope(blip, { attack: 0.006, decayCurve: 4.5 });
+
+  return gain(mix(whoosh, blip), 0.52);
 }
 
 // Keystroke — low, very quiet muted tick
@@ -269,15 +283,18 @@ function designErase() {
   return gain(s, 0.55);
 }
 
-// Navigate — low descending sine commit with a muted transient
+// Navigate — softer and slightly longer than menu clicks so page/canvas
+// navigation still feels distinct without sounding heavy.
 function designNavigate() {
-  const body = sine(0.13, 440, 300, 0.35);
-  envelope(body, { attack: 0.005, decayCurve: 3.5 });
-  let tick = noise(0.009, 1);
-  tick = bandpass(tick, 250, 800);
-  envelope(tick, { attack: 0.0005, decayCurve: 7 });
-  gain(tick, 0.35);
-  return gain(mix(body, tick), 0.6);
+  const body = sine(0.095, 390, 290, 0.22);
+  envelope(body, { attack: 0.004, decayCurve: 4.2 });
+
+  let tick = noise(0.008, 1);
+  tick = bandpass(tick, 240, 700);
+  envelope(tick, { attack: 0.0005, decayCurve: 7.5 });
+  gain(tick, 0.22);
+
+  return gain(mix(body, tick), 0.5);
 }
 
 // Select (canvas pick) — single soft low pluck, short and unobtrusive
@@ -300,26 +317,6 @@ function designTextBegin() {
   return gain(mix(head, blip), 0.55);
 }
 
-// Menu open — muted low whoosh, no bright accent
-function designMenuOpen() {
-  const whooshDur = 0.16;
-  const raw = noise(whooshDur, 1);
-  const lpLow = lowpass(raw, 280);
-  const lpHigh = lowpass(raw, 700);
-  const whoosh = new Float32Array(lpLow.length);
-  for (let i = 0; i < whoosh.length; i++) {
-    const t = i / (whoosh.length - 1);
-    whoosh[i] = lpLow[i] * (1 - t) + lpHigh[i] * t;
-  }
-  envelope(whoosh, { attack: 0.025, decayCurve: 2.8 });
-  gain(whoosh, 0.42);
-
-  const blip = sine(0.11, 280, 380, 0.25);
-  envelope(blip, { attack: 0.007, decayCurve: 3.5 });
-
-  return gain(mix(whoosh, blip), 0.55);
-}
-
 // --- Run ---
 
 const designs = {
@@ -329,8 +326,7 @@ const designs = {
   reset: designReset,
   mute: designMute,
   unmute: designUnmute,
-  "menu-item": designMenuItem,
-  "menu-open": designMenuOpen,
+  menu: designMenu,
   type: designType,
   draw: designDraw,
   erase: designErase,
