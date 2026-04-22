@@ -8,6 +8,8 @@ import { SkillIconShapeUtil } from "@/components/shapes/SkillIconShapeUtil";
 import { ImagePlaceholderShapeUtil } from "@/components/shapes/ImagePlaceholderShapeUtil";
 import { BrowserFrameShapeUtil } from "@/components/shapes/BrowserFrameShapeUtil";
 import { HandDrawnIllustrationShapeUtil } from "@/components/shapes/HandDrawnIllustrationShapeUtil";
+import { OutsideWorkCardShapeUtil } from "@/components/shapes/OutsideWorkCardShapeUtil";
+import { CompanyLogosShapeUtil } from "@/components/shapes/CompanyLogosShapeUtil";
 
 export const customShapeUtils = [
   ...defaultShapeUtils,
@@ -19,6 +21,8 @@ export const customShapeUtils = [
   ImagePlaceholderShapeUtil,
   BrowserFrameShapeUtil,
   HandDrawnIllustrationShapeUtil,
+  OutsideWorkCardShapeUtil,
+  CompanyLogosShapeUtil,
 ];
 
 export const customBindingUtils = [...defaultBindingUtils];

@@ -52,5 +52,19 @@ declare module "tldraw" {
       h: number;
       scene: string;
     };
+    "company-logos": {
+      w: number;
+      h: number;
+      companies: string;
+    };
+    "outside-work-card": {
+      w: number;
+      h: number;
+      number: string;
+      title: string;
+      subtitle: string;
+      description: string;
+      illustration: string;
+    };
   }
 }

@@ -4,9 +4,8 @@ import { getFeaturedWork } from "./workData";
 import {
   hero,
   blogPosts,
-  designPrinciples,
-  team,
-  skills,
+  outsideWork,
+  teamsWorkedWith,
   testimonial,
   footerIcons,
   footerClosing,
@@ -78,6 +77,15 @@ export function createLandingLayout(editor: Editor) {
       variationId: "hero-cta",
       href: hero.cta.href,
     },
+  });
+
+  // Hero illustration — girl working on MacBook with nature background
+  editor.createShape({
+    type: "hand-drawn-illustration",
+    x: CANVAS_W - 220,
+    y: 30,
+    props: { w: 200, h: 160, scene: "girl-laptop" },
+    meta: { componentType: "illustration", variationId: "hero-illustration" },
   });
 
   y += 100;
@@ -202,98 +210,80 @@ export function createLandingLayout(editor: Editor) {
 
   y += 20;
 
-  // --- DESIGN PHILOSOPHY ---
+  // --- OUTSIDE WORK SECTION ---
   editor.createShape({
     type: "annotation",
     x: LEFT_PAD,
     y,
     props: {
-      w: 350,
-      h: 50,
-      text: "My design principles",
-      fontSize: 20,
-      showArrow: false,
-      arrowDirection: "right",
+      w: 300,
+      h: 40,
+      text: outsideWork.heading,
+      fontSize: 22,
+      showArrow: true,
+      arrowDirection: "down",
     },
-    meta: { componentType: "annotation", variationId: "design-philosophy" },
+    meta: { componentType: "annotation", variationId: "outside-work-heading" },
   });
 
-  y += 50;
+  y += 70;
 
-  for (const line of designPrinciples) {
+  for (const item of outsideWork.items) {
     editor.createShape({
-      type: "annotation",
+      type: "outside-work-card",
       x: LEFT_PAD,
       y,
       props: {
-        w: 400,
-        h: 24,
-        text: line,
-        fontSize: 13,
-        showArrow: false,
-        arrowDirection: "right",
+        w: CANVAS_W - LEFT_PAD * 2,
+        h: 160,
+        number: item.number,
+        title: item.title,
+        subtitle: item.subtitle,
+        description: item.description,
+        illustration: item.illustration,
       },
-      meta: { componentType: "annotation", variationId: "design-philosophy-line" },
+      meta: {
+        componentType: "outside-work-card",
+        variationId: `outside-work-${item.number}`,
+      },
     });
-    y += 28;
+
+    y += 190;
   }
 
-  y += 30;
+  y += 20;
 
-  // --- TEAM / PEOPLE SECTION ---
-  editor.createShape({
-    type: "team-avatars",
-    x: LEFT_PAD,
-    y,
-    props: {
-      w: CANVAS_W - LEFT_PAD * 2,
-      h: 200,
-      title: team.title,
-      subtitle: team.subtitle,
-      count: team.count,
-    },
-    meta: { componentType: "team-avatars", variationId: "team-section" },
-  });
-
-  y += 250;
-
-  // --- SKILLS / SERVICES SECTION ---
+  // --- TEAMS WORKED WITH ---
   editor.createShape({
     type: "annotation",
     x: LEFT_PAD,
     y,
     props: {
       w: 400,
-      h: 30,
-      text: "Core capabilities",
-      fontSize: 16,
+      h: 40,
+      text: teamsWorkedWith.heading,
+      fontSize: 22,
       showArrow: false,
       arrowDirection: "right",
     },
-    meta: { componentType: "annotation", variationId: "skills-title" },
+    meta: { componentType: "annotation", variationId: "teams-heading" },
   });
 
-  y += 40;
+  y += 50;
 
-  skills.forEach((skill, i) => {
-    editor.createShape({
-      type: "skill-icon",
-      x: LEFT_PAD + i * 130,
-      y,
-      props: {
-        w: 110,
-        h: 120,
-        icon: skill.icon,
-        label: skill.label,
-      },
-      meta: {
-        componentType: "skill-icon",
-        variationId: `skill-${skill.icon}`,
-      },
-    });
+  editor.createShape({
+    type: "company-logos",
+    x: LEFT_PAD,
+    y,
+    props: {
+      w: CANVAS_W - LEFT_PAD * 2,
+      h: 160,
+      companies: teamsWorkedWith.companies.join(","),
+    },
+    meta: { componentType: "company-logos", variationId: "teams-logos" },
   });
 
-  y += 180;
+  y += 190;
 
   // --- TESTIMONIAL / FEATURED ---
   editor.createShape({

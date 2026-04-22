@@ -1,14 +1,14 @@
 "use client";
 
+import Link from "next/link";
 import { PageShell } from "@/components/PageShell";
 import { createLandingLayout } from "@/lib/createLandingLayout";
 import { workItems, getFeaturedWork } from "@/lib/workData";
 import {
   hero,
   blogPosts,
-  designPrinciples,
-  team,
-  skills,
+  outsideWork,
+  teamsWorkedWith,
   testimonial,
   footerIcons,
   footerClosing,
@@ -47,7 +47,7 @@ export default function Home() {
             <p>{item.tagline}</p>
           </article>
         ))}
-        <a href="/work">View all work</a>
+        <Link href="/work">View all work</Link>
       </section>
 
       <section aria-label="Writing and ideas">
@@ -62,25 +62,22 @@ export default function Home() {
         </ul>
       </section>
 
-      <section aria-label="Design principles">
-        <h2>My design principles</h2>
-        <ul>
-          {designPrinciples.map((p) => (
-            <li key={p}>{p}</li>
-          ))}
-        </ul>
+      <section aria-label="Outside work">
+        <h2>{outsideWork.heading}</h2>
+        {outsideWork.items.map((item) => (
+          <article key={item.number}>
+            <h3>{item.title}</h3>
+            <p><strong>{item.subtitle}</strong></p>
+            <p>{item.description}</p>
+          </article>
+        ))}
       </section>
 
-      <section aria-label="Collaboration">
-        <h2>{team.title}</h2>
-        <p>{team.subtitle}</p>
-      </section>
-
-      <section aria-label="Core capabilities">
-        <h2>Core capabilities</h2>
+      <section aria-label="Teams worked with">
+        <h2>{teamsWorkedWith.heading}</h2>
         <ul>
-          {skills.map((s) => (
-            <li key={s.label}>{s.label}</li>
+          {teamsWorkedWith.companyNames.map((name) => (
+            <li key={name}>{name}</li>
           ))}
         </ul>
       </section>
