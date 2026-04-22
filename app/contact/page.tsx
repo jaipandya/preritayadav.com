@@ -6,8 +6,8 @@ import {
   contactTitle,
   contactSubtitle,
   contactEmail,
-  socials,
 } from "@/lib/contactContent";
+import { contactMe } from "@/lib/landingContent";
 
 export default function ContactPage() {
   return (
@@ -25,11 +25,11 @@ export default function ContactPage() {
       </section>
 
       <section aria-label="Social links">
-        <h2>Find me elsewhere</h2>
+        <h2>{contactMe.heading}</h2>
         <ul>
-          {socials.map((s) => (
-            <li key={s.label}>
-              <a href={s.url}>{s.label}</a>
+          {contactMe.links.map((link) => (
+            <li key={link.icon}>
+              <a href={link.href}>{link.label}</a>
             </li>
           ))}
         </ul>

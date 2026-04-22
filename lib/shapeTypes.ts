@@ -66,5 +66,9 @@ declare module "tldraw" {
       description: string;
       illustration: string;
     };
+    "contact-me": {
+      w: number;
+      h: number;
+    };
   }
 }

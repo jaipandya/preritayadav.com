@@ -12,178 +12,202 @@ import {
   type TLResizeInfo,
   resizeBox,
 } from "tldraw";
-import { wobblyLine, wobblyRect, wobblyCircle } from "@/lib/variationSeed";
+import { wobblyCircle, seededRandom } from "@/lib/variationSeed";
 
 type CompanyLogosShape = TLShape<"company-logos">;
 
 const stroke = "#1a1a1a";
+const sw = 2.2;
+const BOX = 100;
+const PAD = 8;
+
+function wobblyRoundedRect(id: string, w: number, h: number, r: number, wobble = 3): string {
+  const s = (seed: string) => (seededRandom(seed) - 0.5) * wobble;
+  const tl = r + s(`${id}-tlr`);
+  const tr = r + s(`${id}-trr`);
+  const br = r + s(`${id}-brr`);
+  const bl = r + s(`${id}-blr`);
+  return [
+    `M ${tl + s(`${id}-s0`)} ${s(`${id}-s1`)}`,
+    `L ${w - tr + s(`${id}-s2`)} ${s(`${id}-s3`)}`,
+    `Q ${w + s(`${id}-s4`)} ${s(`${id}-s5`)} ${w + s(`${id}-s6`)} ${tr + s(`${id}-s7`)}`,
+    `L ${w + s(`${id}-s8`)} ${h - br + s(`${id}-s9`)}`,
+    `Q ${w + s(`${id}-s10`)} ${h + s(`${id}-s11`)} ${w - br + s(`${id}-s12`)} ${h + s(`${id}-s13`)}`,
+    `L ${bl + s(`${id}-s14`)} ${h + s(`${id}-s15`)}`,
+    `Q ${s(`${id}-s16`)} ${h + s(`${id}-s17`)} ${s(`${id}-s18`)} ${h - bl + s(`${id}-s19`)}`,
+    `L ${s(`${id}-s20`)} ${tl + s(`${id}-s21`)}`,
+    `Q ${s(`${id}-s22`)} ${s(`${id}-s23`)} ${tl + s(`${id}-s24`)} ${s(`${id}-s25`)}`,
+    `Z`,
+  ].join(" ");
+}
+
+function LogoBox({ id, children, showBorder = true }: { id: string; children: React.ReactNode; showBorder?: boolean }) {
+  return (
+    <svg width={BOX} height={BOX} viewBox={`-${PAD} -${PAD} ${BOX + PAD * 2} ${BOX + PAD * 2}`} overflow="visible">
+      {showBorder && (
+        <path
+          d={wobblyRoundedRect(`${id}-box`, BOX, BOX, 12, 3)}
+          fill="none"
+          stroke={stroke}
+          strokeWidth={sw}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      )}
+      {children}
+    </svg>
+  );
+}
 
 function TopprLogo({ id }: { id: string }) {
   return (
-    <svg width="90" height="52" viewBox="0 0 90 52" overflow="visible">
-      <text
-        x="45" y="32"
-        textAnchor="middle"
-        fontFamily="'Loranthus', sans-serif"
-        fontSize="26"
-        fontWeight="600"
-        fill={stroke}
-        style={{ letterSpacing: "0.5px" }}
-      >toppr</text>
-      <path d={wobblyLine(`${id}-tu`, 10, 38, 80, 38, 0.5)} fill="none" stroke={stroke} strokeWidth={0.7} />
-    </svg>
+    <LogoBox id={`${id}-toppr`} showBorder={false}>
+      <g transform="translate(28, 10)">
+        <path
+          d={wobblyRoundedRect(`${id}-ta`, 34, 34, 8, 2)}
+          fill="none" stroke={stroke} strokeWidth={sw} strokeLinecap="round"
+        />
+        <path
+          d="M 17 10 L 17 26 M 10 17 L 17 10 L 24 17"
+          fill="none" stroke={stroke} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round"
+        />
+      </g>
+      <text x="45" y="68" textAnchor="middle" fontFamily="'Loranthus', sans-serif" fontSize="18" fontWeight="700" fill={stroke}>
+        toppr
+      </text>
+    </LogoBox>
   );
 }
 
 function ByjusLogo({ id }: { id: string }) {
   return (
-    <svg width="100" height="52" viewBox="0 0 100 52" overflow="visible">
-      {/* Tilted B in a square */}
-      <g transform="translate(6, 6) rotate(-12, 18, 18)">
-        <path d={wobblyRect(`${id}-bsq`, 32, 32, 1)} fill="none" stroke={stroke} strokeWidth={1.2} />
-        <text
-          x="16" y="25"
-          textAnchor="middle"
-          fontFamily="'Loranthus', sans-serif"
-          fontSize="22"
-          fontWeight="700"
-          fill={stroke}
-        >B</text>
-      </g>
-      <text
-        x="68" y="32"
-        textAnchor="middle"
-        fontFamily="'Loranthus', sans-serif"
-        fontSize="16"
-        fontWeight="600"
-        fill={stroke}
-        style={{ letterSpacing: "0.5px" }}
-      >YJU&apos;S</text>
-    </svg>
+    <LogoBox id={`${id}-byjus`} showBorder={false}>
+      <text x="45" y="28" textAnchor="middle" fontFamily="'Loranthus', sans-serif" fontSize="16" fontWeight="800" fill={stroke} style={{ letterSpacing: "1px" }}>
+        BYJU&apos;S
+      </text>
+      <text x="45" y="62" textAnchor="middle" fontFamily="'Loranthus', sans-serif" fontSize="36" fontWeight="800" fill={stroke}>
+        B
+      </text>
+    </LogoBox>
   );
 }
 
 function EmaLogo({ id }: { id: string }) {
   return (
-    <svg width="80" height="52" viewBox="0 0 80 52" overflow="visible">
-      <path d={wobblyCircle(`${id}-ec`, 40, 26, 22, 1)} fill="none" stroke={stroke} strokeWidth={0.8} />
-      <text
-        x="40" y="32"
-        textAnchor="middle"
-        fontFamily="'Loranthus', sans-serif"
-        fontSize="22"
-        fontWeight="700"
-        fill={stroke}
-        style={{ letterSpacing: "2px" }}
-      >EMA</text>
-    </svg>
+    <LogoBox id={`${id}-ema`} showBorder={false}>
+      <path d={wobblyCircle(`${id}-ec`, 45, 36, 20, 2)} fill="none" stroke={stroke} strokeWidth={sw} />
+      <circle cx={52} cy={30} r={7} fill="none" stroke={stroke} strokeWidth={sw} />
+      <text x="45" y="78" textAnchor="middle" fontFamily="'Loranthus', sans-serif" fontSize="18" fontWeight="700" fill={stroke}>
+        Ema
+      </text>
+    </LogoBox>
   );
 }
 
 function TenKDesignersLogo({ id }: { id: string }) {
   return (
-    <svg width="100" height="52" viewBox="0 0 100 52" overflow="visible">
-      <text
-        x="50" y="24"
-        textAnchor="middle"
-        fontFamily="'Loranthus', sans-serif"
-        fontSize="24"
-        fontWeight="700"
-        fill={stroke}
-      >10K</text>
-      <text
-        x="50" y="40"
-        textAnchor="middle"
-        fontFamily="'Loranthus', sans-serif"
-        fontSize="13"
-        fontWeight="400"
-        fill={stroke}
-        style={{ letterSpacing: "0.5px" }}
-      >designers</text>
-      <path d={wobblyLine(`${id}-du`, 10, 44, 90, 44, 0.4)} fill="none" stroke={stroke} strokeWidth={0.5} />
-    </svg>
+    <LogoBox id={`${id}-10k`} showBorder={false}>
+      <text x="45" y="42" textAnchor="middle" fontFamily="'Loranthus', sans-serif" fontSize="30" fontWeight="800" fill={stroke}>
+        10k
+      </text>
+      <text x="45" y="64" textAnchor="middle" fontFamily="'Loranthus', sans-serif" fontSize="12" fontWeight="700" fill={stroke} style={{ letterSpacing: "3px" }}>
+        DESIGNERS
+      </text>
+    </LogoBox>
   );
 }
 
 function AbhiLoansLogo({ id }: { id: string }) {
   return (
-    <svg width="90" height="52" viewBox="0 0 90 52" overflow="visible">
-      <text
-        x="45" y="24"
-        textAnchor="middle"
-        fontFamily="'Loranthus', sans-serif"
-        fontSize="22"
-        fontWeight="700"
-        fill={stroke}
-      >Abhi</text>
-      <text
-        x="45" y="42"
-        textAnchor="middle"
-        fontFamily="'Loranthus', sans-serif"
-        fontSize="14"
-        fontWeight="400"
-        fill={stroke}
-        style={{ letterSpacing: "0.5px" }}
-      >Loans</text>
-      <path d={wobblyLine(`${id}-au`, 14, 27, 76, 27, 0.4)} fill="none" stroke={stroke} strokeWidth={0.5} />
-    </svg>
+    <LogoBox id={`${id}-abhi`} showBorder={false}>
+      <g transform="translate(15, 2)">
+        {/* Gauge arc */}
+        <path d="M 5 42 A 28 28 0 1 1 55 42" fill="none" stroke={stroke} strokeWidth={sw} strokeLinecap="round" />
+        {/* Tick marks around the arc */}
+        {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => {
+          const angle = Math.PI + (i / 8) * Math.PI;
+          const cx = 30, cy = 40;
+          const x1 = cx + Math.cos(angle) * 26;
+          const y1 = cy + Math.sin(angle) * 26;
+          const x2 = cx + Math.cos(angle) * 21;
+          const y2 = cy + Math.sin(angle) * 21;
+          return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={stroke} strokeWidth={1.5} strokeLinecap="round" />;
+        })}
+        {/* Needle pointing upper-right */}
+        <line x1="30" y1="40" x2="46" y2="18" stroke={stroke} strokeWidth={2.5} strokeLinecap="round" />
+        {/* Center hub */}
+        <circle cx="30" cy="40" r="3.5" fill={stroke} />
+        {/* "A" letter at top of gauge */}
+        <text x="30" y="28" textAnchor="middle" fontFamily="'Loranthus', sans-serif" fontSize="14" fontWeight="800" fill={stroke}>
+          A
+        </text>
+      </g>
+      <text x="30" y="70" textAnchor="middle" fontFamily="'Loranthus', sans-serif" fontSize="18" fontWeight="800" fill={stroke}>
+        abhi
+      </text>
+      <text x="70" y="70" textAnchor="middle" fontFamily="'Loranthus', sans-serif" fontSize="12" fontWeight="800" fill={stroke} style={{ letterSpacing: "1px" }}>
+        LOANS
+      </text>
+    </LogoBox>
   );
 }
 
 function ZkAgiLogo({ id }: { id: string }) {
   return (
-    <svg width="90" height="52" viewBox="0 0 90 52" overflow="visible">
-      <text
-        x="45" y="30"
-        textAnchor="middle"
-        fontFamily="'Courier New', monospace"
-        fontSize="22"
-        fontWeight="700"
-        fill={stroke}
-        style={{ letterSpacing: "1px" }}
-      >ZkAGI</text>
-      <path d={wobblyLine(`${id}-zu1`, 8, 36, 82, 36, 0.4)} fill="none" stroke={stroke} strokeWidth={0.6} />
-      <circle cx={14} cy={42} r={1.6} fill={stroke} />
-      <path d={wobblyLine(`${id}-zn1`, 14, 42, 32, 42, 0.2)} fill="none" stroke={stroke} strokeWidth={0.4} />
-      <circle cx={32} cy={42} r={1.6} fill={stroke} />
-      <path d={wobblyLine(`${id}-zn2`, 32, 42, 58, 42, 0.2)} fill="none" stroke={stroke} strokeWidth={0.4} />
-      <circle cx={58} cy={42} r={1.6} fill={stroke} />
-      <path d={wobblyLine(`${id}-zn3`, 58, 42, 76, 42, 0.2)} fill="none" stroke={stroke} strokeWidth={0.4} />
-      <circle cx={76} cy={42} r={1.6} fill={stroke} />
-    </svg>
+    <LogoBox id={`${id}-zk`} showBorder={false}>
+      {/* Diagonal hatching lines */}
+      <g transform="translate(16, 8)">
+        {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
+          <line
+            key={i}
+            x1={4 + i * 7} y1={2}
+            x2={0 + i * 7} y2={28}
+            stroke={stroke} strokeWidth={1.5} strokeLinecap="round"
+          />
+        ))}
+      </g>
+      {/* Z letter */}
+      <g transform="translate(28, 12)">
+        <path d="M 5 4 L 30 4 L 5 26 L 30 26" fill="none" stroke={stroke} strokeWidth={sw + 0.5} strokeLinecap="round" strokeLinejoin="round" />
+      </g>
+      <text x="45" y="62" textAnchor="middle" fontFamily="'Loranthus', sans-serif" fontSize="11" fontWeight="700" fill={stroke} style={{ letterSpacing: "1.5px" }}>
+        zkAGI
+      </text>
+    </LogoBox>
   );
 }
 
 function FitPassLogo({ id }: { id: string }) {
   return (
-    <svg width="100" height="52" viewBox="0 0 100 52" overflow="visible">
-      <text
-        x="50" y="32"
-        textAnchor="middle"
-        fontFamily="'Loranthus', sans-serif"
-        fontSize="22"
-        fontWeight="700"
-        fill={stroke}
-        style={{ letterSpacing: "2px" }}
-      >FITPASS</text>
-      <path d={wobblyLine(`${id}-fu`, 6, 38, 94, 38, 0.4)} fill="none" stroke={stroke} strokeWidth={0.7} />
-    </svg>
+    <LogoBox id={`${id}-fp`} showBorder={false}>
+      {/* Inverted triangle with dumbbell - matching FITPASS brand */}
+      <g transform="translate(25, 4)">
+        {/* Signal waves at top */}
+        <path d="M 14 0 Q 20 -6 26 0" fill="none" stroke={stroke} strokeWidth={1.8} strokeLinecap="round" />
+        <path d="M 10 3 Q 20 -8 30 3" fill="none" stroke={stroke} strokeWidth={1.8} strokeLinecap="round" />
+        {/* Inverted triangle */}
+        <path d="M 4 10 L 36 10 L 20 38 Z" fill={stroke} stroke={stroke} strokeWidth={1.5} strokeLinejoin="round" />
+        {/* Eye in the triangle */}
+        <circle cx="20" cy="19" r="5" fill="none" stroke="white" strokeWidth={1.8} />
+        <circle cx="20" cy="19" r="2" fill="white" />
+      </g>
+      <text x="45" y="68" textAnchor="middle" fontFamily="'Loranthus', sans-serif" fontSize="15" fontWeight="800" fill={stroke} style={{ letterSpacing: "3px" }}>
+        FITPASS
+      </text>
+      <text x="88" y="62" textAnchor="middle" fontFamily="'Loranthus', sans-serif" fontSize="9" fontWeight="700" fill={stroke}>
+        ®
+      </text>
+    </LogoBox>
   );
 }
 
 function EpicLogo({ id }: { id: string }) {
   return (
-    <svg width="80" height="52" viewBox="0 0 80 52" overflow="visible">
-      <text
-        x="40" y="34"
-        textAnchor="middle"
-        fontFamily="'Loranthus', sans-serif"
-        fontSize="28"
-        fontWeight="700"
-        fill={stroke}
-      >epic!</text>
-      <path d={wobblyLine(`${id}-eu`, 8, 40, 72, 40, 0.4)} fill="none" stroke={stroke} strokeWidth={0.6} />
-    </svg>
+    <LogoBox id={`${id}-epic`} showBorder={false}>
+      <text x="50" y="55" textAnchor="middle" fontFamily="'Loranthus', sans-serif" fontSize="24" fontWeight="700" fill={stroke}>
+        epic!
+      </text>
+    </LogoBox>
   );
 }
 
@@ -211,17 +235,14 @@ function CompanyLogosComponent({ shape }: { shape: CompanyLogosShape }) {
         position: "relative",
         fontFamily: "'Loranthus', sans-serif",
         pointerEvents: "none",
-        overflow: "hidden",
+        overflow: "visible",
       }}
     >
       <div
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(4, 1fr)",
-          gridTemplateRows: "1fr 1fr",
-          gap: "12px 8px",
-          height: "100%",
-          padding: "4px 0",
+          gap: "24px 16px",
           alignItems: "center",
           justifyItems: "center",
         }}
@@ -230,15 +251,7 @@ function CompanyLogosComponent({ shape }: { shape: CompanyLogosShape }) {
           const Logo = LOGOS[company.trim()];
           if (!Logo) return null;
           return (
-            <div
-              key={company}
-              style={{
-                opacity: 0.7,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
+            <div key={company} style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
               <Logo id={`${id}-logo-${i}`} />
             </div>
           );
@@ -260,7 +273,7 @@ export class CompanyLogosShapeUtil extends ShapeUtil<CompanyLogosShape> {
   getDefaultProps(): CompanyLogosShape["props"] {
     return {
       w: 520,
-      h: 160,
+      h: 260,
       companies: "toppr,byjus,ema,10kdesigners,abhiloans,zkagi,fitpass,epic",
     };
   }

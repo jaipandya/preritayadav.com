@@ -348,5 +348,91 @@ export function createUiComponentsLayout(editor: Editor) {
 
   y += 250;
 
+  // --- Section: Company Logos ---
+  editor.createShape({
+    type: "annotation",
+    x: LEFT_PAD,
+    y,
+    props: {
+      w: 300,
+      h: 30,
+      text: "Company Logos",
+      fontSize: 22,
+      showArrow: false,
+      arrowDirection: "right",
+    },
+    meta: { componentType: "annotation", variationId: "section-company-logos" },
+  });
+
+  y += 50;
+
+  editor.createShape({
+    type: "company-logos",
+    x: LEFT_PAD,
+    y,
+    props: {
+      w: CANVAS_W - LEFT_PAD * 2,
+      h: 260,
+      companies: "toppr,byjus,ema,10kdesigners,abhiloans,zkagi,fitpass,epic",
+    },
+    meta: { componentType: "company-logos", variationId: "company-logos-example" },
+  });
+
+  y += 290;
+
+  // --- Section: Contact Me ---
+  editor.createShape({
+    type: "contact-me",
+    x: LEFT_PAD,
+    y,
+    props: {
+      w: CANVAS_W - LEFT_PAD * 2,
+      h: 150,
+    },
+    meta: { componentType: "contact-me", variationId: "contact-me-example" },
+  });
+
+  y += 200;
+
+  // --- Section: Outside Work Card ---
+  editor.createShape({
+    type: "annotation",
+    x: LEFT_PAD,
+    y,
+    props: {
+      w: 300,
+      h: 30,
+      text: "Outside Work Card",
+      fontSize: 22,
+      showArrow: false,
+      arrowDirection: "right",
+    },
+    meta: { componentType: "annotation", variationId: "section-outside-work" },
+  });
+
+  y += 50;
+
+  editor.createShape({
+    type: "outside-work-card",
+    x: LEFT_PAD,
+    y,
+    props: {
+      w: CANVAS_W - LEFT_PAD * 2,
+      h: 160,
+      number: "1",
+      title: "Example activity",
+      subtitle: "A brief tagline for the activity",
+      description:
+        "This is a longer description that explains what the activity is about and why it matters.",
+      illustration: "mentoring",
+    },
+    meta: {
+      componentType: "outside-work-card",
+      variationId: "outside-work-example",
+    },
+  });
+
+  y += 200;
+
   centerCamera(editor);
 }

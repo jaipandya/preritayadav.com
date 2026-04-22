@@ -10,6 +10,7 @@ import { BrowserFrameShapeUtil } from "@/components/shapes/BrowserFrameShapeUtil
 import { HandDrawnIllustrationShapeUtil } from "@/components/shapes/HandDrawnIllustrationShapeUtil";
 import { OutsideWorkCardShapeUtil } from "@/components/shapes/OutsideWorkCardShapeUtil";
 import { CompanyLogosShapeUtil } from "@/components/shapes/CompanyLogosShapeUtil";
+import { ContactMeShapeUtil } from "@/components/shapes/ContactMeShapeUtil";
 
 export const customShapeUtils = [
   ...defaultShapeUtils,
@@ -23,6 +24,7 @@ export const customShapeUtils = [
   HandDrawnIllustrationShapeUtil,
   OutsideWorkCardShapeUtil,
   CompanyLogosShapeUtil,
+  ContactMeShapeUtil,
 ];
 
 export const customBindingUtils = [...defaultBindingUtils];

@@ -6,8 +6,7 @@ import {
   blogPosts,
   outsideWork,
   teamsWorkedWith,
-  testimonial,
-  footerIcons,
+  contactMe,
   footerClosing,
   footerCta,
 } from "./landingContent";
@@ -277,90 +276,45 @@ export function createLandingLayout(editor: Editor) {
     y,
     props: {
       w: CANVAS_W - LEFT_PAD * 2,
-      h: 160,
+      h: 260,
       companies: teamsWorkedWith.companies.join(","),
     },
     meta: { componentType: "company-logos", variationId: "teams-logos" },
   });
 
-  y += 190;
+  y += 290;
 
-  // --- TESTIMONIAL / FEATURED ---
+  // --- CONTACT ME SECTION ---
   editor.createShape({
-    type: "annotation",
+    type: "contact-me",
     x: LEFT_PAD,
     y,
     props: {
       w: CANVAS_W - LEFT_PAD * 2,
-      h: 30,
-      text: testimonial.heading,
-      fontSize: 16,
-      showArrow: false,
-      arrowDirection: "right",
+      h: 150,
     },
-    meta: { componentType: "annotation", variationId: "testimonial-title" },
+    meta: { componentType: "contact-me", variationId: "contact-me" },
   });
 
-  y += 40;
-
-  editor.createShape({
-    type: "annotation",
-    x: LEFT_PAD,
-    y,
-    props: {
-      w: CANVAS_W - LEFT_PAD * 2,
-      h: 100,
-      text: testimonial.quote,
-      fontSize: 14,
-      showArrow: false,
-      arrowDirection: "right",
-    },
-    meta: {
-      componentType: "annotation",
-      variationId: "testimonial-quote",
-    },
-  });
-
-  y += 150;
+  y += 220;
 
   // --- FOOTER ---
-  footerIcons.forEach((item, i) => {
-    editor.createShape({
-      type: "skill-icon",
-      x: LEFT_PAD + i * 110,
-      y,
-      props: {
-        w: 80,
-        h: 90,
-        icon: item.icon,
-        label: item.label,
-      },
-      meta: {
-        componentType: "skill-icon",
-        variationId: `footer-${item.label.toLowerCase()}`,
-        href: item.href,
-      },
-    });
-  });
-
-  y += 110;
-
   editor.createShape({
     type: "annotation",
     x: LEFT_PAD,
     y,
     props: {
-      w: 300,
-      h: 24,
+      w: 450,
+      h: 36,
       text: footerClosing,
-      fontSize: 14,
+      fontSize: 22,
       showArrow: false,
       arrowDirection: "right",
     },
     meta: { componentType: "annotation", variationId: "footer-closing" },
   });
 
-  y += 35;
+  y += 45;
 
   editor.createShape({
     type: "hand-drawn-button",

@@ -4,7 +4,6 @@ import {
   contactTitle,
   contactSubtitle,
   contactEmail,
-  socials,
 } from "./contactContent";
 
 export function createContactLayout(editor: Editor) {
@@ -51,25 +50,9 @@ export function createContactLayout(editor: Editor) {
 
   // Email
   editor.createShape({
-    type: "skill-icon",
+    type: "annotation",
     x: LEFT_PAD,
     y,
-    props: {
-      w: 80,
-      h: 100,
-      icon: "communication",
-      label: "Email",
-    },
-    meta: {
-      componentType: "skill-icon",
-      variationId: "contact-email-icon",
-    },
-  });
-
-  editor.createShape({
-    type: "annotation",
-    x: LEFT_PAD + 100,
-    y: y + 30,
     props: {
       w: 300,
       h: 30,
@@ -78,44 +61,28 @@ export function createContactLayout(editor: Editor) {
       showArrow: false,
       arrowDirection: "right",
     },
-    meta: { componentType: "annotation", variationId: "contact-email" },
+    meta: {
+      componentType: "annotation",
+      variationId: "contact-email",
+      href: `mailto:${contactEmail}`,
+    },
   });
 
-  y += 130;
+  y += 60;
 
-  // Social links
+  // Social links using the same contact-me shape as the landing page
   editor.createShape({
-    type: "annotation",
+    type: "contact-me",
     x: LEFT_PAD,
     y,
     props: {
-      w: 200,
-      h: 26,
-      text: "Find me elsewhere",
-      fontSize: 18,
-      showArrow: false,
-      arrowDirection: "right",
+      w: CANVAS_W - LEFT_PAD * 2,
+      h: 150,
     },
-    meta: { componentType: "annotation", variationId: "contact-social-title" },
+    meta: { componentType: "contact-me", variationId: "contact-social-icons" },
   });
 
-  y += 40;
-
-  socials.forEach((social, i) => {
-    editor.createShape({
-      type: "hand-drawn-button",
-      x: LEFT_PAD + i * 125,
-      y,
-      props: { w: 110, h: 34, label: social.label },
-      meta: {
-        componentType: "button",
-        variationId: `contact-social-${social.label.toLowerCase()}`,
-        href: social.url,
-      },
-    });
-  });
-
-  y += 80;
+  y += 200;
 
   // Decorative browser frame
   editor.createShape({

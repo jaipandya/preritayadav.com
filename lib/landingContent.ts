@@ -117,6 +117,19 @@ export const teamsWorkedWith = {
   ],
 };
 
+export type ContactIcon = "linkedin" | "twitter" | "medium" | "email" | "instagram";
+
+export const contactMe = {
+  heading: "Contact me",
+  links: [
+    { icon: "linkedin" as ContactIcon, label: "Linkedin", href: "https://www.linkedin.com/in/preritayadav/" },
+    { icon: "twitter" as ContactIcon, label: "Twitter", href: "https://x.com/preritayadav" },
+    { icon: "medium" as ContactIcon, label: "Medium", href: "https://medium.com/@preritayadav" },
+    { icon: "email" as ContactIcon, label: "email", href: "mailto:hello@preritayadav.com" },
+    { icon: "instagram" as ContactIcon, label: "Instagram", href: "https://www.instagram.com/preritayadav/" },
+  ],
+};
+
 export const footerIcons: Array<{
   icon: SkillIcon;
   label: string;
@@ -124,7 +137,6 @@ export const footerIcons: Array<{
 }> = [
   { icon: "design", label: "About", href: "/about" },
   { icon: "content", label: "Work", href: "/work" },
-  { icon: "communication", label: "Email", href: "mailto:hello@preritayadav.com" },
 ];
 
 export const footerClosing = "Let's build something great.";

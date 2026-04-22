@@ -8,7 +8,10 @@ export type ComponentType =
   | "team-avatars"
   | "skill-icon"
   | "image-placeholder"
-  | "blog-card";
+  | "blog-card"
+  | "company-logos"
+  | "outside-work-card"
+  | "contact-me";
 
 export type ShapeMeta = {
   componentType: ComponentType;

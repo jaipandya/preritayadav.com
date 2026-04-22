@@ -9,8 +9,7 @@ import {
   blogPosts,
   outsideWork,
   teamsWorkedWith,
-  testimonial,
-  footerIcons,
+  contactMe,
   footerClosing,
   footerCta,
 } from "@/lib/landingContent";
@@ -82,18 +81,19 @@ export default function Home() {
         </ul>
       </section>
 
-      <section aria-label="Testimonial">
-        <h2>{testimonial.heading}</h2>
-        <blockquote>{testimonial.quote}</blockquote>
+      <section aria-label="Contact me">
+        <h2>{contactMe.heading}</h2>
+        <nav aria-label="Social links">
+          {contactMe.links.map((link) => (
+            <a key={link.icon} href={link.href} target="_blank" rel="noopener noreferrer">
+              {link.label}
+            </a>
+          ))}
+        </nav>
       </section>
 
       <footer>
         <p>{footerClosing}</p>
-        <nav aria-label="Footer navigation">
-          {footerIcons.map((item) => (
-            <a key={item.label} href={item.href}>{item.label}</a>
-          ))}
-        </nav>
         <a href={footerCta.href}>{footerCta.label}</a>
       </footer>
     </PageShell>
