@@ -157,10 +157,12 @@ const CACHED_LINES: Array<{ text: string; delay: number }> = [
 export function BuildOverlay({
   onComplete,
   onReset,
+  onClose,
   cached = false,
 }: {
   onComplete: () => void;
   onReset: () => void;
+  onClose: () => void;
   cached?: boolean;
 }) {
   const [done, setDone] = useState(false);
@@ -257,12 +259,24 @@ export function BuildOverlay({
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ display: "flex", gap: 6 }}>
-              <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#3d3b36" }} />
-              <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#3d3b36" }} />
-              <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#3d3b36" }} />
+            <div style={{ display: "flex", gap: 6, paddingLeft: 4 }}>
+              <button 
+                onClick={onClose}
+                aria-label="Close build output"
+                style={{ 
+                  width: 12, 
+                  height: 12, 
+                  borderRadius: "50%", 
+                  background: "#ff5f56",
+                  border: "none",
+                  padding: 0,
+                  cursor: "pointer",
+                }} 
+              />
+              <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#ffbd2e" }} />
+              <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#27c93f" }} />
             </div>
-            <span style={{ color: "#706c64", fontSize: 11 }}>
+            <span style={{ color: "#706c64", fontSize: 11, marginLeft: 4 }}>
               build — preritayadav.com
             </span>
           </div>
@@ -535,7 +549,7 @@ export function BuildButton({
         Build
       </button>
 
-      {building && <BuildOverlay onComplete={handleComplete} onReset={handleReset} cached={isCached} />}
+      {building && <BuildOverlay onComplete={handleComplete} onReset={handleReset} onClose={() => setBuilding(false)} cached={isCached} />}
     </>
   );
 }
