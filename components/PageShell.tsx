@@ -3,6 +3,7 @@
 import type { Editor } from "tldraw";
 import { WipCanvas } from "@/components/canvas/WipCanvas";
 import { AccessibleNav } from "@/components/ui/AccessibleNav";
+import { BuildButton } from "@/components/ui/BuildOverlay";
 
 type NavLink = { href: string; label: string };
 
@@ -22,6 +23,7 @@ export function PageShell({
       <AccessibleNav links={navLinks} />
       <article className="sr-only">{children}</article>
       <WipCanvas pageKey={pageKey} onCreateLayout={onCreateLayout} />
+      <BuildButton />
     </div>
   );
 }

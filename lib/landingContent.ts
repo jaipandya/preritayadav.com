@@ -123,7 +123,7 @@ export const contactMe = {
   heading: "Contact me",
   links: [
     { icon: "linkedin" as ContactIcon, label: "Linkedin", href: "https://www.linkedin.com/in/preritayadav/" },
-    { icon: "twitter" as ContactIcon, label: "Twitter", href: "https://x.com/preritayadav" },
+    { icon: "twitter" as ContactIcon, label: "X", href: "https://x.com/preritayadav" },
     { icon: "medium" as ContactIcon, label: "Medium", href: "https://medium.com/@preritayadav" },
     { icon: "email" as ContactIcon, label: "email", href: "mailto:hello@preritayadav.com" },
     { icon: "instagram" as ContactIcon, label: "Instagram", href: "https://www.instagram.com/preritayadav/" },

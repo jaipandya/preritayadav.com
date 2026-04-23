@@ -21,6 +21,10 @@ body {
   font-family: var(--font-loranthus);
   margin: 0;
   padding: 0;
+}
+
+/* Lock viewport scrolling only on tldraw canvas pages */
+body:has(#main-content) {
   overflow: hidden;
 }
 
