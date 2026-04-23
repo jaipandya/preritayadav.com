@@ -453,6 +453,30 @@ export function BuildOverlay({
               >
                 Rebuild without cache
               </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onClose();
+                }}
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: "#706c64",
+                  fontSize: 11,
+                  cursor: "pointer",
+                  padding: 0,
+                  fontFamily: "inherit",
+                  transition: "color 0.2s",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = "#a8a49b";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = "#706c64";
+                }}
+              >
+                Close modal
+              </button>
             </div>
           )}
         </div>
