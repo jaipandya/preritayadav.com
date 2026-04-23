@@ -207,6 +207,7 @@ export function BuildOverlay({
 
   return (
     <div
+      className="p-4 md:p-6"
       style={{
         position: "fixed",
         inset: 0,
@@ -217,14 +218,14 @@ export function BuildOverlay({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        padding: 24,
       }}
     >
       <div
         style={{
           width: "100%",
           maxWidth: 640,
-          height: 420,
+          height: "100%",
+          maxHeight: 420,
           background: "#0f0e0c",
           border: "1px solid #2e2c28",
           borderRadius: 10,
