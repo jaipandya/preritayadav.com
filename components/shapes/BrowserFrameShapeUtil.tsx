@@ -106,6 +106,7 @@ export class BrowserFrameShapeUtil extends ShapeUtil<BrowserFrameShape> {
           }}
         >
           {contentType === "image" && src && (
+            // eslint-disable-next-line @next/next/no-img-element
             <img src={src} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           )}
           {contentType === "video" && src && (

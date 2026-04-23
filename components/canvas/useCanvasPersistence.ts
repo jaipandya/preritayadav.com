@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { createTLStore, getSnapshot, loadSnapshot } from "tldraw";
 import { customShapeUtils, customBindingUtils } from "@/lib/shapes";
 import { debounce } from "@/lib/debounce";
@@ -13,18 +13,19 @@ export type LoadingState =
 export function useCanvasPersistence(pageKey: string) {
   const persistenceKey = `prerita-wip-${pageKey}`;
 
-  const [store, setStore] = useState<ReturnType<typeof createTLStore> | null>(null);
+  const [store] = useState(() => 
+    createTLStore({
+      shapeUtils: customShapeUtils,
+      bindingUtils: customBindingUtils,
+    })
+  );
   const [loadingState, setLoadingState] = useState<LoadingState>({
     status: "loading",
   });
   const [needsInitialLayout, setNeedsInitialLayout] = useState(false);
 
   useEffect(() => {
-    const s = createTLStore({
-      shapeUtils: customShapeUtils,
-      bindingUtils: customBindingUtils,
-    });
-    setStore(s);
+    const s = store;
 
     const persisted = localStorage.getItem(persistenceKey);
 
@@ -32,6 +33,7 @@ export function useCanvasPersistence(pageKey: string) {
       try {
         const snapshot = JSON.parse(persisted);
         loadSnapshot(s, snapshot);
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setLoadingState({ status: "ready" });
       } catch (e: unknown) {
         const msg = e instanceof Error ? e.message : "Unknown error";
@@ -55,7 +57,7 @@ export function useCanvasPersistence(pageKey: string) {
       cleanup();
       debouncedSave.cancel();
     };
-  }, [persistenceKey]);
+  }, [persistenceKey, store]);
 
   const reset = useCallback(() => {
     // Clear all prerita-wip-* keys, not just the current page

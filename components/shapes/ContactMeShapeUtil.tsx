@@ -42,7 +42,7 @@ function wobblyRoundedRect(id: string, w: number, h: number, r: number, wobble =
   ].join(" ");
 }
 
-function IconBox({ id, children }: { id: string; children: React.ReactNode }) {
+function IconBox({ children }: { children: React.ReactNode }) {
   return (
     <svg width={BOX} height={BOX} viewBox={`-${PAD} -${PAD} ${BOX + PAD * 2} ${BOX + PAD * 2}`} overflow="visible">
       {children}
@@ -50,9 +50,9 @@ function IconBox({ id, children }: { id: string; children: React.ReactNode }) {
   );
 }
 
-function LinkedinIcon({ id }: { id: string }) {
+function LinkedinIcon() {
   return (
-    <IconBox id={`${id}-li`}>
+    <IconBox>
       <g transform="translate(16, 12)">
         <text x="19" y="34" textAnchor="middle" fontFamily="'Loranthus', sans-serif" fontSize="32" fontWeight="800" fill={stroke}>
           in
@@ -62,9 +62,9 @@ function LinkedinIcon({ id }: { id: string }) {
   );
 }
 
-function TwitterIcon({ id }: { id: string }) {
+function TwitterIcon() {
   return (
-    <IconBox id={`${id}-tw`}>
+    <IconBox>
       <g transform="translate(18, 16)">
         <path
           d="M 0 0 L 34 38 M 34 0 L 0 38"
@@ -75,9 +75,9 @@ function TwitterIcon({ id }: { id: string }) {
   );
 }
 
-function MediumIcon({ id }: { id: string }) {
+function MediumIcon() {
   return (
-    <IconBox id={`${id}-md`}>
+    <IconBox>
       <g transform="translate(12, 14)">
         {/* Medium "M" logo - three ellipses side by side */}
         <ellipse cx="13" cy="22" rx="12" ry="14" fill="none" stroke={stroke} strokeWidth={sw} />
@@ -90,7 +90,7 @@ function MediumIcon({ id }: { id: string }) {
 
 function EmailIcon({ id }: { id: string }) {
   return (
-    <IconBox id={`${id}-em`}>
+    <IconBox>
       <g transform="translate(10, 14)">
         <path d={wobblyRect(`${id}-env`, 50, 34, 2)} fill="none" stroke={stroke} strokeWidth={sw} strokeLinecap="round" />
         <path
@@ -104,7 +104,7 @@ function EmailIcon({ id }: { id: string }) {
 
 function InstagramIcon({ id }: { id: string }) {
   return (
-    <IconBox id={`${id}-ig`}>
+    <IconBox>
       <g transform="translate(12, 12)">
         <path d={wobblyRoundedRect(`${id}-igb`, 46, 46, 10, 2)} fill="none" stroke={stroke} strokeWidth={sw} strokeLinecap="round" />
         <path d={wobblyCircle(`${id}-igc`, 23, 23, 13, 1.5)} fill="none" stroke={stroke} strokeWidth={sw} />

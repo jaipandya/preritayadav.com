@@ -427,7 +427,13 @@ export function BuildOverlay({
   );
 }
 
-export function BuildButton() {
+export function BuildButton({ 
+  variant = "floating",
+  className = ""
+}: { 
+  variant?: "floating" | "inline",
+  className?: string
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const [building, setBuilding] = useState(false);
@@ -457,14 +463,14 @@ export function BuildButton() {
   return (
     <>
       <button
+        className={className}
         onClick={handleClick}
-        style={{
+        style={variant === "floating" ? {
           position: "fixed",
           bottom: 48,
           right: 24,
           zIndex: 600,
           pointerEvents: "auto",
-          display: "inline-flex",
           alignItems: "center",
           gap: 7,
           fontFamily: "'Loranthus', sans-serif",
@@ -477,20 +483,44 @@ export function BuildButton() {
           cursor: "pointer",
           transition: "background 0.15s, transform 0.15s, box-shadow 0.15s",
           boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+        } : {
+          alignItems: "center",
+          gap: 5,
+          height: "100%",
+          padding: "0 8px",
+          border: "none",
+          borderLeft: "1px solid #1a1a1a",
+          background: "#fff",
+          color: "#1a1a1a",
+          fontSize: 11,
+          fontFamily: "'Loranthus', sans-serif",
+          cursor: "pointer",
+          borderTopRightRadius: 2,
+          borderBottomRightRadius: 2,
+          transition: "background 0.15s",
+          pointerEvents: "auto",
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.background = "#f5f5f0";
-          e.currentTarget.style.transform = "translateY(-1px)";
-          e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.12)";
+          if (variant === "floating") {
+            e.currentTarget.style.background = "#f5f5f0";
+            e.currentTarget.style.transform = "translateY(-1px)";
+            e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.12)";
+          } else {
+            e.currentTarget.style.background = "#f5f5f0";
+          }
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.background = "#fff";
-          e.currentTarget.style.transform = "translateY(0)";
-          e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.08)";
+          if (variant === "floating") {
+            e.currentTarget.style.background = "#fff";
+            e.currentTarget.style.transform = "translateY(0)";
+            e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.08)";
+          } else {
+            e.currentTarget.style.background = "#fff";
+          }
         }}
         title="Build high-fidelity version"
       >
-        <svg width={14} height={14} viewBox="0 0 14 14" fill="none" stroke="#1a1a1a" strokeWidth={1.3} strokeLinecap="round" strokeLinejoin="round">
+        <svg width={variant === "floating" ? 14 : 12} height={variant === "floating" ? 14 : 12} viewBox="0 0 14 14" fill="none" stroke="#1a1a1a" strokeWidth={1.3} strokeLinecap="round" strokeLinejoin="round">
           <rect x="1.5" y="3" width="11" height="8.5" rx="1" />
           <path d="M4.5 6l2 1.5-2 1.5" />
           <path d="M8 9h2" />

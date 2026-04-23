@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import { TopNav } from "@/components/ui/TopNav";
 import { Footer } from "@/components/ui/Footer";
+import { BuildButton } from "@/components/ui/BuildOverlay";
 
 const BROWSER_MAX_WIDTH = 840;
 const MARGIN_Y = 24;
@@ -79,11 +80,13 @@ export function BrowserChrome({ children }: { children: React.ReactNode }) {
               border: "1px solid #1a1a1a",
               borderRadius: 4,
               boxSizing: "border-box",
+              display: "flex",
+              alignItems: "stretch",
             }}
           >
             <div
               style={{
-                height: "100%",
+                flex: 1,
                 display: "flex",
                 alignItems: "center",
                 fontSize: 13,
@@ -96,6 +99,7 @@ export function BrowserChrome({ children }: { children: React.ReactNode }) {
             >
               {displayUrl}
             </div>
+            <BuildButton variant="inline" className="inline-flex md:hidden" />
           </div>
 
 

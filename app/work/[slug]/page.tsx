@@ -1,10 +1,11 @@
 "use client";
 
-import { use, useCallback } from "react";
+import { use } from "react";
 import type { Editor } from "tldraw";
 import { PageShell } from "@/components/PageShell";
 import { createWorkDetailLayout } from "@/lib/createWorkDetailLayout";
 import { getWorkBySlug } from "@/lib/workData";
+import Link from "next/link";
 
 const navLinks = [
   { href: "/work", label: "Back to Work" },
@@ -21,12 +22,9 @@ export default function WorkDetailPage({
   const { slug } = use(params);
   const data = getWorkBySlug(slug);
 
-  const handleCreateLayout = useCallback(
-    (editor: Editor) => {
-      createWorkDetailLayout(editor, slug);
-    },
-    [slug]
-  );
+  const handleCreateLayout = (editor: Editor) => {
+    createWorkDetailLayout(editor, slug);
+  };
 
   return (
     <PageShell navLinks={navLinks} pageKey={`work-${slug}`} onCreateLayout={handleCreateLayout}>
@@ -86,8 +84,8 @@ export default function WorkDetailPage({
           </section>
 
           <footer>
-            <a href="/contact">Contact me</a>
-            <a href="/work">Back to work</a>
+            <Link href="/contact">Contact me</Link>
+            <Link href="/work">Back to work</Link>
           </footer>
         </>
       )}

@@ -22,8 +22,8 @@ export function PageShell({
     <div id="main-content" style={{ width: "100vw", height: "100vh" }}>
       <AccessibleNav links={navLinks} />
       <article className="sr-only">{children}</article>
-      <WipCanvas pageKey={pageKey} onCreateLayout={onCreateLayout} />
-      <BuildButton />
+      <WipCanvas key={pageKey} pageKey={pageKey} onCreateLayout={onCreateLayout} />
+      <BuildButton className="hidden md:inline-flex" />
     </div>
   );
 }

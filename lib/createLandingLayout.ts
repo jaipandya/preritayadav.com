@@ -6,7 +6,6 @@ import {
   blogPosts,
   outsideWork,
   teamsWorkedWith,
-  contactMe,
   footerClosing,
   footerCta,
 } from "./landingContent";

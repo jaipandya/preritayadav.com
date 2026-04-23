@@ -1,5 +1,5 @@
 import type { Editor } from "tldraw";
-import { CANVAS_W, LEFT_PAD, centerCamera } from "./layoutHelpers";
+import { LEFT_PAD, centerCamera } from "./layoutHelpers";
 
 export function createNotFoundLayout(editor: Editor) {
   let y = 80;

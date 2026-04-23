@@ -12,7 +12,7 @@ import {
   type TLResizeInfo,
   resizeBox,
 } from "tldraw";
-import { wobblyRect, wobblyLine, wobblyCircle, seededRandom } from "@/lib/variationSeed";
+import { wobblyRect, wobblyLine, wobblyCircle } from "@/lib/variationSeed";
 
 type OutsideWorkCardShape = TLShape<"outside-work-card">;
 

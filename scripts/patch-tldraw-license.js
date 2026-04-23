@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-disable @typescript-eslint/no-require-imports */
 // Temporary patch: make @tldraw/editor treat every environment as development
 // so the production license check is skipped while the hobby license is obtained.
 // Remove this file (and the postinstall entry in package.json) once the licenseKey

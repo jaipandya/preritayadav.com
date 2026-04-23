@@ -32,6 +32,12 @@ function MenuIcon({ open }: { open: boolean }) {
 export function RenderedNav() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [prevPath, setPrevPath] = useState(pathname);
+
+  if (pathname !== prevPath) {
+    setPrevPath(pathname);
+    setMobileOpen(false);
+  }
 
   const isActive = useCallback(
     (href: string) => {
@@ -40,10 +46,6 @@ export function RenderedNav() {
     },
     [pathname]
   );
-
-  useEffect(() => {
-    setMobileOpen(false);
-  }, [pathname]);
 
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? "hidden" : "";

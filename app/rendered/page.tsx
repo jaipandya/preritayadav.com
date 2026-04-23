@@ -57,7 +57,7 @@ const OUTSIDE_IMAGE_ILLUSTRATIONS = {
   },
 } as const;
 
-function HeroIllustration({ className }: IllustrationProps) {
+export function HeroIllustration({ className }: IllustrationProps) {
   return (
     <svg
       viewBox="0 0 320 240"
@@ -247,7 +247,7 @@ function TinkeringIllustration({ className }: IllustrationProps) {
   );
 }
 
-const OUTSIDE_ILLUSTRATIONS = {
+export const OUTSIDE_ILLUSTRATIONS = {
   mentoring: MentoringIllustration,
   travel: TravelIllustration,
   tinkering: TinkeringIllustration,
@@ -621,6 +621,7 @@ export default function RenderedHome() {
               return (
                 <div key={key} className="r-team-logo-cell">
                   {logo ? (
+                    // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={logo}
                       alt={name}
