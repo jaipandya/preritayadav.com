@@ -397,85 +397,91 @@ export function BuildOverlay({
                 borderTop: "1px solid #1e1d1a",
                 display: "flex",
                 alignItems: "center",
+                justifyContent: "space-between",
                 gap: 16,
                 flexWrap: "wrap",
               }}
             >
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onComplete();
-                }}
-                style={{
-                  background: "#D4A853",
-                  border: "1px solid #B8923F",
-                  color: "#0f0e0c",
-                  fontSize: 12,
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  padding: "6px 12px",
-                  borderRadius: 4,
-                  fontFamily: "inherit",
-                  transition: "background 0.15s, transform 0.15s",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "#E8BC5E";
-                  e.currentTarget.style.transform = "translateY(-1px)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "#D4A853";
-                  e.currentTarget.style.transform = "translateY(0)";
-                }}
-              >
-                Visit rendered page →
-              </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onReset();
-                }}
-                style={{
-                  background: "none",
-                  border: "none",
-                  color: "#706c64",
-                  fontSize: 11,
-                  cursor: "pointer",
-                  padding: 0,
-                  fontFamily: "inherit",
-                  transition: "color 0.2s",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.color = "#a8a49b";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.color = "#706c64";
-                }}
-              >
-                Rebuild without cache
-              </button>
+              <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onComplete();
+                  }}
+                  style={{
+                    background: "#D4A853",
+                    border: "1px solid #B8923F",
+                    color: "#0f0e0c",
+                    fontSize: 12,
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    padding: "6px 12px",
+                    borderRadius: 4,
+                    fontFamily: "inherit",
+                    transition: "background 0.15s, transform 0.15s",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = "#E8BC5E";
+                    e.currentTarget.style.transform = "translateY(-1px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = "#D4A853";
+                    e.currentTarget.style.transform = "translateY(0)";
+                  }}
+                >
+                  Visit rendered page →
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onReset();
+                  }}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "#706c64",
+                    fontSize: 11,
+                    cursor: "pointer",
+                    padding: 0,
+                    fontFamily: "inherit",
+                    transition: "color 0.2s",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = "#a8a49b";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = "#706c64";
+                  }}
+                >
+                  Rebuild without cache
+                </button>
+              </div>
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   onClose();
                 }}
                 style={{
-                  background: "none",
-                  border: "none",
-                  color: "#706c64",
+                  background: "transparent",
+                  border: "1px solid #2e2c28",
+                  color: "#a8a49b",
                   fontSize: 11,
                   cursor: "pointer",
-                  padding: 0,
+                  padding: "4px 10px",
+                  borderRadius: 4,
                   fontFamily: "inherit",
-                  transition: "color 0.2s",
+                  transition: "background 0.2s, color 0.2s",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.color = "#a8a49b";
+                  e.currentTarget.style.background = "#1e1d1a";
+                  e.currentTarget.style.color = "#d4d0c8";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.color = "#706c64";
+                  e.currentTarget.style.background = "transparent";
+                  e.currentTarget.style.color = "#a8a49b";
                 }}
               >
-                Close modal
+                Close
               </button>
             </div>
           )}
