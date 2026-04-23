@@ -115,6 +115,16 @@ export const teamsWorkedWith = {
     "FitPass",
     "Epic",
   ],
+  logos: {
+    toppr: "/logos/toppr.svg",
+    byjus: "/logos/byjus.svg",
+    ema: "/logos/ema.svg",
+    "10kdesigners": "/logos/10kdesigners.png",
+    abhiloans: "/logos/abhiloans.webp",
+    zkagi: "/logos/zkagi.svg",
+    fitpass: "/logos/fitpass.svg",
+    epic: "/logos/epic.svg",
+  } as Record<string, string>,
 };
 
 export type ContactIcon = "linkedin" | "twitter" | "medium" | "email" | "instagram";

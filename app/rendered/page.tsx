@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { motion } from "motion/react";
 import {
@@ -14,233 +15,243 @@ import {
 } from "@/lib/landingContent";
 import { getFeaturedWork } from "@/lib/workData";
 import { fadeUp, staggerContainer, ease } from "@/lib/renderedAnimations";
-const s1 = "#0a0a0a";
-const s2 = "#8a8a8a";
-const sa = "#0a0a0a";
 
-function HeroIllustration() {
+type IllustrationProps = {
+  className?: string;
+};
+
+const INK = "#121212";
+const MID = "#8b8b8b";
+const WASH = "#f1f0ec";
+const PAPER = "var(--r-bg)";
+const SKIN = "#f4d9c9";
+const BLUSH = "#eeb7b0";
+const HAIR = "#181818";
+const GOLD = "#f1d36d";
+const SAGE = "#c9d8c0";
+const SKY = "#d9e6ef";
+const ROSE = "#e4c4cb";
+const DENIM = "#c8d3ed";
+
+const HERO_ILLUSTRATION = {
+  src: "/rendered/generated/hero-notion-avatar.png",
+  width: 1448,
+  height: 1086,
+};
+
+const OUTSIDE_IMAGE_ILLUSTRATIONS = {
+  mentoring: {
+    src: "/rendered/generated/outside-mentoring-avatar.png",
+    width: 1448,
+    height: 1086,
+  },
+  travel: {
+    src: "/rendered/generated/outside-travel-avatar.png",
+    width: 1448,
+    height: 1086,
+  },
+  tinkering: {
+    src: "/rendered/generated/outside-tinkering-avatar.png",
+    width: 1448,
+    height: 1086,
+  },
+} as const;
+
+function HeroIllustration({ className }: IllustrationProps) {
   return (
-    <svg width="240" height="200" viewBox="0 0 240 200" fill="none" aria-hidden="true" className="r-hero-illustration">
-      {/* Figure — stylised girl at desk */}
-      {/* Head */}
-      <circle cx="120" cy="50" r="20" stroke={s1} strokeWidth="1.5" />
-      {/* Hair */}
-      <path d="M100 45 Q100 28 120 28 Q140 28 140 45" stroke={s1} strokeWidth="1.3" fill="none" />
-      <path d="M100 44 Q96 50 94 64" stroke={s1} strokeWidth="1.2" fill="none" />
-      <path d="M140 44 Q144 50 146 64" stroke={s1} strokeWidth="1.2" fill="none" />
-      {/* Body */}
-      <path d="M108 70 Q120 74 132 70 L136 110 L104 110 Z" stroke={s1} strokeWidth="1.3" fill="none" />
-      {/* Arms on desk */}
-      <path d="M108 82 Q96 86 80 90 L78 96" stroke={s1} strokeWidth="1.2" fill="none" strokeLinecap="round" />
-      <path d="M132 82 Q144 86 160 90 L162 96" stroke={s1} strokeWidth="1.2" fill="none" strokeLinecap="round" />
-      {/* Desk */}
-      <line x1="40" y1="110" x2="200" y2="110" stroke={s2} strokeWidth="1.2" />
-      {/* Laptop on desk */}
-      <rect x="86" y="96" width="68" height="14" rx="2" stroke={s2} strokeWidth="1" />
-      <path d="M82 110 L86 96 M154 96 L158 110" stroke={s2} strokeWidth="0.8" />
-      {/* Chair back */}
-      <path d="M96 74 Q120 80 144 74 Q148 78 148 86 L92 86 Q92 78 96 74 Z" stroke={s2} strokeWidth="0.8" fill="none" opacity="0.4" />
-      {/* Decorative elements */}
-      {/* Plant */}
-      <rect x="180" y="92" width="14" height="18" rx="3" stroke={s2} strokeWidth="1" />
-      <path d="M187 92 Q187 80 182 74" stroke={sa} strokeWidth="1" fill="none" />
-      <path d="M187 92 Q187 82 192 76" stroke={sa} strokeWidth="1" fill="none" />
-      <ellipse cx="181" cy="73" rx="4" ry="3" stroke={sa} strokeWidth="0.8" fill="none" />
-      <ellipse cx="193" cy="75" rx="4" ry="3" stroke={sa} strokeWidth="0.8" fill="none" />
-      {/* Coffee cup */}
-      <rect x="46" y="96" width="14" height="14" rx="2" stroke={s2} strokeWidth="1" />
-      <path d="M60 99 Q66 99 66 103 Q66 107 60 107" stroke={s2} strokeWidth="0.8" fill="none" />
-      {/* Sparkle */}
-      <g transform="translate(56, 42)" opacity="0.6">
-        <line x1="4" y1="0" x2="4" y2="8" stroke={sa} strokeWidth="0.8" strokeLinecap="round" />
-        <line x1="0" y1="4" x2="8" y2="4" stroke={sa} strokeWidth="0.8" strokeLinecap="round" />
-      </g>
-      <g transform="translate(172, 46)" opacity="0.4">
-        <line x1="3" y1="0" x2="3" y2="6" stroke={sa} strokeWidth="0.7" strokeLinecap="round" />
-        <line x1="0" y1="3" x2="6" y2="3" stroke={sa} strokeWidth="0.7" strokeLinecap="round" />
-      </g>
-      {/* Legs */}
-      <line x1="112" y1="110" x2="108" y2="140" stroke={s1} strokeWidth="1.2" strokeLinecap="round" />
-      <line x1="128" y1="110" x2="132" y2="140" stroke={s1} strokeWidth="1.2" strokeLinecap="round" />
-      {/* Chair legs */}
-      <line x1="100" y1="140" x2="92" y2="156" stroke={s2} strokeWidth="0.8" strokeLinecap="round" />
-      <line x1="140" y1="140" x2="148" y2="156" stroke={s2} strokeWidth="0.8" strokeLinecap="round" />
-      {/* Chair base */}
-      <line x1="88" y1="156" x2="152" y2="156" stroke={s2} strokeWidth="0.8" strokeLinecap="round" />
-      {/* Wheels */}
-      <circle cx="94" cy="158" r="2" stroke={s2} strokeWidth="0.7" />
-      <circle cx="146" cy="158" r="2" stroke={s2} strokeWidth="0.7" />
-      <circle cx="120" cy="158" r="2" stroke={s2} strokeWidth="0.7" />
+    <svg
+      viewBox="0 0 320 240"
+      fill="none"
+      aria-hidden="true"
+      className={className}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M44 176C60 132 92 92 140 86C184 80 224 108 252 154C258 164 270 176 286 180V206H64C50 206 40 194 44 176Z" fill={WASH} stroke="none" />
+      <circle cx="258" cy="52" r="24" fill={ROSE} />
+      <circle cx="72" cy="62" r="20" fill={SKY} />
+      <rect x="216" y="28" width="64" height="84" rx="18" fill={PAPER} stroke={MID} strokeWidth="2" />
+      <path d="M232 54H264" stroke={MID} strokeWidth="2" />
+      <path d="M232 68H258" stroke={MID} strokeWidth="2" />
+      <path d="M232 82H266" stroke={MID} strokeWidth="2" />
+      <rect x="38" y="48" width="58" height="38" rx="14" fill={PAPER} stroke={MID} strokeWidth="2" />
+      <path d="M54 66H82" stroke={MID} strokeWidth="2" />
+      <path d="M54 78H74" stroke={MID} strokeWidth="2" />
+      <rect x="56" y="162" width="214" height="22" rx="11" fill={PAPER} stroke={INK} strokeWidth="2.2" />
+      <rect x="146" y="132" width="72" height="30" rx="10" fill={PAPER} stroke={INK} strokeWidth="2.2" />
+      <path d="M158 144H204" stroke={MID} strokeWidth="2" />
+      <path d="M158 154H194" stroke={MID} strokeWidth="2" />
+      <path d="M94 170C90 152 90 132 100 118" stroke={INK} strokeWidth="2.2" />
+      <path d="M154 170C156 150 156 134 148 122" stroke={INK} strokeWidth="2.2" />
+      <path d="M108 92C96 102 92 118 96 132C98 138 102 142 108 146H144C154 140 160 128 160 114C160 98 150 86 136 80L108 92Z" fill={GOLD} stroke={INK} strokeWidth="2.2" />
+      <ellipse cx="124" cy="88" rx="28" ry="26" fill={SKIN} stroke={INK} strokeWidth="2.2" />
+      <path d="M98 84C102 60 132 52 148 72C152 78 154 88 150 96C144 88 136 82 126 80C118 78 108 78 98 84Z" fill={HAIR} stroke={INK} strokeWidth="2" />
+      <circle cx="115" cy="90" r="2.4" fill={INK} stroke="none" />
+      <circle cx="131" cy="90" r="2.4" fill={INK} stroke="none" />
+      <path d="M118 102C122 106 126 106 130 102" stroke={INK} strokeWidth="1.8" />
+      <circle cx="106" cy="98" r="3" fill={BLUSH} stroke="none" opacity="0.85" />
+      <circle cx="140" cy="98" r="3" fill={BLUSH} stroke="none" opacity="0.85" />
+      <path d="M102 120C118 126 132 128 146 126" stroke={INK} strokeWidth="2.2" />
+      <path d="M146 132C136 142 126 150 116 158" stroke={INK} strokeWidth="2.2" />
+      <path d="M100 128C114 136 126 142 146 146" stroke={INK} strokeWidth="2.2" />
+      <path d="M114 160L108 182" stroke={INK} strokeWidth="2.2" />
+      <path d="M132 160L138 182" stroke={INK} strokeWidth="2.2" />
+      <path d="M238 152V130" stroke={INK} strokeWidth="2" />
+      <path d="M238 130C232 124 230 116 232 108" stroke={INK} strokeWidth="1.8" />
+      <path d="M238 130C244 124 246 116 244 108" stroke={INK} strokeWidth="1.8" />
+      <rect x="228" y="152" width="20" height="18" rx="5" fill={SAGE} stroke={INK} strokeWidth="2" />
+      <rect x="68" y="150" width="18" height="20" rx="5" fill={ROSE} stroke={INK} strokeWidth="2" />
+      <path d="M86 154C92 154 94 164 88 166" stroke={INK} strokeWidth="1.8" />
+      <path d="M50 36V48" stroke={INK} strokeWidth="2" />
+      <path d="M44 42H56" stroke={INK} strokeWidth="2" />
+      <path d="M254 126V138" stroke={INK} strokeWidth="2" />
+      <path d="M248 132H260" stroke={INK} strokeWidth="2" />
     </svg>
   );
 }
 
-function MentoringIllustration() {
+function MentoringIllustration({ className }: IllustrationProps) {
   return (
-    <svg width="200" height="160" viewBox="0 0 200 160" fill="none" aria-hidden="true" className="r-outside-illustration">
-      {/* Whiteboard */}
-      <rect x="10" y="10" width="100" height="65" rx="4" stroke={s1} strokeWidth="1.3" />
-      {/* Header bar */}
-      <rect x="18" y="18" width="84" height="6" rx="2" fill="var(--r-border)" />
-      {/* Card 1 */}
-      <rect x="18" y="30" width="36" height="36" rx="3" stroke="var(--r-border)" strokeWidth="0.8" />
-      <circle cx="30" cy="40" r="4" stroke={s2} strokeWidth="0.8" />
-      <line x1="22" y1="50" x2="50" y2="50" stroke={s2} strokeWidth="0.6" />
-      <line x1="22" y1="55" x2="44" y2="55" stroke={s2} strokeWidth="0.6" />
-      {/* Arrow */}
-      <path d="M58 48 L68 48 M66 45 L69 48 L66 51" stroke={s2} strokeWidth="0.8" fill="none" strokeLinecap="round" />
-      {/* Card 2 */}
-      <rect x="72" y="30" width="30" height="36" rx="3" stroke="var(--r-border)" strokeWidth="0.8" />
-      <line x1="78" y1="38" x2="96" y2="38" stroke={s2} strokeWidth="0.6" />
-      <line x1="78" y1="44" x2="92" y2="44" stroke={s2} strokeWidth="0.6" />
-      <line x1="78" y1="50" x2="96" y2="50" stroke={s2} strokeWidth="0.6" />
-      <rect x="78" y="56" width="14" height="4" rx="1" fill={sa} opacity="0.3" />
-      {/* Easel legs */}
-      <line x1="40" y1="75" x2="36" y2="95" stroke={s2} strokeWidth="1" />
-      <line x1="80" y1="75" x2="84" y2="95" stroke={s2} strokeWidth="1" />
-      {/* Mentor figure */}
-      <circle cx="140" cy="40" r="10" stroke={s1} strokeWidth="1.3" />
-      <path d="M130 55 Q140 58 150 55 L152 85 L128 85 Z" stroke={s1} strokeWidth="1.2" fill="none" />
-      {/* Pointing arm */}
-      <path d="M130 60 Q118 55 112 52" stroke={s1} strokeWidth="1.2" fill="none" strokeLinecap="round" />
-      {/* Pointer stick */}
-      <line x1="112" y1="52" x2="104" y2="48" stroke={s2} strokeWidth="0.8" strokeLinecap="round" />
-      {/* Legs */}
-      <line x1="135" y1="85" x2="132" y2="115" stroke={s1} strokeWidth="1.2" strokeLinecap="round" />
-      <line x1="145" y1="85" x2="148" y2="115" stroke={s1} strokeWidth="1.2" strokeLinecap="round" />
-      {/* Student figures */}
-      <circle cx="40" cy="108" r="6" stroke={s2} strokeWidth="1" />
-      <path d="M34 118 Q40 120 46 118 L47 135 L33 135 Z" stroke={s2} strokeWidth="1" fill="none" />
-      <circle cx="80" cy="106" r="6" stroke={s2} strokeWidth="1" />
-      <path d="M74 116 Q80 118 86 116 L87 135 L73 135 Z" stroke={s2} strokeWidth="1" fill="none" />
-      {/* Raised hand */}
-      <line x1="86" y1="116" x2="92" y2="102" stroke={s2} strokeWidth="0.8" strokeLinecap="round" />
-      {/* Sparkle */}
-      <g transform="translate(164, 22)">
-        <line x1="5" y1="0" x2="5" y2="10" stroke={sa} strokeWidth="0.8" strokeLinecap="round" />
-        <line x1="0" y1="5" x2="10" y2="5" stroke={sa} strokeWidth="0.8" strokeLinecap="round" />
-      </g>
-      {/* Desk line */}
-      <line x1="10" y1="135" x2="180" y2="135" stroke={s2} strokeWidth="0.8" />
+    <svg
+      viewBox="0 0 320 240"
+      fill="none"
+      aria-hidden="true"
+      className={className}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M20 178C46 140 92 120 138 122C184 124 222 146 266 182V208H34C20 208 12 194 20 178Z" fill={WASH} stroke="none" />
+      <rect x="28" y="38" width="132" height="94" rx="20" fill={PAPER} stroke={INK} strokeWidth="2.2" />
+      <path d="M48 60H140" stroke={MID} strokeWidth="2" />
+      <rect x="50" y="76" width="40" height="30" rx="10" fill={SKY} stroke={MID} strokeWidth="1.8" />
+      <circle cx="62" cy="88" r="5" fill={PAPER} stroke={MID} strokeWidth="1.4" />
+      <path d="M100 84H128" stroke={MID} strokeWidth="1.8" />
+      <path d="M100 96H136" stroke={MID} strokeWidth="1.8" />
+      <path d="M70 146V178" stroke={MID} strokeWidth="2" />
+      <path d="M122 146V178" stroke={MID} strokeWidth="2" />
+      <ellipse cx="228" cy="74" rx="26" ry="24" fill={SKIN} stroke={INK} strokeWidth="2.2" />
+      <path d="M202 72C204 54 224 48 238 52C250 56 258 66 252 84C246 76 240 72 228 70C220 68 212 68 202 72Z" fill={HAIR} stroke={INK} strokeWidth="2" />
+      <circle cx="220" cy="78" r="2.4" fill={INK} stroke="none" />
+      <circle cx="236" cy="78" r="2.4" fill={INK} stroke="none" />
+      <path d="M222 90C226 94 230 94 234 90" stroke={INK} strokeWidth="1.8" />
+      <circle cx="212" cy="86" r="3" fill={BLUSH} stroke="none" />
+      <circle cx="244" cy="86" r="3" fill={BLUSH} stroke="none" />
+      <path d="M204 102C214 98 238 98 250 106V142C238 150 218 150 204 140V102Z" fill={DENIM} stroke={INK} strokeWidth="2.2" />
+      <path d="M206 114L184 100" stroke={INK} strokeWidth="2.2" />
+      <path d="M184 100L154 94" stroke={INK} strokeWidth="2.2" />
+      <path d="M248 116L266 128" stroke={INK} strokeWidth="2.2" />
+      <path d="M220 142L212 182" stroke={INK} strokeWidth="2.2" />
+      <path d="M236 142L242 182" stroke={INK} strokeWidth="2.2" />
+      <ellipse cx="102" cy="162" rx="18" ry="16" fill={SKIN} stroke={INK} strokeWidth="2" />
+      <path d="M84 158C88 146 106 140 120 150C122 152 122 156 120 166C114 158 108 156 102 156C96 156 90 156 84 158Z" fill={HAIR} stroke={INK} strokeWidth="1.8" />
+      <path d="M88 176C94 170 110 170 118 176V200C110 204 96 204 88 200V176Z" fill={ROSE} stroke={INK} strokeWidth="2" />
+      <circle cx="144" cy="168" r="15" fill={SKIN} stroke={INK} strokeWidth="2" />
+      <path d="M129 164C132 152 148 148 160 156C162 158 162 162 160 170C154 164 150 162 144 162C138 162 134 162 129 164Z" fill={HAIR} stroke={INK} strokeWidth="1.8" />
+      <path d="M132 180C140 174 150 174 158 180V202C150 206 140 206 132 202V180Z" fill={SAGE} stroke={INK} strokeWidth="2" />
+      <path d="M152 182L166 160" stroke={INK} strokeWidth="2" />
+      <path d="M266 48V60" stroke={INK} strokeWidth="2" />
+      <path d="M260 54H272" stroke={INK} strokeWidth="2" />
+      <path d="M30 206H282" stroke={MID} strokeWidth="2" />
     </svg>
   );
 }
 
-function TravelIllustration() {
+function TravelIllustration({ className }: IllustrationProps) {
   return (
-    <svg width="200" height="160" viewBox="0 0 200 160" fill="none" aria-hidden="true" className="r-outside-illustration">
-      {/* Sun */}
-      <circle cx="30" cy="28" r="10" stroke={sa} strokeWidth="1.2" />
-      <line x1="30" y1="12" x2="30" y2="16" stroke={sa} strokeWidth="0.8" strokeLinecap="round" />
-      <line x1="14" y1="28" x2="18" y2="28" stroke={sa} strokeWidth="0.8" strokeLinecap="round" />
-      <line x1="42" y1="16" x2="39" y2="19" stroke={sa} strokeWidth="0.8" strokeLinecap="round" />
-      <line x1="18" y1="16" x2="21" y2="19" stroke={sa} strokeWidth="0.8" strokeLinecap="round" />
-      {/* Cloud */}
-      <path d="M60 25 Q62 18 68 20 Q74 15 80 22 Q84 26 78 28 Q66 28 60 25 Z" stroke={s2} strokeWidth="0.8" />
-      {/* Plane */}
-      <path d="M110 32 L126 26 L122 32 L126 38 Z" stroke={s2} strokeWidth="1" />
-      <path d="M110 34 Q96 33 82 40" stroke={s2} strokeWidth="0.6" strokeDasharray="3 3" />
-      {/* Mountains */}
-      <path d="M0 90 L30 58 L50 75 L70 48 L95 72 L115 52 L140 68 L165 56 L190 74 L200 68 L200 90 Z" stroke={s1} strokeWidth="1.2" fill="none" />
-      {/* Snow cap */}
-      <path d="M63 55 L70 48 L77 55 L74 53 L70 56 L66 53 Z" stroke={s2} strokeWidth="0.8" fill="var(--r-bg-elevated)" />
-      {/* Hills */}
-      <path d="M0 108 Q50 92 100 106 Q150 92 200 105" stroke={s2} strokeWidth="1" fill="none" />
-      {/* Trees */}
-      <path d="M28 96 L34 82 L40 96 Z" stroke={s2} strokeWidth="1" />
-      <line x1="34" y1="96" x2="34" y2="104" stroke={s2} strokeWidth="1" />
-      <path d="M155 100 L160 86 L165 100 Z" stroke={s2} strokeWidth="1" />
-      <line x1="160" y1="100" x2="160" y2="108" stroke={s2} strokeWidth="1" />
-      {/* Cabin */}
-      <rect x="72" y="96" width="16" height="12" rx="1" stroke={s2} strokeWidth="1" />
-      <path d="M70 96 L80 86 L90 96" stroke={s2} strokeWidth="1" fill="none" />
-      {/* Smoke */}
-      <path d="M85 88 Q87 82 85 78 Q83 74 86 70" stroke={s2} strokeWidth="0.6" fill="none" opacity="0.5" />
-      {/* Hiker 1 */}
-      <circle cx="120" cy="106" r="4" stroke={s1} strokeWidth="1" />
-      <line x1="120" y1="110" x2="120" y2="128" stroke={s1} strokeWidth="1" strokeLinecap="round" />
-      <line x1="120" y1="128" x2="116" y2="142" stroke={s1} strokeWidth="1" strokeLinecap="round" />
-      <line x1="120" y1="128" x2="124" y2="142" stroke={s1} strokeWidth="1" strokeLinecap="round" />
-      <line x1="120" y1="116" x2="126" y2="124" stroke={s1} strokeWidth="0.8" strokeLinecap="round" />
-      {/* Walking stick */}
-      <line x1="126" y1="118" x2="130" y2="140" stroke={s2} strokeWidth="0.7" strokeLinecap="round" />
-      {/* Backpack */}
-      <rect x="114" y="112" width="6" height="10" rx="1.5" stroke={s2} strokeWidth="0.8" />
-      {/* Hiker 2 */}
-      <circle cx="145" cy="112" r="3.5" stroke={s2} strokeWidth="1" />
-      <line x1="145" y1="116" x2="145" y2="130" stroke={s2} strokeWidth="1" strokeLinecap="round" />
-      <line x1="145" y1="130" x2="142" y2="142" stroke={s2} strokeWidth="1" strokeLinecap="round" />
-      <line x1="145" y1="130" x2="148" y2="142" stroke={s2} strokeWidth="1" strokeLinecap="round" />
-      {/* Suitcase */}
-      <rect x="150" y="124" width="6" height="10" rx="1" stroke={s2} strokeWidth="0.7" />
-      {/* Ground */}
-      <line x1="0" y1="142" x2="200" y2="142" stroke={s2} strokeWidth="0.8" />
-      {/* Path */}
-      <path d="M20 150 Q60 144 100 148 Q140 152 180 146" stroke={s2} strokeWidth="0.7" strokeDasharray="4 4" />
+    <svg
+      viewBox="0 0 320 240"
+      fill="none"
+      aria-hidden="true"
+      className={className}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M22 186C54 144 106 132 152 140C198 148 232 170 278 182V208H34C22 208 14 196 22 186Z" fill={WASH} stroke="none" />
+      <circle cx="54" cy="52" r="18" fill={GOLD} stroke={INK} strokeWidth="2" />
+      <path d="M48 24V34" stroke={MID} strokeWidth="1.8" />
+      <path d="M30 42H40" stroke={MID} strokeWidth="1.8" />
+      <path d="M68 36L74 30" stroke={MID} strokeWidth="1.8" />
+      <path d="M102 52C116 38 134 36 148 46" stroke={MID} strokeWidth="2" />
+      <path d="M220 52L244 44L238 54L244 64Z" stroke={INK} strokeWidth="2" />
+      <path d="M220 56C200 58 180 68 164 82" stroke={MID} strokeWidth="1.8" strokeDasharray="6 6" />
+      <path d="M26 160C58 116 90 92 126 86C168 80 204 94 242 124" stroke={SAGE} strokeWidth="8" />
+      <path d="M26 176C74 152 128 150 172 162C208 172 240 172 286 164" stroke={SKY} strokeWidth="8" />
+      <ellipse cx="214" cy="132" rx="24" ry="22" fill={SKIN} stroke={INK} strokeWidth="2.2" />
+      <path d="M192 128C196 110 216 104 230 108C242 112 248 122 244 138C236 130 226 126 214 126C208 126 200 126 192 128Z" fill={HAIR} stroke={INK} strokeWidth="2" />
+      <circle cx="206" cy="136" r="2.4" fill={INK} stroke="none" />
+      <circle cx="220" cy="136" r="2.4" fill={INK} stroke="none" />
+      <path d="M208 148C212 152 216 152 220 148" stroke={INK} strokeWidth="1.8" />
+      <path d="M194 160C206 154 224 154 238 162V194C224 202 206 202 194 194V160Z" fill={DENIM} stroke={INK} strokeWidth="2.2" />
+      <path d="M194 170L178 178" stroke={INK} strokeWidth="2.2" />
+      <path d="M238 172L254 180" stroke={INK} strokeWidth="2.2" />
+      <path d="M208 194L198 208" stroke={INK} strokeWidth="2.2" />
+      <path d="M226 194L236 208" stroke={INK} strokeWidth="2.2" />
+      <path d="M178 178L172 206" stroke={INK} strokeWidth="2" />
+      <rect x="182" y="156" width="18" height="22" rx="6" fill={SAGE} stroke={INK} strokeWidth="2" />
+      <ellipse cx="248" cy="164" rx="17" ry="15" fill={SKIN} stroke={INK} strokeWidth="2" />
+      <path d="M232 160C236 148 250 144 262 152C264 154 264 158 262 168C256 162 252 160 248 160C242 160 238 160 232 160Z" fill={HAIR} stroke={INK} strokeWidth="1.8" />
+      <path d="M236 176C242 170 252 170 260 176V196C252 202 242 202 236 196V176Z" fill={ROSE} stroke={INK} strokeWidth="2" />
+      <rect x="262" y="172" width="18" height="24" rx="6" fill={PAPER} stroke={INK} strokeWidth="2" />
+      <path d="M30 208H286" stroke={MID} strokeWidth="2" />
     </svg>
   );
 }
 
-function TinkeringIllustration() {
+function TinkeringIllustration({ className }: IllustrationProps) {
   return (
-    <svg width="200" height="160" viewBox="0 0 200 160" fill="none" aria-hidden="true" className="r-outside-illustration">
-      {/* Open sketchbook */}
-      <rect x="10" y="30" width="80" height="64" rx="3" stroke={s1} strokeWidth="1.3" />
-      <line x1="50" y1="33" x2="50" y2="91" stroke={s2} strokeWidth="0.6" />
-      {/* House sketch on left page */}
-      <path d="M22 62 L32 48 L42 62 Z" stroke={s2} strokeWidth="0.9" />
-      <rect x="25" y="62" width="14" height="16" rx="1" stroke={s2} strokeWidth="0.9" />
-      <rect x="30" y="66" width="4" height="4" rx="0.5" stroke={s2} strokeWidth="0.6" />
-      {/* Lines on right page */}
-      <line x1="56" y1="44" x2="82" y2="44" stroke={s2} strokeWidth="0.6" />
-      <line x1="56" y1="52" x2="78" y2="52" stroke={s2} strokeWidth="0.6" />
-      <line x1="56" y1="60" x2="82" y2="60" stroke={s2} strokeWidth="0.6" />
-      <line x1="56" y1="68" x2="74" y2="68" stroke={s2} strokeWidth="0.6" />
-      {/* Spiral doodle */}
-      <path d="M68 38 Q74 34 76 40 Q74 46 68 44 Q64 42 70 42" stroke={s2} strokeWidth="0.6" fill="none" />
-      {/* Yarn ball */}
-      <circle cx="140" cy="48" r="22" stroke={s1} strokeWidth="1.3" />
-      <path d="M120 42 Q140 34 160 48" stroke={s2} strokeWidth="0.6" />
-      <path d="M118 52 Q140 44 162 56" stroke={s2} strokeWidth="0.6" />
-      <path d="M122 60 Q140 52 158 62" stroke={s2} strokeWidth="0.6" />
-      {/* Trailing yarn */}
-      <path d="M160 56 Q170 60 168 72 Q166 82 176 86" stroke={s2} strokeWidth="0.8" fill="none" />
-      {/* Crochet piece */}
-      <rect x="100" y="110" width="24" height="20" rx="2" stroke={s2} strokeWidth="1" />
-      <path d="M103 116 Q107 114 111 116 Q115 114 119 116 Q123 114 124 116" stroke={s2} strokeWidth="0.5" fill="none" />
-      <path d="M103 122 Q107 120 111 122 Q115 120 119 122 Q123 120 124 122" stroke={s2} strokeWidth="0.5" fill="none" />
-      {/* Scissors */}
-      <circle cx="148" cy="114" r="6" stroke={s2} strokeWidth="1" />
-      <circle cx="160" cy="120" r="6" stroke={s2} strokeWidth="1" />
-      <path d="M152 108 L176 96" stroke={s2} strokeWidth="0.9" strokeLinecap="round" />
-      <path d="M164 114 L176 96" stroke={s2} strokeWidth="0.9" strokeLinecap="round" />
-      {/* Pencil */}
-      <g transform="translate(28, 100) rotate(-15)">
-        <rect x="0" y="0" width="50" height="5" rx="1" stroke={s2} strokeWidth="0.9" />
-        <path d="M50 0 L56 2.5 L50 5 Z" fill={sa} opacity="0.4" stroke="none" />
-      </g>
-      {/* Glue bottle */}
-      <rect x="174" y="104" width="16" height="30" rx="2" stroke={s2} strokeWidth="1" />
-      <rect x="178" y="96" width="8" height="8" rx="1" stroke={s2} strokeWidth="0.8" />
-      <rect x="178" y="114" width="8" height="8" rx="1" stroke="var(--r-border)" strokeWidth="0.5" />
-      {/* Origami crane */}
-      <g transform="translate(170, 20)">
-        <path d="M0 10 L12 4 L22 8 L16 12 L22 16 L12 14 L0 18 L6 12 Z" stroke={s2} strokeWidth="0.8" />
-        <line x1="12" y1="4" x2="12" y2="14" stroke={s2} strokeWidth="0.4" />
-      </g>
-      {/* Beads */}
-      <circle cx="40" cy="140" r="2.5" fill={sa} opacity="0.3" />
-      <circle cx="50" cy="142" r="2" stroke={s2} strokeWidth="0.6" />
-      <circle cx="60" cy="139" r="2.5" fill={sa} opacity="0.2" />
+    <svg
+      viewBox="0 0 320 240"
+      fill="none"
+      aria-hidden="true"
+      className={className}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M34 186C58 152 98 136 140 136C184 136 220 150 270 180V208H48C34 208 26 196 34 186Z" fill={WASH} stroke="none" />
+      <rect x="28" y="50" width="94" height="70" rx="18" fill={PAPER} stroke={INK} strokeWidth="2.2" />
+      <path d="M74 54V116" stroke={MID} strokeWidth="1.8" />
+      <path d="M48 84L62 70L76 84" stroke={MID} strokeWidth="1.8" />
+      <rect x="54" y="84" width="18" height="20" rx="5" fill={SKY} stroke={MID} strokeWidth="1.8" />
+      <path d="M88 74H108" stroke={MID} strokeWidth="1.8" />
+      <path d="M88 86H102" stroke={MID} strokeWidth="1.8" />
+      <path d="M88 98H110" stroke={MID} strokeWidth="1.8" />
+      <circle cx="214" cy="80" r="20" fill={ROSE} stroke={INK} strokeWidth="2.2" />
+      <path d="M196 76C204 68 222 68 232 80" stroke={INK} strokeWidth="1.8" />
+      <path d="M194 88C206 80 222 82 232 94" stroke={INK} strokeWidth="1.8" />
+      <path d="M198 100C208 94 220 94 230 104" stroke={INK} strokeWidth="1.8" />
+      <path d="M232 102C246 112 248 126 240 144" stroke={INK} strokeWidth="1.8" />
+      <ellipse cx="148" cy="152" rx="24" ry="22" fill={SKIN} stroke={INK} strokeWidth="2.2" />
+      <path d="M124 146C130 128 150 124 164 132C170 136 172 146 166 160C160 152 152 148 144 148C136 148 130 148 124 146Z" fill={HAIR} stroke={INK} strokeWidth="2" />
+      <circle cx="140" cy="154" r="2.4" fill={INK} stroke="none" />
+      <circle cx="154" cy="154" r="2.4" fill={INK} stroke="none" />
+      <path d="M142 166C146 170 150 170 154 166" stroke={INK} strokeWidth="1.8" />
+      <path d="M124 176C136 170 156 170 170 178V202C156 210 136 210 124 202V176Z" fill={GOLD} stroke={INK} strokeWidth="2.2" />
+      <path d="M124 184L104 172" stroke={INK} strokeWidth="2.2" />
+      <path d="M170 186L188 176" stroke={INK} strokeWidth="2.2" />
+      <path d="M138 202L128 212" stroke={INK} strokeWidth="2.2" />
+      <path d="M156 202L166 212" stroke={INK} strokeWidth="2.2" />
+      <rect x="88" y="148" width="34" height="28" rx="10" fill={SKY} stroke={INK} strokeWidth="2" />
+      <path d="M96 160H112" stroke={MID} strokeWidth="1.8" />
+      <path d="M180 148L198 166" stroke={INK} strokeWidth="2" />
+      <path d="M196 146L178 166" stroke={INK} strokeWidth="2" />
+      <circle cx="176" cy="144" r="6" fill={PAPER} stroke={INK} strokeWidth="2" />
+      <circle cx="202" cy="144" r="6" fill={PAPER} stroke={INK} strokeWidth="2" />
+      <rect x="220" y="150" width="22" height="34" rx="7" fill={SAGE} stroke={INK} strokeWidth="2" />
+      <rect x="224" y="140" width="14" height="12" rx="5" fill={PAPER} stroke={INK} strokeWidth="1.8" />
+      <path d="M44 182H86" stroke={MID} strokeWidth="2" />
+      <path d="M44 30V42" stroke={INK} strokeWidth="2" />
+      <path d="M38 36H50" stroke={INK} strokeWidth="2" />
+      <path d="M258 56V68" stroke={INK} strokeWidth="2" />
+      <path d="M252 62H264" stroke={INK} strokeWidth="2" />
     </svg>
   );
 }
 
-const OUTSIDE_ILLUSTRATIONS: Record<string, React.FC> = {
+const OUTSIDE_ILLUSTRATIONS = {
   mentoring: MentoringIllustration,
   travel: TravelIllustration,
   tinkering: TinkeringIllustration,
-};
+} as const;
 
 function CompanyMark({ company }: { company: string }) {
   const slug = company.toLowerCase().replace(/[^a-z0-9]/g, "");
@@ -432,7 +443,18 @@ export default function RenderedHome() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, delay: 0.2, ease }}
         >
-          <HeroIllustration />
+          <div className="r-hero-image-frame">
+            <Image
+              src={HERO_ILLUSTRATION.src}
+              alt=""
+              aria-hidden="true"
+              width={HERO_ILLUSTRATION.width}
+              height={HERO_ILLUSTRATION.height}
+              priority
+              sizes="(max-width: 768px) 100vw, 340px"
+              className="r-hero-illustration"
+            />
+          </div>
         </motion.div>
       </section>
 
@@ -548,7 +570,10 @@ export default function RenderedHome() {
 
           <div className="r-outside-list">
             {outsideWork.items.map((item, i) => {
-              const Illustration = OUTSIDE_ILLUSTRATIONS[item.illustration];
+              const imageIllustration =
+                OUTSIDE_IMAGE_ILLUSTRATIONS[
+                  item.illustration as keyof typeof OUTSIDE_IMAGE_ILLUSTRATIONS
+                ];
               return (
                 <motion.div
                   key={item.number}
@@ -561,9 +586,19 @@ export default function RenderedHome() {
                     <p className="r-outside-item-subtitle">{item.subtitle}</p>
                     <p className="r-outside-item-desc">{item.description}</p>
                   </div>
-                  {Illustration && (
+                  {imageIllustration && (
                     <div className="r-outside-item-illustration">
-                      <Illustration />
+                      <div className="r-outside-image-frame">
+                        <Image
+                          src={imageIllustration.src}
+                          alt=""
+                          aria-hidden="true"
+                          width={imageIllustration.width}
+                          height={imageIllustration.height}
+                          sizes="(max-width: 640px) 100vw, 220px"
+                          className="r-outside-illustration"
+                        />
+                      </div>
                     </div>
                   )}
                 </motion.div>
@@ -582,9 +617,22 @@ export default function RenderedHome() {
           <div className="r-teams-grid">
             {teamsWorkedWith.companies.map((key, i) => {
               const name = companies[i];
+              const logo = teamsWorkedWith.logos[key];
               return (
                 <div key={key} className="r-team-logo-cell">
-                  <span className="r-team-logo-name">{name}</span>
+                  {logo ? (
+                    <img
+                      src={logo}
+                      alt={name}
+                      title={name}
+                      data-slug={key}
+                      className="r-team-logo-img"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  ) : (
+                    <span className="r-team-logo-name">{name}</span>
+                  )}
                 </div>
               );
             })}

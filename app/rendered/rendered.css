@@ -256,8 +256,23 @@ html:has(.rendered-root) {
   justify-content: center;
 }
 
+.r-hero-image-frame {
+  width: min(100%, 340px);
+  padding: 10px;
+  border: 1px solid var(--r-border);
+  border-radius: 16px;
+  background: linear-gradient(180deg, var(--r-bg) 0%, var(--r-bg-elevated) 100%);
+  box-shadow: 0 22px 44px rgba(10, 10, 10, 0.08);
+  overflow: hidden;
+  color: var(--r-text);
+}
+
 .r-hero-illustration {
-  opacity: 0.85;
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  opacity: 0.96;
 }
 
 @media (max-width: 768px) {
@@ -570,11 +585,29 @@ html:has(.rendered-root) {
   justify-content: center;
 }
 
-.r-outside-illustration {
-  opacity: 0.7;
-  transition: opacity 0.3s ease-out;
+.r-outside-image-frame {
+  width: 220px;
+  padding: 8px;
+  border: 1px solid var(--r-border);
+  border-radius: 16px;
+  background: linear-gradient(180deg, var(--r-bg) 0%, var(--r-bg-elevated) 100%);
+  box-shadow: 0 18px 34px rgba(10, 10, 10, 0.07);
+  overflow: hidden;
+  color: var(--r-text);
 }
-.r-outside-item:hover .r-outside-illustration { opacity: 1; }
+
+.r-outside-illustration {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  opacity: 0.88;
+  transition: opacity 0.3s ease-out, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.r-outside-item:hover .r-outside-illustration {
+  opacity: 1;
+  transform: translateY(-2px);
+}
 
 @media (max-width: 640px) {
   .r-outside-item {
@@ -583,6 +616,9 @@ html:has(.rendered-root) {
   }
   .r-outside-item--reverse { direction: ltr; }
   .r-outside-item-illustration { justify-content: flex-start; }
+  .r-outside-image-frame {
+    width: min(100%, 280px);
+  }
 }
 
 /* ---------- TEAMS — GRID ---------- */
@@ -616,10 +652,34 @@ html:has(.rendered-root) {
   letter-spacing: 0.02em;
 }
 
+.r-team-logo-img {
+  max-height: 44px;
+  max-width: 160px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  filter: grayscale(0.35) opacity(0.85);
+  transition: filter 0.2s ease-out;
+}
+.r-team-logo-cell:hover .r-team-logo-img {
+  filter: grayscale(0) opacity(1);
+}
+
+/* Logos that are white-on-transparent need inverting on the light background */
+.r-team-logo-img[data-slug="10kdesigners"],
+.r-team-logo-img[data-slug="zkagi"] {
+  filter: invert(1) opacity(0.85);
+}
+.r-team-logo-cell:hover .r-team-logo-img[data-slug="10kdesigners"],
+.r-team-logo-cell:hover .r-team-logo-img[data-slug="zkagi"] {
+  filter: invert(1) opacity(1);
+}
+
 @media (max-width: 640px) {
   .r-teams-grid { grid-template-columns: repeat(2, 1fr); }
   .r-team-logo-cell { padding: 28px 16px; }
   .r-team-logo-name { font-size: 15px; }
+  .r-team-logo-img { max-height: 36px; max-width: 120px; }
 }
 
 /* ---------- CONTACT ---------- */
