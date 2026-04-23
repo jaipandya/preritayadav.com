@@ -226,8 +226,45 @@ export function BuildOverlay({
         alignItems: "center",
         justifyContent: "center",
       }}
+      onClick={onClose}
     >
+      <button
+        onClick={onClose}
+        aria-label="Close modal"
+        style={{
+          position: "absolute",
+          top: 24,
+          right: 24,
+          width: 40,
+          height: 40,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "rgba(0, 0, 0, 0.4)",
+          border: "1px solid rgba(255, 255, 255, 0.1)",
+          borderRadius: "50%",
+          color: "#fff",
+          cursor: "pointer",
+          zIndex: 10,
+          transition: "background 0.2s, transform 0.2s",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = "rgba(0, 0, 0, 0.6)";
+          e.currentTarget.style.transform = "scale(1.05)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = "rgba(0, 0, 0, 0.4)";
+          e.currentTarget.style.transform = "scale(1)";
+        }}
+      >
+        <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+
       <div
+        onClick={(e) => e.stopPropagation()}
         style={{
           width: "100%",
           maxWidth: 640,
