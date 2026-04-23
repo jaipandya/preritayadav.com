@@ -57,6 +57,7 @@ export const CanvasUI = track(function CanvasUI({
 
   return createPortal(
     <div
+      className="canvas-ui-toolbar"
       style={{
         position: "fixed",
         bottom: 48,

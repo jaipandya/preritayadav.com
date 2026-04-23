@@ -133,3 +133,9 @@ body:has(#main-content) {
 .canvas-fade-in {
   animation: fadeIn 0.3s ease-out forwards;
 }
+
+/* Hide toolbars and build buttons when build modal is active */
+body.is-building .canvas-ui-toolbar,
+body.is-building .build-button {
+  display: none !important;
+}

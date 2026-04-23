@@ -200,6 +200,11 @@ export function BuildOverlay({
   }, [cached]);
 
   useEffect(() => {
+    document.body.classList.add("is-building");
+    return () => document.body.classList.remove("is-building");
+  }, []);
+
+  useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
@@ -464,7 +469,7 @@ export function BuildButton({
   return (
     <>
       <button
-        className={className}
+        className={`build-button ${className}`}
         onClick={handleClick}
         style={variant === "floating" ? {
           position: "fixed",
