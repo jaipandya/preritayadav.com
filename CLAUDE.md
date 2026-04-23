@@ -35,3 +35,9 @@ Both the **tldraw layout creators** (`lib/create*Layout.ts`) and the **semantic 
 ### Component decomposition
 
 When building or modifying features, keep components small and focused. Extract shared logic into hooks (`lib/`) and shared UI into components (`components/`). If you find yourself copying code between shape utils or layout creators, extract it into a shared module first.
+
+### Markdown endpoints are pre-rendered at build time
+
+The `/md/*` routes (served from `app/md/[...path]/route.ts`) are statically generated via `generateStaticParams` on every `bun run build`. This means markdown regenerates from the content modules automatically — no runtime rendering, no stale cache.
+
+**When adding a new top-level markdown path** (e.g. `/md/blog`): update both `generateMarkdownForPath` in `lib/markdownGenerators.ts` and the `generateStaticParams` array in `app/md/[...path]/route.ts`. Work slug paths are enumerated automatically from `workData.ts`, so adding a new case study needs no route changes.

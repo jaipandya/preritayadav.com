@@ -1,4 +1,19 @@
 import { generateMarkdownForPath } from "@/lib/markdownGenerators";
+import { getMainWork, getArchivedWork } from "@/lib/workData";
+
+export const dynamic = "force-static";
+export const dynamicParams = false;
+
+export function generateStaticParams() {
+  const workSlugs = [...getMainWork(), ...getArchivedWork()].map((w) => w.slug);
+  return [
+    { path: ["index"] },
+    { path: ["about"] },
+    { path: ["contact"] },
+    { path: ["work"] },
+    ...workSlugs.map((slug) => ({ path: ["work", slug] })),
+  ];
+}
 
 export async function GET(
   _request: Request,
