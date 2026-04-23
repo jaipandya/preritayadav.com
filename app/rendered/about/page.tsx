@@ -42,7 +42,7 @@ export default function RenderedAboutPage() {
           <motion.p
             variants={fadeUp}
             custom={aboutParagraphs.length + 1}
-            style={{ color: "var(--r-text)", fontFamily: "var(--r-serif)", fontSize: 20, fontStyle: "italic", lineHeight: 1.6, marginTop: 16 }}
+            style={{ color: "var(--r-text)", fontFamily: "var(--r-serif)", fontSize: 19, fontStyle: "italic", lineHeight: 1.65, marginTop: 12 }}
           >
             {aboutOutro}
           </motion.p>

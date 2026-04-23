@@ -54,10 +54,6 @@ export function RenderedNav() {
     <>
       <nav className="r-nav">
         <div className="r-nav-inner">
-          <Link href="/rendered" className="r-nav-logo">
-            Prerita Yadav
-          </Link>
-
           <div className="r-nav-links">
             {NAV_LINKS.map((link) => (
               <Link
@@ -69,10 +65,11 @@ export function RenderedNav() {
                 {link.label}
               </Link>
             ))}
-            <Link href="/rendered/contact" className="r-nav-cta">
-              Let&rsquo;s talk
-            </Link>
           </div>
+
+          <Link href="/rendered/contact" className="r-nav-cta">
+            Let&rsquo;s talk
+          </Link>
 
           <button
             className="r-nav-toggle"

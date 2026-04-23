@@ -11,6 +11,14 @@ import {
 import { getMainWork, getArchivedWork } from "@/lib/workData";
 import { fadeUp, staggerContainer, ease } from "@/lib/renderedAnimations";
 
+function CompanyMark({ company }: { company: string }) {
+  return (
+    <span className="r-company-mark" aria-label={company} title={company}>
+      {company.charAt(0)}
+    </span>
+  );
+}
+
 function ArrowRight() {
   return (
     <svg width={18} height={18} viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
@@ -50,7 +58,7 @@ export default function RenderedWorkPage() {
           {main.map((item, i) => (
             <motion.div key={item.slug} variants={fadeUp} custom={i + 1}>
               <Link href={`/rendered/work/${item.slug}`} className="r-work-item">
-                <span className="r-work-num">{item.number}</span>
+                <CompanyMark company={item.company} />
                 <div className="r-work-meta">
                   <span className="r-work-company">{item.company}</span>
                   <span className="r-work-title">{item.title}</span>
@@ -85,7 +93,7 @@ export default function RenderedWorkPage() {
           {archived.map((item, i) => (
             <motion.div key={item.slug} variants={fadeUp} custom={i + 2}>
               <Link href={`/rendered/work/${item.slug}`} className="r-work-item">
-                <span className="r-work-num">{item.number}</span>
+                <CompanyMark company={item.company} />
                 <div className="r-work-meta">
                   <span className="r-work-company">{item.company}</span>
                   <span className="r-work-title">{item.title}</span>
