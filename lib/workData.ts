@@ -10,10 +10,13 @@ export interface WorkItem {
   illustrationType: string;
   overview: string;
   challenge: string;
+  challengeTitle?: string;
   process: string[];
   approach: string;
   keyContributions: string[];
   outcome: string;
+  learnings?: string;
+  layoutVersion?: number;
   featured: boolean;
   archived: boolean;
   layoutFormat: "standard" | "narrative" | "process-heavy" | "before-after" | "minimal";
@@ -71,36 +74,40 @@ const abhiloans: WorkItem = {
   tagline:
     "Streamlining the path from sign-up to first loan for 500K+ users",
   company: "Abhiloans",
-  role: "UX Designer",
+  role: "Product Designer",
   duration: "3 months",
-  tools: "Figma, Maze, Hotjar",
+  tools: "Figma, Maze",
   illustrationType: "abhiloans",
   overview:
     "Abhiloans (by Knab Finance) is a fintech platform trusted by over 500,000 Indians that lets users borrow against mutual funds, shares, and bonds — getting funds disbursed within 4 hours without impacting their credit score. I redesigned the onboarding flow to make the journey from sign-up to loan application fast, intuitive, and friction-free, directly targeting the high drop-off rates in the existing multi-step process.",
+  challengeTitle: "The Problem",
   challenge:
-    "The existing onboarding required users to navigate too many steps before they could even begin a loan application. The interface was cluttered, progress was unclear, and users frequently dropped off at key moments — particularly during KYC verification and securities pledging. For a product that promises loans in 4 hours, the onboarding felt anything but quick. The challenge was to make a process that involves financial compliance feel effortless.",
+    "Getting a loan against your investments involves several financial and compliance-related steps.\nThe existing onboarding required users to navigate through multiple stages before completing their loan application. Progress was not always clear, information had to be entered more than once, and users frequently dropped off at key moments, particularly during KYC verification and securities pledging.\n\nThe challenge was to make a complex financial process feel simple and predictable, without removing the steps required to complete it",
   process: [
-    "Drop-off Analysis",
-    "User Interviews",
-    "Flow Mapping",
+    "Existing Flow Audit",
+    "Journey Mapping",
     "Friction Audit",
+    "Flow Restructuring",
     "Progressive Disclosure",
     "UI Design",
-    "Usability Testing",
+    "Flow Refinement",
   ],
   approach:
-    "I started with Hotjar recordings and funnel analytics to pinpoint exactly where users were dropping off and why. User interviews revealed that the biggest frustrations were around unclear progress, redundant data entry, and anxiety about financial steps. I redesigned the flow using progressive disclosure — showing only what's needed at each step — with clear progress indicators, inline validation, and contextual guidance that reassured users about security and compliance at every stage.",
+    "I looked at the onboarding journey as one continuous experience rather than a collection of individual steps. The goal was to reduce the cognitive load at each stage, make progress easier to understand, and give users the right information at the right moment.\n\nThe redesigned flow introduced clearer stages, reduced redundant information, surfaced the loan summary earlier, and simplified financial terminology. For third-party and regulated screens that could not be redesigned directly, the experience was improved through contextual screens that prepared users for what was coming next.",
   keyContributions: [
-    "Analyzed drop-off data and heatmaps to identify the highest-friction steps in the funnel",
-    "Conducted user interviews focused on trust, anxiety, and cognitive load during financial onboarding",
-    "Redesigned the multi-step flow into a streamlined progressive disclosure pattern",
-    "Added clear progress indicators so users always knew where they stood",
-    "Designed inline validation and contextual help to reduce errors and support anxiety",
-    "Created a security-first visual language that reinforced trust at every financial step",
-    "Validated the new flow through moderated usability testing with target users",
+    "Restructured the multi-step onboarding journey into clearer stages",
+    "Reduced repeated information and unnecessary data entry",
+    "Introduced clearer progress indicators across the journey",
+    "Surfaced the loan summary early to set expectations",
+    "Simplified complex financial terms such as overdraft and term loans",
+    "Designed contextual screens to prepare users for third-party and regulated flows",
+    "Refined the UI to create a more consistent experience across the onboarding journey",
   ],
   outcome:
-    "The redesigned onboarding significantly reduced time-to-first-loan and improved conversion rates through the application funnel. Users reported feeling more confident during the process, and the new progressive disclosure pattern became a template for other flows across the Abhiloans platform. The work helped the platform better deliver on its core promise: quick, hassle-free loans against securities.",
+    "The redesigned flow brought greater structure and continuity to a complex financial journey. Users could understand where they were in the process, what was required next, and what they were applying for without having to navigate the entire journey at once.\n\nThe experience made a multi-step loan application feel more guided while continuing to accommodate the compliance and third-party requirements behind the scenes.",
+  learnings:
+    "Financial products often come with complexity that design cannot simply remove.\nThe opportunity is to organise that complexity so users don't have to carry it themselves.",
+  layoutVersion: 2,
   featured: true,
   archived: false,
   layoutFormat: "before-after",

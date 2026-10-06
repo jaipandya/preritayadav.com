@@ -7,6 +7,12 @@ import { createWorkDetailLayout } from "@/lib/createWorkDetailLayout";
 import { getWorkBySlug } from "@/lib/workData";
 import Link from "next/link";
 
+function TextContent({ text }: { text: string }) {
+  return text.split(/\n{2,}/).map((paragraph, index) => (
+    <p key={index} style={{ whiteSpace: "pre-line" }}>{paragraph}</p>
+  ));
+}
+
 const navLinks = [
   { href: "/work", label: "Back to Work" },
   { href: "/", label: "Home" },
@@ -27,7 +33,11 @@ export default function WorkDetailPage({
   };
 
   return (
-    <PageShell navLinks={navLinks} pageKey={`work-${slug}`} onCreateLayout={handleCreateLayout}>
+    <PageShell
+      navLinks={navLinks}
+      pageKey={`work-${slug}${data?.layoutVersion ? `-v${data.layoutVersion}` : ""}`}
+      onCreateLayout={handleCreateLayout}
+    >
       {data && (
         <>
           <header>
@@ -47,12 +57,12 @@ export default function WorkDetailPage({
 
           <section aria-label="Overview">
             <h2>Overview</h2>
-            <p>{data.overview}</p>
+            <TextContent text={data.overview} />
           </section>
 
-          <section aria-label="Challenge">
-            <h2>The Challenge</h2>
-            <p>{data.challenge}</p>
+          <section aria-label={data.challengeTitle ?? "The Challenge"}>
+            <h2>{data.challengeTitle ?? "The Challenge"}</h2>
+            <TextContent text={data.challenge} />
           </section>
 
           <section aria-label="Process">
@@ -66,7 +76,7 @@ export default function WorkDetailPage({
 
           <section aria-label="Approach">
             <h2>Approach</h2>
-            <p>{data.approach}</p>
+            <TextContent text={data.approach} />
           </section>
 
           <section aria-label="Key contributions">
@@ -80,8 +90,15 @@ export default function WorkDetailPage({
 
           <section aria-label="Outcome">
             <h2>Outcome</h2>
-            <p>{data.outcome}</p>
+            <TextContent text={data.outcome} />
           </section>
+
+          {data.learnings && (
+            <section aria-label="What I learned">
+              <h2>What I learned</h2>
+              <TextContent text={data.learnings} />
+            </section>
+          )}
 
           <footer>
             <Link href="/contact">Contact me</Link>

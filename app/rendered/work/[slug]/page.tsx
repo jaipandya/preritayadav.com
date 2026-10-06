@@ -23,6 +23,12 @@ function ArrowRight() {
   );
 }
 
+function TextContent({ text }: { text: string }) {
+  return text.split(/\n{2,}/).map((paragraph, index) => (
+    <p key={index} style={{ whiteSpace: "pre-line" }}>{paragraph}</p>
+  ));
+}
+
 export default function RenderedWorkDetail({
   params,
 }: {
@@ -90,7 +96,7 @@ export default function RenderedWorkDetail({
         custom={0}
       >
         <h2>Overview</h2>
-        <p>{work.overview}</p>
+        <TextContent text={work.overview} />
       </motion.div>
 
       <motion.div
@@ -100,9 +106,10 @@ export default function RenderedWorkDetail({
         viewport={{ once: true, amount: 0.15 }}
         variants={fadeUp}
         custom={0}
+        aria-label={work.challengeTitle ?? "The Challenge"}
       >
-        <h2>The Challenge</h2>
-        <p>{work.challenge}</p>
+        <h2>{work.challengeTitle ?? "The Challenge"}</h2>
+        <TextContent text={work.challenge} />
       </motion.div>
 
       <motion.div
@@ -130,7 +137,7 @@ export default function RenderedWorkDetail({
         custom={0}
       >
         <h2>Approach</h2>
-        <p>{work.approach}</p>
+        <TextContent text={work.approach} />
       </motion.div>
 
       <motion.div
@@ -158,8 +165,23 @@ export default function RenderedWorkDetail({
         custom={0}
       >
         <h2>Outcome</h2>
-        <p>{work.outcome}</p>
+        <TextContent text={work.outcome} />
       </motion.div>
+
+      {work.learnings && (
+        <motion.div
+          className="r-case-section"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.15 }}
+          variants={fadeUp}
+          custom={0}
+          aria-label="What I learned"
+        >
+          <h2>What I learned</h2>
+          <TextContent text={work.learnings} />
+        </motion.div>
+      )}
 
       <div style={{ padding: "56px 0", display: "flex", justifyContent: "space-between", gap: 24, flexWrap: "wrap" }}>
         {prev ? (

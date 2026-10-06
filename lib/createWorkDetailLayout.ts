@@ -90,13 +90,15 @@ function section(editor: Editor, slug: string, y: number, label: string, text: s
   return y + h + 24;
 }
 
-function bulletList(editor: Editor, slug: string, y: number, label: string, items: string[]): number {
+function bulletList(editor: Editor, slug: string, y: number, label: string, items: string[], wrapItems = false): number {
   const sid = label.toLowerCase().replace(/\s+/g, "-");
   annotation(editor, slug, `${sid}-label`, y, label, 18, 300, 28);
   y += 35;
   for (let i = 0; i < items.length; i++) {
-    annotation(editor, slug, `${sid}-${i}`, y, `· ${items[i]}`, 13, CW, 24, LEFT_PAD);
-    y += 28;
+    const text = `· ${items[i]}`;
+    const h = wrapItems ? Math.max(24, textHeight(text)) : 24;
+    annotation(editor, slug, `${sid}-${i}`, y, text, 13, CW, h, LEFT_PAD);
+    y += h + 4;
   }
   return y + 16;
 }
@@ -167,7 +169,10 @@ function annotation(
 
 function textHeight(text: string): number {
   const charsPerLine = Math.floor(CW / 7);
-  const lines = Math.ceil(text.length / charsPerLine);
+  const lines = text.split("\n").reduce(
+    (total, line) => total + Math.max(1, Math.ceil(line.length / charsPerLine)),
+    0
+  );
   return Math.max(40, lines * 18 + 10);
 }
 
@@ -209,21 +214,17 @@ function layoutBeforeAfter(editor: Editor, data: WorkItem) {
   y = section(editor, data.slug, y, "Overview", data.overview);
 
   // Before state
-  annotation(editor, data.slug, "before-label", y, "The Problem", 20, 300, 32);
+  annotation(editor, data.slug, "before-label", y, data.challengeTitle ?? "The Problem", 20, 300, 32);
   y += 36;
   const challengeH = textHeight(data.challenge);
   annotation(editor, data.slug, "before-text", y, data.challenge, 14, CW, challengeH);
-  y += challengeH + 10;
-
-  // Divider arrow
-  annotation(editor, data.slug, "transform-arrow", y, "↓  What changed  ↓", 13, CW, 24, LEFT_PAD);
-  y += 40;
+  y += challengeH + 24;
 
   // Process
   y = processTimeline(editor, data.slug, y, data.process);
 
   // After state
-  annotation(editor, data.slug, "after-label", y, "The Solution", 20, 300, 32);
+  annotation(editor, data.slug, "after-label", y, "Approach", 20, 300, 32);
   y += 36;
   const approachH = textHeight(data.approach);
   annotation(editor, data.slug, "after-text", y, data.approach, 14, CW, approachH);
@@ -231,8 +232,11 @@ function layoutBeforeAfter(editor: Editor, data: WorkItem) {
 
   y = imagePlaceholders(editor, data.slug, y);
 
-  y = bulletList(editor, data.slug, y, "What I Did", data.keyContributions);
-  y = section(editor, data.slug, y, "Impact", data.outcome);
+  y = bulletList(editor, data.slug, y, "Key Contributions", data.keyContributions, true);
+  y = section(editor, data.slug, y, "Outcome", data.outcome);
+  if (data.learnings) {
+    y = section(editor, data.slug, y, "What I learned", data.learnings);
+  }
 
   footerCta(editor, data.slug, y);
 }

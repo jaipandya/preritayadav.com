@@ -173,6 +173,13 @@ export function generateWorkListingMarkdown(): string {
 
 function workItemToMarkdown(data: WorkItem): string {
   const lines: string[] = [];
+  const pushText = (text: string) => {
+    lines.push(text.split(/\n{2,}/).map((paragraph) =>
+      paragraph.split("\n").map((line, index, all) =>
+        index < all.length - 1 ? `${line}  ` : line,
+      ).join("\n"),
+    ).join("\n\n"));
+  };
 
   lines.push(`# ${data.title}`);
   lines.push("");
@@ -188,12 +195,12 @@ function workItemToMarkdown(data: WorkItem): string {
 
   lines.push("## Overview");
   lines.push("");
-  lines.push(data.overview);
+  pushText(data.overview);
   lines.push("");
 
-  lines.push("## The Challenge");
+  lines.push(`## ${data.challengeTitle ?? "The Challenge"}`);
   lines.push("");
-  lines.push(data.challenge);
+  pushText(data.challenge);
   lines.push("");
 
   lines.push("## Process");
@@ -205,7 +212,7 @@ function workItemToMarkdown(data: WorkItem): string {
 
   lines.push("## Approach");
   lines.push("");
-  lines.push(data.approach);
+  pushText(data.approach);
   lines.push("");
 
   lines.push("## Key Contributions");
@@ -217,8 +224,16 @@ function workItemToMarkdown(data: WorkItem): string {
 
   lines.push("## Outcome");
   lines.push("");
-  lines.push(data.outcome);
+  pushText(data.outcome);
   lines.push("");
+
+  if (data.learnings) {
+    lines.push("## What I learned");
+    lines.push("");
+    pushText(data.learnings);
+    lines.push("");
+  }
+
   lines.push("---");
   lines.push("");
   lines.push("[Contact me →](/contact) · [Back to work →](/work)");
