@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { socials } from "@/lib/contactContent";
-import { renderedNav } from "@/lib/renderedChrome";
+import { newTabLabel, renderedNav } from "@/lib/renderedChrome";
 import { SocialIcon } from "./SocialIcon";
 
 
@@ -24,8 +24,8 @@ export function FloatingBar() {
 
   return (
     <div className="r-bar-wrap">
-      <div className="r-bar">
-        <nav className="r-bar-group" aria-label={renderedNav.ariaLabel}>
+      <nav className="r-bar" aria-label={renderedNav.ariaLabel}>
+        <div className="r-bar-group">
           {renderedNav.links.map((link) => (
             <Link
               key={link.href}
@@ -41,16 +41,17 @@ export function FloatingBar() {
           </Link>
           <div className="r-bar-socials">
             {socials.map((s) => (
-              <a key={s.label} href={s.url} target="_blank" rel="noopener noreferrer" className="r-bar-icon" aria-label={s.label}>
+              <a key={s.label} href={s.url} target="_blank" rel="noopener noreferrer" className="r-bar-icon" aria-label={`${s.label} (${newTabLabel})`}>
                 <SocialIcon name={s.label} />
               </a>
             ))}
           </div>
-        </nav>
+        </div>
         <Link href={renderedNav.cta.href} className="r-bar-link r-bar-cta">
-          {renderedNav.cta.label} &#8599;
+          {renderedNav.cta.label}
+          <span aria-hidden="true">&nbsp;&#8599;</span>
         </Link>
-      </div>
+      </nav>
     </div>
   );
 }

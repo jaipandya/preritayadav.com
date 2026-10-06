@@ -10,6 +10,7 @@ import {
   viewAllWorkLabel,
   blogHeading,
 } from "@/lib/landingContent";
+import { newTabLabel } from "@/lib/renderedChrome";
 import { getFeaturedWork } from "@/lib/workData";
 import { Content, ContentLines } from "@/components/rendered/Content";
 import { Mark } from "@/components/rendered/Mark";
@@ -69,6 +70,7 @@ export default function RenderedHome() {
                 <span className="r-row-title">
                   <Content k={`landing.blogPosts.${i}.title`} fallback={post.title} />
                   <span className="r-ext" aria-hidden="true">&#8599;</span>
+                  <span className="sr-only"> ({newTabLabel})</span>
                 </span>
                 <span className="r-row-desc">
                   <Content k={`landing.blogPosts.${i}.description`} fallback={post.description} />

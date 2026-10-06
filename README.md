@@ -1,6 +1,6 @@
 # preritayadav.com
 
-A work-in-progress portfolio for Prerita Yadav. The site is built around an interactive canvas — instead of a traditional page layout, visitors navigate the portfolio by panning and interacting with a hand-drawn canvas powered by [tldraw](https://tldraw.dev).
+A portfolio for Prerita Yadav in two worlds. The **sketch** (work in progress) is an interactive hand-drawn canvas powered by [tldraw](https://tldraw.dev). The **rendered** site under `/rendered` is the same content built as a minimal, fast, accessible set of normal pages. Text edited on the sketch can be carried to the rendered pages in the same browser (see `docs/content-overrides.md`).
 
 Live at: **wip.preritayadav.com**
 
@@ -14,7 +14,7 @@ Live at: **wip.preritayadav.com**
 | Language | TypeScript |
 | Styling | [Tailwind CSS v4](https://tailwindcss.com) + global CSS |
 | Canvas | [tldraw v4](https://tldraw.dev) |
-| Font | Loranthus (custom, self-hosted in `public/fonts/`) |
+| Fonts | Sketch: Loranthus (custom, self-hosted in `public/fonts/`). Rendered: Geist and Geist Mono via `next/font` |
 | Package manager | [Bun](https://bun.sh) |
 | Hosting | Vercel (auto-deploy from `main`) |
 | Repo | GitHub — `jaipandya/preritayadav.com` |
@@ -23,7 +23,7 @@ Live at: **wip.preritayadav.com**
 
 ## How the site works
 
-Every route in the app renders a `WipCanvas` — a full-screen tldraw canvas. Instead of HTML content, each page's content (project cards, text, images, buttons) is represented as **custom tldraw shapes** positioned on the canvas. Visitors can pan around, zoom, draw, erase, and click on interactive shapes to navigate between pages.
+Every route outside `/rendered` renders a `WipCanvas`, a full-screen tldraw canvas. Instead of HTML content, each page's content (project cards, text, images, buttons) is represented as **custom tldraw shapes** positioned on the canvas. Visitors can pan around, zoom, draw, erase, and click on interactive shapes to navigate between pages.
 
 ### Routing
 
@@ -32,9 +32,11 @@ Standard Next.js App Router routes live in `app/`:
 ```
 app/
   page.tsx                 ← Landing / home canvas
-  contact/page.tsx         ← Contact canvas
+  about/ contact/ work/    ← Canvas pages
+  work/[slug]/page.tsx     ← Individual case study canvas
   blog/[slug]/page.tsx     ← Individual blog post canvas
-  project/[slug]/page.tsx  ← Individual project canvas
+  rendered/                ← The rendered site (normal HTML pages, see below)
+  md/                      ← Markdown versions of the pages (/md/*), built at build time
   not-found.tsx            ← 404 canvas
   error.tsx                ← Error canvas
   meta/                    ← Internal dev pages (not linked publicly)
@@ -42,7 +44,11 @@ app/
     ui-components/
 ```
 
-Each page calls `WipCanvas` with a `pageKey` (used for localStorage persistence) and an `onCreateLayout` callback that populates the canvas with the right shapes for that page.
+Each canvas page calls `WipCanvas` with a `pageKey` (used for localStorage persistence) and an `onCreateLayout` callback that populates the canvas with the right shapes for that page.
+
+### The rendered site
+
+`app/rendered/**`, `components/rendered/**` and `app/rendered/rendered.css` make up the rendered site: one 540px column, a navigation bar (top on desktop, bottom on phones), and static server-rendered pages. All text comes from the same content modules in `lib/` as the canvas and is shown through the `Content*` components so overrides apply. The design, its rules and the reference study are in `docs/rendered-design.md`.
 
 ---
 

@@ -5,9 +5,9 @@ The WIP (tldraw) site is out of scope except where a content field changes (see 
 
 Status: **implemented**, pending review. See "6. Decisions" for the answers to the open questions.
 
-## 1. Why redesign
+## 1. Background: why the previous design was replaced
 
-The current rendered site (measured at 1440 wide, `/rendered`: 5012px tall landing page):
+The previous rendered site (measured at 1440 wide, `/rendered`: 5012px tall landing page):
 
 - Heavy: grain overlay, a hero illustration with a drop shadow, 693 lines of inline SVG illustrations, three card styles, a sticky uppercase top nav with a black CTA, a floating Sketch button.
 - Two type families (Libre Baskerville + Manrope) loaded from Google Fonts with a render-blocking `@import`.
@@ -156,41 +156,38 @@ Scale (same numbers as the reference, they are good):
 | `micro` (mono, years) | 12px / 1.5 / 0 / 400 |
 | `badge` | 11px / 1 / 0 / 500 |
 
-Rules: no uppercase transforms, no letter-spacing on body, no italics (the About outro loses its serif italic and becomes `lede`). `text-wrap: balance` on h1 and lede, `text-wrap: pretty` on body. `font-variant-numeric: tabular-nums` on years.
+Rules: no uppercase transforms, no letter-spacing on body, no italics (the About outro is `lede`). `text-wrap: balance` on h1 and lede, `text-wrap: pretty` on body. `font-variant-numeric: tabular-nums` on years.
 
-### 3.5 Components (all small, in `components/rendered/`)
+### 3.5 Components (small, in `components/rendered/`)
 
 | Component | Notes |
 | --- | --- |
-| `Content`, `ContentParagraphs`, `ContentList`, `ContentLines` | Client, thin wrappers over `useContent` / `useContentList` (see section 4). Everything else is a server component. |
-| `Page` | `<div class="r-col">` container with the padding tokens. |
-| `SectionLabel` | Mono label, 64px top margin, 20px bottom. Takes `children` (a `Content`). |
-| `Row` | Link row: optional `Mark`, title, sub, trailing slot. The hover bleed lives here. No built-in arrow icon (labels may already contain one). |
-| `Mark` | 36 / 44px tile, 10px radius. Uses the square logos in `public/logos/square/` (10kdesigners, abhiloans, ema, epic-wiki, fitpass-og, toppr-wiki, zkagi), mapped by work slug in `components/rendered/markSources.ts`. One frame for every tile: white with a 1px hairline ring drawn above the image, so full-bleed app icons get it too. Marks are cropped to the emblem where there is one (Fitpass, Toppr) and get about 18% air (`pad` in `markSources.ts`). The portfolio uses the site's own `/icon.svg`. Only bird-tab, which has no logo, shows the company initial, dark on `#f0f0f0`. The broken `public/logos/square/epic-wiki.png` and `toppr-wiki.png` (HTML error pages saved as PNG) were deleted; Epic uses `logos/epic.svg` and Toppr a cropped emblem from `logos/mark/`. Check each file visually for crop and padding in phase 3. `teamsWorkedWith.logos` (non-square, wordmarks) is used for the home logo strip only. |
-| `Badge` | Status pill (not used on day one; kept only if we add statuses, see 3.7). |
-| `FloatingBar` | Replaces `RenderedNav` + `RenderedFooter` + `SketchToggle`. See 3.6. |
-| `BackLink` | Renders the stored label as is (it already has "←"), no icon. Used on case study, Work and Contact. On case studies a floating round back button (its own `aria-label` from the same label field) appears after 200px scroll (IntersectionObserver sentinel). |
-| `Prose` | Wrapper that sets paragraph rhythm (16px) and list style. |
-| `Figure` | Media with 16px radius and caption. Wraps the existing `CaseStudyGallery` (restyled via CSS, no fork). |
-| `CardTitle` | Work listing row title honoring `workListing.cards.<slug>` (see 4.3). |
+| `Content`, `ContentParagraphs`, `ContentList`, `ContentLines`, `ContentEmailRow`, `CardTitle` | Client leaves over `useContent` / `useContentList`; the only client components that show content text (see section 4). |
+| `Mark` + `markSources.ts` | 36 / 44px logo tile, one white frame with a hairline ring. Marks are cropped to the emblem where there is one and get about 18% air (`pad`). The portfolio uses `/icon.svg`; only a company with no logo shows its initial, dark on `#f0f0f0`. The broken `epic-wiki.png` and `toppr-wiki.png` (HTML error pages saved as PNG) were deleted. |
+| `TeamLogos` | Home team logos, see 3.7. |
+| `SocialIcon` | LinkedIn, X, Medium and envelope icons, shared by the bar and the contact page. |
+| `FloatingBar` | The navigation bar. See 3.6. |
+| `FloatingBack`, `BackLink` | `BackLink` renders the stored label as is (it already has "←"), no icon, with a 44px hit area. `FloatingBack` is the round button that appears after scrolling on case studies. |
 
-Delete when done: `RenderedNav`, `RenderedFooter`, `SketchToggle` (folded into `FloatingBar`), the 693 lines of inline SVG illustrations in `app/rendered/page.tsx`, `public/rendered/generated/*` (check no other page uses them first), `lib/renderedAnimations.ts`, and the `motion` dependency (nothing else used it).
+Layout primitives are CSS classes, not components: `.r-col` (column), `.r-label` (mono section label), `.r-row` (link row), `.r-prose`, `.r-list`, `.r-steps` and `.r-tray` (media tray, wraps the existing `CaseStudyGallery`, restyled with CSS only). There are no status badges yet.
 
 ### 3.6 Navigation: the floating bar
 
-The reference has social icons + "Let's chat". We also need to move between Home / Work / About, so:
+The reference has social icons and "Let's chat" in a floating bar at the bottom. We also need Home / Work / About, and (decision after review) the bar sits **at the top from 640px up**, where people look for navigation, and **at the bottom on phones**, within thumb reach.
 
 ```
-┌──────────────────────────────────────────────────┐
-│  Home  Work  About  [pencil]        [in] [X] [M]  Let's talk ↗ │   fixed, bottom 20px, 540px
-└──────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────┐
+│  Home  Work  About  [pencil] │ [in] [M] [X]  Let's talk ↗ │   fixed, 540px wide
+└──────────────────────────────────────────────────────┘
 ```
 
-- Left: `Home`, `Work`, `About` text links (13px / 500, `#737373`, active `#1a1a1a`, `aria-current="page"`), then a 20px pencil icon with `aria-label="Switch to sketch version"` (keeps today's behavior: maps `/rendered/x` to `/x`).
-- Right: `Let's talk ↗` to the contact page. This label and the arrow are fixed chrome (see 4.5).
-- Social icons (LinkedIn, X, Medium, from `socials` in `lib/contactContent.ts`) show from `sm` (640px) up. Below that they are hidden so the bar fits on a phone (at 390px: three links, pencil, CTA).
-- Styling is the reference's: `bg-white/70`, `backdrop-blur-xl` (24px), 16px radius, 1px `white/60` border plus `black/4%` ring, `0 2px 20px rgba(0,0,0,.06)`. Fallback without `backdrop-filter`: `bg-white/95`.
-- Safe area: `bottom: max(20px, env(safe-area-inset-bottom))`. Body gets `padding-bottom: 128px` so the bar never covers the last row.
+- One `<nav aria-label="Primary">` contains everything, including the CTA (axe flagged the CTA when it sat outside a landmark). It comes first in the DOM, after the skip link, so keyboard order matches the visual order on desktop.
+- Left: `Home`, `Work`, `About` text links (13px / 500, `#666`, active `#1a1a1a`, `aria-current="page"`), then a pencil icon with `aria-label="Switch to sketch version"` (maps `/rendered/x` to `/x`).
+- Right: `Let's talk` and an `aria-hidden` arrow, linking to the contact page. Labels are fixed chrome from `lib/renderedChrome.ts`, not content keys (see 4.5).
+- Social icons (LinkedIn, Medium, X, from `socials`) show from 640px up, with an accessible name that includes "(opens in a new tab)". Below that they are hidden so the bar fits; checked down to 320px.
+- Styling: `rgba(255,255,255,.86)` with 24px backdrop blur (falls back to `.95` without `backdrop-filter`), 16px radius, 1px white border, hairline ring, soft shadow. Position: `top: 16px` from 640px, otherwise `bottom: max(20px, env(safe-area-inset-bottom))`.
+- The page content starts below the bar: `padding-top: 112px` from 640px; on phones `padding-bottom: 128px` so the bar never covers the last row.
+- The round floating back button on case studies sits at `top: 84px` below the bar and only shows from 960px, where there is room beside the column.
 
 ### 3.7 Pages
 
@@ -310,9 +307,13 @@ Other case study rules:
 
 ### 3.9 Accessibility
 
-- Semantic structure: one `h1` per page, labels as `h2` (styled mono), lists as `ul`/`ol`. The bar is a `<nav aria-label="Primary">`; current page `aria-current="page"`.
+- Semantic structure: one `h1` per page, labels as `h2` (styled mono), lists as `ul`/`ol`. One `<nav aria-label="Primary">` holds the whole bar, one `<main id="main">`; current page `aria-current="page"`. A "Skip to content" link is the first focusable element and appears on focus.
+- Every page has its own `<title>` (Work, About, Contact, and each case study); the home page keeps the site title.
+- Links that open a new tab say so: visually hidden "(opens in a new tab)" text, or an `aria-label` for icon links.
+- No text is hidden or clamped: descriptions show in full, so text spacing and zoom (WCAG 1.4.12, 1.4.4) cannot cut content off.
+- Hidden controls are really hidden: the floating back button uses `visibility: hidden` until it shows, so it is not focusable.
 - Visible focus ring on every link and row: `outline: 2px solid #1a1a1a; outline-offset: 2px`, rows use `outline-offset: -2px` so the ring is not clipped.
-- Tap targets 44px minimum: rows are 48px+, bar links get `min-height: 44px` hit areas.
+- Tap targets 44px minimum: rows are 48px+, bar links and the back link have 44px hit areas (icons are 40 by 44).
 - Contrast: all text is AA (4.5:1) or better. Nothing lighter than `#737373` is used for text. `#ccc` is decorative only.
 - `prefers-reduced-motion` respected (fade removed, spinner stops spinning).
 - Images have `alt`. Logo tiles inside rows are decorative (`alt=""`) because the company name is adjacent text.
@@ -327,7 +328,7 @@ Follows `docs/content-overrides.md` exactly. Decisions for this redesign:
 
 - `ContentLines`: splits the value on `\n`; the first line is primary text and the remaining lines secondary. Used by `landing.hero.subtitle` (two-line default) and `contact.subtitle` (joined with a space).
 - `CardTitle`: reads `useContentOverrides()`. If `workListing.cards.<slug>` has an override it renders that as one `<span>`; otherwise it renders `<span>{company}</span><span>{title}</span>` (brief item 6). Fallbacks are the exact `item.company` and `item.title`. Home rows and prev/next rows use `Content` on `work.<slug>.company` and `work.<slug>.title`; only the Work listing uses `CardTitle`.
-- `ContentEmailLink`: renders `contact.email` as text and builds `mailto:` from the same resolved value, so a changed email changes both.
+- `ContentEmailRow`: renders `contact.email` as text and builds `mailto:` from the same resolved value, so a changed email changes both.
 
 Pages and layouts stay server components. Only these leaf components are client components. Fallback props are always the exact default from the `lib/` module, never retyped copy.
 
@@ -367,18 +368,22 @@ Target: none. The design reuses existing fields. If a later decision adds copy (
 
 Floating bar labels (`Home`, `Work`, `About`, `Let's talk`), aria labels and the "Switch to sketch version" label. These are navigation chrome. The canvas has no shape for them and the brief says not to change the WIP side unless the redesign needs a new field. This is the one place where "every piece of text" is narrowed. Open question 3 asks whether to make them editable.
 
-## 5. Implementation plan
+## 5. Implementation notes (as built)
 
-Phases are independent commits. Run `bun test` and `bun run lint` after each; `bun run build` at the end.
+| Area | Where |
+| --- | --- |
+| Styles and tokens | `app/rendered/rendered.css`, everything scoped under `.rendered-root`. Layout primitives (column, section label, row, tile, tray, prose, list, steps) are CSS classes, not components. |
+| Fonts | Geist and Geist Mono via `next/font` in `app/rendered/layout.tsx` |
+| Layout | `app/rendered/layout.tsx`: skip link, `FloatingBar`, then `ContentGate` around `<main id="main">`. `ContentGateHead` lives in the root `<head>` (4.3). |
+| Content components | `components/rendered/Content.tsx` (`Content`, `ContentParagraphs`, `ContentList`, `ContentLines`, `ContentEmailRow`, `CardTitle`) |
+| Case study sections | `lib/caseStudySections.ts`, tested against the canvas in `tests/caseStudySections.test.ts` |
+| Navigation | `components/rendered/FloatingBar.tsx`, `FloatingBack.tsx`, `BackLink.tsx` |
+| Logos | `Mark.tsx` + `markSources.ts` (tiles), `TeamLogos.tsx` (home grid), `SocialIcon.tsx`; files in `public/logos` and `public/logos/mark` |
+| Fixed text | `lib/renderedChrome.ts` (nav labels, skip link, new-tab hint, portrait alt) |
+| Pages | `app/rendered/{page,work/page,work/[slug]/page,about/page,contact/page}.tsx`, all static server components |
+| Docs | this file, `docs/content-overrides.md`, `.impeccable.md` |
 
-1. **Foundations.** Rewrite `rendered.css` (tokens, reset, `.r-col`, type scale, row, label, prose, list, bar, spinner). Add Geist and Geist Mono through `next/font` in `app/rendered/layout.tsx` (scoped to `.rendered-root`, not the whole app). No Google `@import`.
-2. **Content layer.** `components/rendered/Content.tsx` with `Content`, `ContentParagraphs`, `ContentList`, `ContentLines`, `CardTitle`, `ContentEmailLink`. Unit-test the resolution (override beats default, `[]` list override renders nothing, no-JS fallback renders default).
-3. **Shell.** `FloatingBar`, `Page`, `SectionLabel`, `Row`, `Mark` (+ `markSources.ts`), `BackLink`. Layout: `ContentGate` around children; `ContentGateHead` in the root `<head>` with `suppressHydrationWarning` on `<html>` in `app/layout.tsx` (see 4.3). Remove the grain, `RenderedNav`, `RenderedFooter`, `SketchToggle`.
-3b. **Case study sections helper.** `caseStudySections(work)` in `lib/` (pure data, no React) with a unit test that checks it against the per-format table in 3.7, and ideally against the label names the canvas layout creator uses (read from `createWorkDetailLayout` bindings with the fake editor already used by `tests/contentOverrides.test.ts`).
-4. **Pages**, one commit each: Contact, About, Work listing, Case study, Home. Order is simplest to hardest; Home last because it deletes the SVG block.
-5. **Cleanup.** Delete unused files (list in 3.5), check imports with `bunx tsc --noEmit`, remove `motion` only if nothing else uses it (`grep`). `components/ui/BuildOverlay.tsx` mentions `lib/renderedAnimations.ts` in a text string only; update that string if the file is deleted.
-6. **Docs.** Update `docs/content-overrides.md`: status of the rendered side, `summaryTagline` is canvas-only, the gate placement and `suppressHydrationWarning`, and any renamed key. Update `CLAUDE.md` only if architecture changes (it should not).
-7. **Verification** (below).
+Removed: the old nav, footer, sketch toggle, grain overlay, 693 lines of inline SVG illustrations, `lib/renderedAnimations.ts` and the `motion` dependency, three unused avatar images and two broken logo files.
 
 ### 5.1 Verification
 

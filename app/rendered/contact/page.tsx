@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import {
   contactTitle,
   contactSubtitle,
@@ -7,6 +8,7 @@ import {
 } from "@/lib/contactContent";
 import { Content, ContentEmailRow } from "@/components/rendered/Content";
 import { SocialIcon } from "@/components/rendered/SocialIcon";
+import { newTabLabel } from "@/lib/renderedChrome";
 import { BackLink } from "@/components/rendered/BackLink";
 
 /** "https://www.linkedin.com/in/preritayadav/" becomes "linkedin.com/in/preritayadav". */
@@ -14,6 +16,8 @@ function displayUrl(url: string) {
   const { host, pathname } = new URL(url);
   return `${host.replace(/^www\./, "")}${pathname.replace(/\/$/, "")}`;
 }
+
+export const metadata: Metadata = { title: "Contact" };
 
 export default function RenderedContactPage() {
   return (
@@ -45,7 +49,10 @@ export default function RenderedContactPage() {
                   <SocialIcon name={s.label} />
                 </span>
                 <span className="r-row-main">
-                  <span className="r-row-title">{s.label}</span>
+                  <span className="r-row-title">
+                    {s.label}
+                    <span className="sr-only"> ({newTabLabel})</span>
+                  </span>
                   <span className="r-row-desc">{displayUrl(s.url)}</span>
                 </span>
               </span>

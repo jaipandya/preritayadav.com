@@ -115,9 +115,9 @@ Shapes that the canvas cannot edit as text: outside-work cards, company logos, s
 
 In `createWorkDetailLayout.ts`, use the helpers instead: `section(..., heading(...), text, { key })`, `paragraphs(..., key)`, `bulletList(..., heading, items, keyPath)`, `processTimeline(...)`.
 
-## Wiring the rendered site (for the redesign)
+## Wiring the rendered site
 
-Rendered pages keep importing the content modules; the override is applied on top, on the client.
+Rendered pages (`app/rendered`) import the content modules; the override is applied on top, on the client.
 
 ### 1. Wrap content in `useContent`
 

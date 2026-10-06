@@ -39,7 +39,7 @@ Both the **tldraw layout creators** (`lib/create*Layout.ts`) and the **semantic 
 
 ### Content overrides (WIP edits reach the rendered site)
 
-Text edited on the WIP canvas is carried to the rendered site (same browser only) through `lib/contentOverrides.ts`. Details, key schema and the plan for wiring the rendered redesign are in `docs/content-overrides.md`.
+Text edited on the WIP canvas is carried to the rendered site (same browser only) through `lib/contentOverrides.ts`. Details, the key schema and how the rendered site is wired are in `docs/content-overrides.md`.
 
 - Every text shape a layout creator makes from a content module must bind its text with `withContent(meta, bind(key, value, opts))`. Bullet lists use `bindList` on the heading and every item. Keys mirror the field path in the content module (`work.<slug>.overview`, `about.outro`).
 - Anything a user can edit on the canvas must have a content-module field and a binding, including labels and button text. If it has no field, add one to a `lib/*Content.ts` module.

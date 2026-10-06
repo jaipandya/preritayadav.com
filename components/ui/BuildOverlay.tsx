@@ -336,7 +336,7 @@ export function BuildOverlay({
                   ? "#7a9e6a"
                   : line.startsWith("  →") || line.startsWith("  [")
                   ? "#8a9eb5"
-                  : line.startsWith("  font-") || line.startsWith("  palette") || line.startsWith("  grain") || line.startsWith("    --r-") || line.startsWith('    display:') || line.startsWith('    body:')
+                  : line.startsWith("  font-") || line.startsWith("  palette") || line.startsWith("    --r-") || line.startsWith('    sans:') || line.startsWith('    mono:')
                   ? "#b89a6a"
                   : line.startsWith("$")
                   ? "#706c64"
@@ -344,7 +344,7 @@ export function BuildOverlay({
                   ? "#e8e4dc"
                   : line.startsWith("  ○")
                   ? "#706c64"
-                  : line.startsWith("  ƒ")
+                  : line.startsWith("  ƒ") || line.startsWith("  ●")
                   ? "#8a9eb5"
                   : undefined,
                 fontWeight: line.startsWith("▸") || line.startsWith("✓") ? 600 : 400,

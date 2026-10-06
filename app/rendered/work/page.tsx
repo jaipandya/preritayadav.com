@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import {
   workTitle,
@@ -27,6 +28,8 @@ function WorkRow({ item }: { item: WorkItem }) {
     </Link>
   );
 }
+
+export const metadata: Metadata = { title: "Work" };
 
 export default function RenderedWorkPage() {
   const main = getMainWork();

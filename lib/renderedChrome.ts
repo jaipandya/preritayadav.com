@@ -13,6 +13,10 @@ export const renderedNav = {
   sketchLabel: "Switch to sketch version",
 };
 
+/** Accessible text added to links that open another site or a new tab. */
+export const newTabLabel = "opens in a new tab";
+export const skipToContentLabel = "Skip to content";
+
 export const renderedCaseStudyNavLabel = "More case studies";
 
 export const aboutPortrait = {

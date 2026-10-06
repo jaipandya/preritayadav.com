@@ -66,9 +66,11 @@ html:has(.rendered-root) {
   margin: 0 auto;
   padding: 48px 24px 128px;
 }
+/* From 640px the bar sits at the top (about 68px tall), so the page starts below it and no longer needs room at the bottom. */
 @media (min-width: 640px) {
-  .r-col { padding-top: 72px; }
+  .r-col { padding: 112px 24px 96px; }
 }
+#main:focus { outline: none; }
 
 /* ---------- TYPE ---------- */
 .r-display {
@@ -160,10 +162,6 @@ a.r-row:focus-visible { outline-offset: -2px; border-radius: 8px; }
   font-size: 14px;
   line-height: 1.5;
   color: var(--r-body);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 }
 .r-row-trail { flex: none; color: var(--r-muted); font-size: 13px; }
 .r-row-plain { font-size: 14px; color: var(--r-muted); }
@@ -207,17 +205,19 @@ a.r-row:focus-visible { outline-offset: -2px; border-radius: 8px; }
 
 /* ---------- BACK LINK ---------- */
 .r-back {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   font-size: 13px;
   color: var(--r-muted);
-  margin-bottom: 40px;
+  margin: -14px 0 26px;
   transition: color 150ms ease;
 }
 .r-back:hover { color: var(--r-text); }
 
 .r-float-back {
   position: fixed;
-  top: 20px;
+  top: 84px;
   left: 20px;
   z-index: 40;
   width: 36px;
@@ -232,12 +232,14 @@ a.r-row:focus-visible { outline-offset: -2px; border-radius: 8px; }
   justify-content: center;
   color: var(--r-muted);
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
-  transition: opacity 200ms ease, color 150ms ease;
+  transition: opacity 200ms ease, visibility 0s linear 200ms, color 150ms ease;
 }
-.r-float-back[data-visible="true"] { opacity: 1; pointer-events: auto; }
+.r-float-back[data-visible="true"] { opacity: 1; visibility: visible; pointer-events: auto; transition-delay: 0s; }
 .r-float-back:hover { color: var(--r-text); }
-@media (max-width: 639px) { .r-float-back { display: none; } }
+/* Needs space beside the 540px column; on narrower screens the inline back link is enough. */
+@media (max-width: 959px) { .r-float-back { display: none; } }
 
 /* ---------- PROSE ---------- */
 .r-prose { display: flex; flex-direction: column; gap: 16px; }
@@ -363,6 +365,10 @@ a.r-row:hover .r-ext { color: var(--r-muted); }
   padding: 0 24px;
   pointer-events: none;
 }
+/* Phones: bottom, within thumb reach. From 640px: top, where people look for navigation. */
+@media (min-width: 640px) {
+  .r-bar-wrap { bottom: auto; top: 16px; }
+}
 .r-bar {
   pointer-events: auto;
   width: 100%;
@@ -379,7 +385,7 @@ a.r-row:hover .r-ext { color: var(--r-muted); }
 }
 @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
   .r-bar {
-    background: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.86);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
   }
@@ -392,7 +398,7 @@ a.r-row:hover .r-ext { color: var(--r-muted); }
   padding: 0 8px;
   font-size: 13px;
   font-weight: 500;
-  color: var(--r-muted);
+  color: var(--r-body);
   transition: color 150ms ease;
 }
 .r-bar-link:hover,
@@ -401,9 +407,9 @@ a.r-row:hover .r-ext { color: var(--r-muted); }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
+  width: 40px;
   height: 44px;
-  color: var(--r-muted);
+  color: var(--r-body);
   transition: color 150ms ease;
 }
 .r-bar-icon:hover { color: var(--r-text); }
@@ -412,3 +418,21 @@ a.r-row:hover .r-ext { color: var(--r-muted); }
   .r-bar-socials { display: flex; align-items: center; margin-left: 8px; padding-left: 8px; border-left: 1px solid var(--r-ring); }
 }
 .r-bar-cta { padding: 0 8px; white-space: nowrap; }
+
+/* ---------- SKIP LINK ---------- */
+.r-skip {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 100;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: var(--r-text);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  transform: translateY(-200%);
+  transition: transform 150ms ease;
+}
+.r-skip:focus { transform: none; outline: 2px solid var(--r-text); outline-offset: 2px; }
+.rendered-root a.r-skip { color: #fff; }

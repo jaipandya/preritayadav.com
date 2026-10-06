@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -10,6 +11,8 @@ import {
 import { Content } from "@/components/rendered/Content";
 import { aboutPortrait } from "@/lib/renderedChrome";
 
+
+export const metadata: Metadata = { title: "About" };
 
 export default function RenderedAboutPage() {
   return (
