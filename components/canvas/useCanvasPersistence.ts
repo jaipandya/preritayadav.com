@@ -1,10 +1,21 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { createTLStore, getSnapshot, loadSnapshot } from "tldraw";
+import { createTLStore, getSnapshot, inlineBase64AssetStore, loadSnapshot, type TLAssetStore } from "tldraw";
 import { customShapeUtils, customBindingUtils } from "@/lib/shapes";
 import { debounce } from "@/lib/debounce";
+import { optimizedImageUrl } from "@/lib/canvasAssets";
 import { WIP_STORAGE_PREFIX, clearOverrides } from "@/lib/contentOverrides";
+
+/** Canvas images are shown through the Next.js image optimizer at their on-screen size (see lib/canvasAssets.ts). */
+const canvasAssetStore: TLAssetStore = {
+  ...inlineBase64AssetStore,
+  resolve(asset, ctx) {
+    const src = asset.props.src;
+    if (!src || asset.type !== "image" || ctx.shouldResolveToOriginal) return src;
+    return optimizedImageUrl(src, asset.props.w, ctx.steppedScreenScale, ctx.dpr);
+  },
+};
 
 export type LoadingState =
   | { status: "loading" }
@@ -38,6 +49,7 @@ export function useCanvasPersistence(pageKey: string) {
     createTLStore({
       shapeUtils: customShapeUtils,
       bindingUtils: customBindingUtils,
+      assets: canvasAssetStore,
     })
   );
   const [loadingState, setLoadingState] = useState<LoadingState>({

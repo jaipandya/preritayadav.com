@@ -139,3 +139,20 @@ body.is-building .canvas-ui-toolbar,
 body.is-building .build-button {
   display: none !important;
 }
+/* Placeholder behind canvas images (case study screenshots). It is the same box as the image,
+   so nothing shifts when the image arrives and covers it. The shimmer runs a few times and stops,
+   so it never repaints behind an image that has loaded. */
+.tl-shape[data-shape-type="image"] .tl-html-container {
+  background-color: #ececea;
+  background-image: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.55) 50%, transparent 100%);
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  animation: image-shimmer 1.4s ease-in-out 4;
+}
+@keyframes image-shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -100% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tl-shape[data-shape-type="image"] .tl-html-container { animation: none; }
+}

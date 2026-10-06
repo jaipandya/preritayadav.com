@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   Tldraw,
   type Editor,
+  type TLAssetId,
   type TLUiOverrides,
   type TLEditorComponents,
   DefaultSizeStyle,
@@ -21,6 +22,34 @@ import { sounds } from "@/lib/sounds";
 import { attachCanvasSounds } from "@/lib/canvasSounds";
 
 const DRAG_THRESHOLD = 5;
+
+/**
+ * Start downloading the canvas images once the page is idle. tldraw only requests an image when its
+ * shape scrolls into view, so without this a screenshot starts loading at the moment you reach it.
+ * Uses the same URL tldraw will ask for, so the browser cache serves it.
+ */
+function warmCanvasImages(editor: Editor) {
+  const run = () => {
+    const zoom = editor.getZoomLevel();
+    for (const shape of editor.getCurrentPageShapes()) {
+      if (shape.type !== "image") continue;
+      const { assetId, w } = shape.props as { assetId: TLAssetId | null; w: number };
+      const asset = assetId && editor.getAsset(assetId);
+      if (!asset || asset.type !== "image") continue;
+      editor
+        .resolveAssetUrl(asset.id, { screenScale: zoom * (w / asset.props.w) })
+        .then((url) => {
+          if (!url) return;
+          const img = new Image();
+          img.fetchPriority = "low";
+          img.decoding = "async";
+          img.src = url;
+        });
+    }
+  };
+  if ("requestIdleCallback" in window) window.requestIdleCallback(run, { timeout: 2000 });
+  else setTimeout(run, 500);
+}
 
 const uiOverrides: TLUiOverrides = {
   tools(_editor, tools) {
@@ -47,6 +76,7 @@ export function WipCanvas({
   const { store, loadingState, reset, needsInitialLayout } =
     useCanvasPersistence(pageKey);
   const layoutCreated = useRef(false);
+  const prefetched = useRef(new Set<string>());
   const pointerDownPos = useRef<{ x: number; y: number } | null>(null);
   const [canvasReady, setCanvasReady] = useState(false);
 
@@ -98,6 +128,7 @@ export function WipCanvas({
       document.addEventListener("keydown", handleKeyDown);
 
       attachCanvasSounds(editor);
+      warmCanvasImages(editor);
 
       // Listen for pointer events to handle navigation in browse mode
       editor.on("event", (event) => {
@@ -115,6 +146,14 @@ export function WipCanvas({
             margin: 0,
           });
           const overLink = shapesAtPoint.some((s) => isNavigable(s));
+          // Start loading the next page while the pointer is on its link (production only).
+          for (const s of shapesAtPoint) {
+            const href = getHref(s);
+            if (href && href.startsWith("/") && !prefetched.current.has(href)) {
+              prefetched.current.add(href);
+              router.prefetch(href);
+            }
+          }
           if (container) {
             if (overLink) {
               container.style.setProperty("cursor", "pointer", "important");
