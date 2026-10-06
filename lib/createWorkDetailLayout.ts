@@ -274,26 +274,18 @@ function layoutNarrative(editor: Editor, data: WorkItem) {
   y = metaRow(editor, data.slug, data, y);
   y = heroCard(editor, data, y);
 
-  // Story-driven sections
-  y = section(editor, data.slug, y, "Context", data.overview);
+  y = section(editor, data.slug, y, data.overviewTitle ?? "Overview", data.overview);
   y = section(editor, data.slug, y, "The Challenge", data.challenge);
+  y = processTimeline(editor, data.slug, y, data.process, data.processTitle);
 
   y = imagePlaceholders(editor, data.slug, y);
 
-  y = section(editor, data.slug, y, "How I Approached It", data.approach);
-  y = processTimeline(editor, data.slug, y, data.process);
-
-  // Key decisions framed as narrative
-  annotation(editor, data.slug, "decisions-label", y, "Key Decisions & Work", 18, 300, 28);
-  y += 35;
-  for (let i = 0; i < data.keyContributions.length; i++) {
-    const num = String(i + 1).padStart(2, "0");
-    annotation(editor, data.slug, `decision-${i}`, y, `${num}  ${data.keyContributions[i]}`, 13, CW, 26, LEFT_PAD);
-    y += 30;
+  y = section(editor, data.slug, y, "Approach", data.approach);
+  y = bulletList(editor, data.slug, y, "Key Contributions", data.keyContributions, true);
+  y = section(editor, data.slug, y, "Outcome", data.outcome);
+  if (data.learnings) {
+    y = section(editor, data.slug, y, "What I learned", data.learnings);
   }
-  y += 16;
-
-  y = section(editor, data.slug, y, "Impact", data.outcome);
 
   footerCta(editor, data.slug, y);
 }
