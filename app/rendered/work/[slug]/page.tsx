@@ -161,33 +161,37 @@ export default function RenderedWorkDetail({
             </div>
           </motion.div>
 
-          <motion.div
-            className="r-case-section"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.15 }}
-            variants={fadeUp}
-            custom={0}
-          >
-            <h2>Approach</h2>
-            <TextContent text={work.approach} />
-          </motion.div>
+          {work.approach.trim() && (
+            <motion.div
+              className="r-case-section"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.15 }}
+              variants={fadeUp}
+              custom={0}
+            >
+              <h2>Approach</h2>
+              <TextContent text={work.approach} />
+            </motion.div>
+          )}
 
-          <motion.div
-            className="r-case-section"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.1 }}
-            variants={fadeUp}
-            custom={0}
-          >
-            <h2>Key Contributions</h2>
-            <ul>
-              {work.keyContributions.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          </motion.div>
+          {work.keyContributions.length > 0 && (
+            <motion.div
+              className="r-case-section"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.1 }}
+              variants={fadeUp}
+              custom={0}
+            >
+              <h2>Key Contributions</h2>
+              <ul>
+                {work.keyContributions.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </motion.div>
+          )}
 
           {work.additionalSections?.map((section) => (
             <motion.div

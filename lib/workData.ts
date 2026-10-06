@@ -263,38 +263,64 @@ const portfolio: WorkItem = {
 
 const superTeacher: WorkItem = {
   slug: "super-teacher-fees",
-  number: "06",
-  title: "Fee Management System",
+  number: "01",
+  title: "Fee Management System for Super Teacher",
   tagline:
-    "Helping independent coaching teachers manage fees, payments, and reminders",
-  company: "Super Teacher",
+    "Helping independent coaching teachers manage fees with less manual work",
+  summaryTagline: "Fee Management System for Super Teacher",
+  company: "Toppr",
   role: "Product Designer",
-  duration: "2 months",
-  tools: "Figma",
+  duration: "1 month",
+  tools: "Figma, FigJam",
   illustrationType: "superteacher",
   overview:
-    "Super Teacher is a tool for independent teachers running coaching centres. I designed a fee management system that lets teachers create fee structures, track payments across students, and send automated reminders — replacing the spreadsheets and manual follow-ups that most coaching teachers rely on.",
+    "As part of our capstone project at 10kdesigners, we worked on a problem statement from Toppr for Super Teacher.\n\nSuper Teacher is a platform designed to help independent teachers running coaching centres manage their classes and day-to-day operations.\n\nThe challenge was to design a fee management system that would help teachers set up fees, track payments, mark students as paid, and send reminders without adding unnecessary complexity to their existing workflows.",
   challenge:
-    "Independent coaching teachers in India manage fees manually — through notebooks, spreadsheets, or WhatsApp messages. Tracking who has paid, who hasn't, and when to send reminders is time-consuming and error-prone. The challenge was designing a system simple enough for non-tech-savvy teachers to adopt, yet comprehensive enough to replace their existing manual workflows.",
+    "Managing fees is more than just collecting payments.\n\nTeachers need to set different fee structures for different batches, keep track of individual student payments, follow up on overdue fees, and occasionally handle situations such as refunds or fee waivers.\n\nThe goal was to create a system that made these frequent actions easy to access while still supporting the different ways teachers manage their batches.\n\nThe problem statement focused on three core needs:\n\nSetting up fees for new or existing batches\nGetting a clear overview of fee collection\nMaking frequent actions like marking students paid and sending reminders easy to access",
+  processTitle: "Design Process",
   process: [
     "User Research",
+    "Competitive Analysis",
     "Workflow Mapping",
     "Information Architecture",
     "Wireframing",
-    "UI Design",
-    "Prototype Testing",
+    "Visual Design",
+    "Prototype testing",
   ],
-  approach:
-    "I mapped the existing manual fee management workflows — from creating fee structures for different courses and batches, to tracking individual student payments, to following up on overdue fees. The design centered on a dashboard that gives teachers an instant overview of their financial status, with simple flows for creating fee plans, recording payments, and triggering reminders.",
-  keyContributions: [
-    "Mapped manual fee workflows of independent coaching teachers",
-    "Designed flexible fee structure creation for different courses and batches",
-    "Built a payment tracking dashboard with at-a-glance overdue visibility",
-    "Created automated reminder flows via SMS and WhatsApp",
-    "Designed batch operations for managing fees across student groups",
+  approach: "",
+  keyContributions: [],
+  additionalSections: [
+    {
+      title: "Understanding the Problem",
+      body:
+        "We started by understanding how independent teachers currently manage fees and what they needed from a digital system. We brainstormed and structured our interview questions in FigJam, then spoke with teachers running coaching centres and tuition classes.\n\nWe also looked at existing fee management solutions to understand how they approached fee creation, payment tracking, dashboards, and frequent actions. The research helped us identify that the system needed to support both batch-level setup and individual student-level actions without making either workflow difficult to navigate.",
+    },
+    {
+      title: "Mapping the Workflows",
+      body:
+        "We broke the experience into smaller tasks and mapped how they connected.\nThe flow covered:\nCreating a batch → Setting up fees → Tracking payments → Marking students paid → Sending reminders\nWe also considered less frequent edge cases such as refunds, fee waivers, and restricting students when fees remain unpaid. The flow went through multiple iterations as we explored the different ways these actions could fit together.",
+    },
+    {
+      title: "Designing the System",
+      body:
+        "The main idea was to make fee management a dedicated part of the teacher's workflow rather than another isolated feature.\n\nThe system brought together:\nA dashboard for an overview of fee collection\nFlexible fee structure setup for new and existing batches\nPayment status at the student level\nQuick actions for marking students as paid\nReminder actions for overdue fees\nControls for less frequent cases such as refunds and fee restrictions\n\nThe design also explored ways to manage fees across multiple students and batches without forcing teachers to repeat the same actions individually.",
+    },
+    {
+      title: "From Wireframes to Prototype",
+      body:
+        "We started with low-fidelity wireframes to work through the different flows before moving into visual design. The early flows were reviewed by the Toppr design team, which helped us question some of our assumptions and refine the experience.\n\nAfter several iterations, we created a high-fidelity prototype covering the key fee management workflows.",
+    },
+    {
+      title: "Testing the Flows",
+      body:
+        "We tested the prototype with one of the teachers we had interviewed earlier.\nThe session focused on realistic tasks:\nCreate a new batch and set up its fee structure\nAdd bank details\nSend a manual reminder to a student\nRestrict access for a student\nIssue a refund\n\nWatching someone work through these flows helped us identify where the experience needed more clarity and led to another round of iterations.",
+    },
   ],
   outcome:
-    "Delivered a fee management system that replaced manual tracking with a structured, digital workflow — giving teachers clear visibility into their finances and automating the most tedious part of running a coaching centre.",
+    "The final concept brought the key fee management workflows into one structured experience, from setting up fees to tracking payments and following up with students.\n\nMore importantly, the project helped us move beyond designing individual screens and think about how a system should support frequent actions, edge cases, and different levels of information within the same workflow.",
+  learnings:
+    "Design gets better through iteration\nOur first flow was not our final flow. As we moved from research to wireframes, reviews, and testing, several decisions changed. The project reinforced that a good solution often comes from repeatedly questioning and refining the first idea.\n\nResearch changes what you design\nTalking to teachers made the problem more concrete. Instead of designing a generic payment dashboard, we had to account for the actual situations teachers deal with when managing multiple batches and students.\n\nSystems thinking matters\nFee management is a collection of connected workflows rather than a single feature. Thinking about setup, tracking, reminders, payments, and edge cases together helped us design a more coherent experience rather than a collection of individual screens.",
+  layoutVersion: 2,
   featured: false,
   archived: true,
   layoutFormat: "standard",

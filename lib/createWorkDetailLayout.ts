@@ -308,14 +308,23 @@ function layoutStandard(editor: Editor, data: WorkItem) {
   y = section(editor, data.slug, y, "Overview", data.overview);
   y = section(editor, data.slug, y, "The Challenge", data.challenge);
   y = processTimeline(editor, data.slug, y, data.process, data.processTitle);
-  y = section(editor, data.slug, y, "Approach", data.approach);
-  y = bulletList(editor, data.slug, y, "Key Contributions", data.keyContributions, !!data.additionalSections);
+  if (data.approach) {
+    y = section(editor, data.slug, y, "Approach", data.approach);
+  }
+  if (data.keyContributions.length > 0) {
+    y = bulletList(editor, data.slug, y, "Key Contributions", data.keyContributions, !!data.additionalSections);
+  }
+
+  const researchSections = !data.approach && data.keyContributions.length === 0 && !!data.additionalSections?.length;
+  if (researchSections) {
+    y = imagePlaceholders(editor, data.slug, y);
+  }
 
   for (const extra of data.additionalSections ?? []) {
     y = section(editor, data.slug, y, extra.title, extra.body);
   }
 
-  if (!data.showAtAGlance) {
+  if (!data.showAtAGlance && !researchSections) {
     y = imagePlaceholders(editor, data.slug, y);
   }
 

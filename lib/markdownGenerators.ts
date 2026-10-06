@@ -221,17 +221,21 @@ function workItemToMarkdown(data: WorkItem): string {
     });
     lines.push("");
 
-    lines.push("## Approach");
-    lines.push("");
-    pushText(data.approach);
-    lines.push("");
-
-    lines.push("## Key Contributions");
-    lines.push("");
-    for (const item of data.keyContributions) {
-      lines.push(`- ${item}`);
+    if (data.approach.trim()) {
+      lines.push("## Approach");
+      lines.push("");
+      pushText(data.approach);
+      lines.push("");
     }
-    lines.push("");
+
+    if (data.keyContributions.length > 0) {
+      lines.push("## Key Contributions");
+      lines.push("");
+      for (const item of data.keyContributions) {
+        lines.push(`- ${item}`);
+      }
+      lines.push("");
+    }
 
     for (const section of data.additionalSections ?? []) {
       lines.push(`## ${section.title}`);

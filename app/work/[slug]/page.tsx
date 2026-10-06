@@ -87,19 +87,23 @@ export default function WorkDetailPage({
                 </ol>
               </section>
 
-              <section aria-label="Approach">
-                <h2>Approach</h2>
-                <TextContent text={data.approach} />
-              </section>
+              {data.approach.trim() && (
+                <section aria-label="Approach">
+                  <h2>Approach</h2>
+                  <TextContent text={data.approach} />
+                </section>
+              )}
 
-              <section aria-label="Key contributions">
-                <h2>Key Contributions</h2>
-                <ul>
-                  {data.keyContributions.map((item, i) => (
-                    <li key={i}>{item}</li>
-                  ))}
-                </ul>
-              </section>
+              {data.keyContributions.length > 0 && (
+                <section aria-label="Key contributions">
+                  <h2>Key Contributions</h2>
+                  <ul>
+                    {data.keyContributions.map((item, i) => (
+                      <li key={i}>{item}</li>
+                    ))}
+                  </ul>
+                </section>
+              )}
 
               {data.additionalSections?.map((section) => (
                 <section key={section.title} aria-label={section.title}>
