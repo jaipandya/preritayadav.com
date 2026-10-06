@@ -1,17 +1,21 @@
 import type { Editor } from "tldraw";
 import { CANVAS_W, LEFT_PAD, centerCamera, createBackButton } from "./layoutHelpers";
-import { getMainWork, getArchivedWork } from "./workData";
+import { getMainWork, getArchivedWork, listingCardTitle } from "./workData";
 import {
   workTitle,
   workSubtitle,
   archiveTitle,
   archiveSubtitle,
+  workListingBackLabel,
+  workListingCtaLabel,
 } from "./workListingContent";
+import { bind, withContent } from "./contentOverrides";
+import { contentKey } from "./contentOverrides";
 
 export function createWorkListingLayout(editor: Editor) {
   let y = 40;
 
-  createBackButton(editor, LEFT_PAD, y, "work-back");
+  createBackButton(editor, LEFT_PAD, y, "work-back", { label: workListingBackLabel, labelKey: "workListing.backLabel" });
 
   y += 60;
 
@@ -27,7 +31,7 @@ export function createWorkListingLayout(editor: Editor) {
       showArrow: false,
       arrowDirection: "right",
     },
-    meta: { componentType: "annotation", variationId: "work-heading" },
+    meta: withContent({ componentType: "annotation", variationId: "work-heading" }, bind("workListing.title", workTitle)),
   });
 
   y += 55;
@@ -44,7 +48,7 @@ export function createWorkListingLayout(editor: Editor) {
       showArrow: false,
       arrowDirection: "right",
     },
-    meta: { componentType: "annotation", variationId: "work-subtitle" },
+    meta: withContent({ componentType: "annotation", variationId: "work-subtitle" }, bind("workListing.subtitle", workSubtitle)),
   });
 
   y += 60;
@@ -60,15 +64,15 @@ export function createWorkListingLayout(editor: Editor) {
         w: CANVAS_W - LEFT_PAD * 2,
         h: 180,
         number: item.number,
-        title: `${item.company}: ${item.title}`,
+        title: listingCardTitle(item),
         description: item.tagline,
         mediaType: item.illustrationType,
       },
-      meta: {
-        componentType: "project-card",
-        variationId: `work-${item.slug}`,
-        href: `/work/${item.slug}`,
-      },
+      meta: withContent(
+        { componentType: "project-card", variationId: `work-${item.slug}`, href: `/work/${item.slug}` },
+        bind(contentKey("workListing", "cards", item.slug), listingCardTitle(item), { prop: "title" }),
+        bind(contentKey("work", item.slug, "tagline"), item.tagline, { prop: "description" })
+      ),
     });
 
     y += 220;
@@ -89,7 +93,7 @@ export function createWorkListingLayout(editor: Editor) {
       showArrow: true,
       arrowDirection: "down",
     },
-    meta: { componentType: "annotation", variationId: "archive-heading" },
+    meta: withContent({ componentType: "annotation", variationId: "archive-heading" }, bind("workListing.archiveTitle", archiveTitle)),
   });
 
   y += 50;
@@ -106,7 +110,7 @@ export function createWorkListingLayout(editor: Editor) {
       showArrow: false,
       arrowDirection: "right",
     },
-    meta: { componentType: "annotation", variationId: "archive-subtitle" },
+    meta: withContent({ componentType: "annotation", variationId: "archive-subtitle" }, bind("workListing.archiveSubtitle", archiveSubtitle)),
   });
 
   y += 45;
@@ -122,15 +126,15 @@ export function createWorkListingLayout(editor: Editor) {
         w: CANVAS_W - LEFT_PAD * 2,
         h: 180,
         number: item.number,
-        title: `${item.company}: ${item.title}`,
+        title: listingCardTitle(item),
         description: item.tagline,
         mediaType: item.illustrationType,
       },
-      meta: {
-        componentType: "project-card",
-        variationId: `archive-${item.slug}`,
-        href: `/work/${item.slug}`,
-      },
+      meta: withContent(
+        { componentType: "project-card", variationId: `archive-${item.slug}`, href: `/work/${item.slug}` },
+        bind(contentKey("workListing", "cards", item.slug), listingCardTitle(item), { prop: "title" }),
+        bind(contentKey("work", item.slug, "tagline"), item.tagline, { prop: "description" })
+      ),
     });
 
     y += 220;
@@ -142,12 +146,11 @@ export function createWorkListingLayout(editor: Editor) {
     type: "hand-drawn-button",
     x: CANVAS_W / 2 - 70,
     y,
-    props: { w: 140, h: 36, label: "Contact me" },
-    meta: {
-      componentType: "button",
-      variationId: "work-footer-cta",
-      href: "/contact",
-    },
+    props: { w: 140, h: 36, label: workListingCtaLabel },
+    meta: withContent(
+      { componentType: "button", variationId: "work-footer-cta", href: "/contact" },
+      bind("workListing.ctaLabel", workListingCtaLabel, { prop: "label" })
+    ),
   });
 
   centerCamera(editor);

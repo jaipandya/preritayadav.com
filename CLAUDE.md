@@ -28,6 +28,7 @@ All page text content lives in shared data modules under `lib/`:
 - `lib/contactContent.ts` — title, subtitle, email, social links
 - `lib/workListingContent.ts` — headings and subtitles for the work listing page
 - `lib/workData.ts` — all work/project case study content (already existed)
+- `lib/workPageContent.ts` — default labels of a case study page (headings, Role/Duration/Tools, buttons)
 
 Both the **tldraw layout creators** (`lib/create*Layout.ts`) and the **semantic HTML layers** (in each `app/*/page.tsx`) import from these modules. This ensures crawlers, screen readers, and the visual canvas all render the same content.
 
@@ -35,6 +36,17 @@ Both the **tldraw layout creators** (`lib/create*Layout.ts`) and the **semantic 
 1. Edit the relevant content module in `lib/` — never hardcode text in a layout creator or page component.
 2. Both the canvas and the hidden HTML will automatically pick up the change.
 3. If adding a new page, create a content module first, then wire it into both the layout creator and the page's sr-only `<article>`.
+
+### Content overrides (WIP edits reach the rendered site)
+
+Text edited on the WIP canvas is carried to the rendered site (same browser only) through `lib/contentOverrides.ts`. Details, key schema and the plan for wiring the rendered redesign are in `docs/content-overrides.md`.
+
+- Every text shape a layout creator makes from a content module must bind its text with `withContent(meta, bind(key, value, opts))`. Bullet lists use `bindList` on the heading and every item. Keys mirror the field path in the content module (`work.<slug>.overview`, `about.outro`).
+- Anything a user can edit on the canvas must have a content-module field and a binding, including labels and button text. If it has no field, add one to a `lib/*Content.ts` module.
+- Do not put editable decoration in a shape (like a label plus value in one text). Use separate shapes.
+- When a layout creator changes shape structure, bump that page's layout version (`layoutVersion` in `workData.ts`, or the `-vN` page key on static pages).
+- Run `bun test` after changing layout creators, bindings or `lib/contentOverrides.ts`.
+- New rendered-site copy must come from `lib/` and be shown through `useContent` / `useContentList`, inside the `ContentGate` (see the doc). Do not change `app/rendered` or `components/rendered` for this until the redesign is wired.
 
 ### Component decomposition
 

@@ -13,7 +13,7 @@ export default function ContactPage() {
   return (
     <PageShell
       navLinks={[{ href: "/", label: "Back to Home" }]}
-      pageKey="contact"
+      pageKey="contact-v3"
       onCreateLayout={createContactLayout}
     >
       <h1>{contactTitle}</h1>

@@ -6,7 +6,11 @@ import {
   skills,
   testimonial,
   footerClosing,
+  featuredWorkHeading,
+  viewAllWorkLabel,
+  blogHeading,
 } from "./landingContent";
+import { workPageLabels } from "./workPageContent";
 import {
   aboutTitle,
   aboutParagraphs,
@@ -43,7 +47,7 @@ export function generateLandingMarkdown(): string {
   lines.push(hero.subtitle.replace("\n", " — "));
   lines.push("");
 
-  lines.push("## Featured work");
+  lines.push(`## ${featuredWorkHeading}`);
   lines.push("");
   for (const item of featured) {
     lines.push(`### [${item.company}: ${item.title}](/work/${item.slug})`);
@@ -52,10 +56,10 @@ export function generateLandingMarkdown(): string {
     lines.push("");
   }
 
-  lines.push("[View all work →](/work)");
+  lines.push(`[${viewAllWorkLabel}](/work)`);
   lines.push("");
 
-  lines.push("## Writing & ideas");
+  lines.push(`## ${blogHeading}`);
   lines.push("");
   for (const post of blogPosts) {
     lines.push(`- [${post.title}](${post.href}) — ${post.description}`);
@@ -188,12 +192,12 @@ function workItemToMarkdown(data: WorkItem): string {
 
   lines.push("| | |");
   lines.push("|---|---|");
-  lines.push(`| **Role** | ${data.role} |`);
-  lines.push(`| **Duration** | ${data.duration} |`);
-  lines.push(`| **Tools** | ${data.tools} |`);
+  lines.push(`| **${workPageLabels.role}** | ${data.role} |`);
+  lines.push(`| **${workPageLabels.duration}** | ${data.duration} |`);
+  lines.push(`| **${workPageLabels.tools}** | ${data.tools} |`);
   lines.push("");
 
-  lines.push(`## ${data.overviewTitle ?? "Overview"}`);
+  lines.push(`## ${data.overviewTitle ?? workPageLabels.overview}`);
   lines.push("");
   pushText(data.overview);
   lines.push("");
@@ -202,19 +206,19 @@ function workItemToMarkdown(data: WorkItem): string {
     pushText(data.previewText);
     lines.push("");
   } else {
-    lines.push(`## ${data.challengeTitle ?? "The Challenge"}`);
+    lines.push(`## ${data.challengeTitle ?? workPageLabels.challenge}`);
     lines.push("");
     pushText(data.challenge);
     lines.push("");
 
     if (data.processIntro) {
-      lines.push("## Design Process");
+      lines.push(`## ${workPageLabels.designProcess}`);
       lines.push("");
       pushText(data.processIntro);
       lines.push("");
     }
 
-    lines.push(`## ${data.processTitle ?? "Process"}`);
+    lines.push(`## ${data.processTitle ?? workPageLabels.process}`);
     lines.push("");
     data.process.forEach((step, i) => {
       lines.push(`${i + 1}. ${step}`);
@@ -222,14 +226,14 @@ function workItemToMarkdown(data: WorkItem): string {
     lines.push("");
 
     if (data.approach.trim()) {
-      lines.push("## Approach");
+      lines.push(`## ${workPageLabels.approach}`);
       lines.push("");
       pushText(data.approach);
       lines.push("");
     }
 
     if (data.keyContributions.length > 0) {
-      lines.push("## Key Contributions");
+      lines.push(`## ${workPageLabels.keyContributions}`);
       lines.push("");
       for (const item of data.keyContributions) {
         lines.push(`- ${item}`);
@@ -244,13 +248,13 @@ function workItemToMarkdown(data: WorkItem): string {
       lines.push("");
     }
 
-    lines.push("## Outcome");
+    lines.push(`## ${workPageLabels.outcome}`);
     lines.push("");
     pushText(data.outcome);
     lines.push("");
 
     if (data.showAtAGlance || data.atAGlanceImages?.length) {
-      lines.push("## At a glance");
+      lines.push(`## ${workPageLabels.atAGlance}`);
       lines.push("");
       for (const image of data.atAGlanceImages ?? []) {
         lines.push(`![${image.alt}](${image.src})`);
@@ -259,7 +263,7 @@ function workItemToMarkdown(data: WorkItem): string {
     }
 
     if (data.learnings || data.learningPoints) {
-      lines.push("## What I learned");
+      lines.push(`## ${workPageLabels.learned}`);
       lines.push("");
       if (data.learningPoints) {
         data.learningPoints.forEach((point) => lines.push(`- ${point}`));

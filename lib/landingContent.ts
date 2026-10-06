@@ -151,3 +151,7 @@ export const footerIcons: Array<{
 
 export const footerClosing = "Let's build something great.";
 export const footerCta = { label: "Say hello", href: "/contact" };
+
+export const featuredWorkHeading = "Featured work";
+export const viewAllWorkLabel = "View all work \u2192";
+export const blogHeading = "Writing & ideas";

@@ -6,3 +6,6 @@ export const workSubtitle =
 export const archiveTitle = "Archive";
 
 export const archiveSubtitle = "Earlier projects and personal experiments.";
+
+export const workListingBackLabel = "\u2190 Back home";
+export const workListingCtaLabel = "Contact me";

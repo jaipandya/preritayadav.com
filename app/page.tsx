@@ -12,6 +12,9 @@ import {
   contactMe,
   footerClosing,
   footerCta,
+  featuredWorkHeading,
+  viewAllWorkLabel,
+  blogHeading,
 } from "@/lib/landingContent";
 
 const navLinks = [
@@ -28,7 +31,7 @@ const featured = getFeaturedWork();
 
 export default function Home() {
   return (
-    <PageShell navLinks={navLinks} pageKey="landing" onCreateLayout={createLandingLayout}>
+    <PageShell navLinks={navLinks} pageKey="landing-v3" onCreateLayout={createLandingLayout}>
       <header>
         <p>{hero.greeting}</p>
         <h1>{hero.name}</h1>
@@ -36,8 +39,8 @@ export default function Home() {
         <a href={hero.cta.href}>{hero.cta.label}</a>
       </header>
 
-      <section aria-label="Featured work">
-        <h2>Featured work</h2>
+      <section aria-label={featuredWorkHeading}>
+        <h2>{featuredWorkHeading}</h2>
         {featured.map((item) => (
           <article key={item.slug}>
             <h3>
@@ -46,11 +49,11 @@ export default function Home() {
             <p>{item.tagline}</p>
           </article>
         ))}
-        <Link href="/work">View all work</Link>
+        <Link href="/work">{viewAllWorkLabel}</Link>
       </section>
 
-      <section aria-label="Writing and ideas">
-        <h2>Writing &amp; ideas</h2>
+      <section aria-label={blogHeading}>
+        <h2>{blogHeading}</h2>
         <ul>
           {blogPosts.map((post) => (
             <li key={post.href}>

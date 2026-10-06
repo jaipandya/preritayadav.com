@@ -1,4 +1,5 @@
 import type { Editor } from "tldraw";
+import { bind, withContent } from "./contentOverrides";
 
 export const CANVAS_W = 560;
 export const LEFT_PAD = 20;
@@ -13,7 +14,7 @@ export function createBackButton(
   x: number,
   y: number,
   variationId: string,
-  opts?: { w?: number; h?: number; label?: string; href?: string }
+  opts?: { w?: number; h?: number; label?: string; href?: string; labelKey?: string }
 ) {
   editor.createShape({
     type: "hand-drawn-button",
@@ -24,10 +25,9 @@ export function createBackButton(
       h: opts?.h ?? 32,
       label: opts?.label ?? "← Back home",
     },
-    meta: {
-      componentType: "button",
-      variationId,
-      href: opts?.href ?? "/",
-    },
+    meta: withContent(
+      { componentType: "button", variationId, href: opts?.href ?? "/" },
+      ...(opts?.labelKey ? [bind(opts.labelKey, opts?.label ?? "← Back home", { prop: "label" })] : [])
+    ),
   });
 }

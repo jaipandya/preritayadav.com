@@ -8,7 +8,11 @@ import {
   teamsWorkedWith,
   footerClosing,
   footerCta,
+  featuredWorkHeading,
+  viewAllWorkLabel,
+  blogHeading,
 } from "./landingContent";
+import { bind, contentKey, withContent } from "./contentOverrides";
 
 export function createLandingLayout(editor: Editor) {
   let y = 30;
@@ -26,7 +30,7 @@ export function createLandingLayout(editor: Editor) {
       showArrow: false,
       arrowDirection: "right",
     },
-    meta: { componentType: "annotation", variationId: "hero-hello" },
+    meta: withContent({ componentType: "annotation", variationId: "hero-hello" }, bind("landing.hero.greeting", hero.greeting)),
   });
 
   y += 30;
@@ -43,7 +47,7 @@ export function createLandingLayout(editor: Editor) {
       showArrow: false,
       arrowDirection: "right",
     },
-    meta: { componentType: "annotation", variationId: "hero-title" },
+    meta: withContent({ componentType: "annotation", variationId: "hero-title" }, bind("landing.hero.name", hero.name)),
   });
 
   y += 75;
@@ -60,7 +64,7 @@ export function createLandingLayout(editor: Editor) {
       showArrow: false,
       arrowDirection: "right",
     },
-    meta: { componentType: "annotation", variationId: "hero-sub" },
+    meta: withContent({ componentType: "annotation", variationId: "hero-sub" }, bind("landing.hero.subtitle", hero.subtitle)),
   });
 
   y += 85;
@@ -70,11 +74,10 @@ export function createLandingLayout(editor: Editor) {
     x: LEFT_PAD,
     y,
     props: { w: 120, h: 34, label: hero.cta.label },
-    meta: {
-      componentType: "button",
-      variationId: "hero-cta",
-      href: hero.cta.href,
-    },
+    meta: withContent(
+      { componentType: "button", variationId: "hero-cta", href: hero.cta.href },
+      bind("landing.hero.cta.label", hero.cta.label, { prop: "label" })
+    ),
   });
 
   // Hero illustration — girl working on MacBook with nature background
@@ -96,12 +99,12 @@ export function createLandingLayout(editor: Editor) {
     props: {
       w: 300,
       h: 40,
-      text: "Featured work",
+      text: featuredWorkHeading,
       fontSize: 22,
       showArrow: true,
       arrowDirection: "down",
     },
-    meta: { componentType: "annotation", variationId: "selected-work-heading" },
+    meta: withContent({ componentType: "annotation", variationId: "selected-work-heading" }, bind("landing.featuredWorkHeading", featuredWorkHeading)),
   });
 
   y += 80;
@@ -121,11 +124,11 @@ export function createLandingLayout(editor: Editor) {
         description: item.tagline,
         mediaType: item.illustrationType,
       },
-      meta: {
-        componentType: "project-card",
-        variationId: `work-${item.slug}`,
-        href: `/work/${item.slug}`,
-      },
+      meta: withContent(
+        { componentType: "project-card", variationId: `work-${item.slug}`, href: `/work/${item.slug}` },
+        bind(contentKey("work", item.slug, "company"), item.company, { prop: "title" }),
+        bind(contentKey("work", item.slug, "tagline"), item.tagline, { prop: "description" })
+      ),
     });
 
     y += 220;
@@ -135,12 +138,11 @@ export function createLandingLayout(editor: Editor) {
     type: "hand-drawn-button",
     x: LEFT_PAD,
     y,
-    props: { w: 150, h: 34, label: "View all work →" },
-    meta: {
-      componentType: "button",
-      variationId: "see-all-work",
-      href: "/work",
-    },
+    props: { w: 150, h: 34, label: viewAllWorkLabel },
+    meta: withContent(
+      { componentType: "button", variationId: "see-all-work", href: "/work" },
+      bind("landing.viewAllWorkLabel", viewAllWorkLabel, { prop: "label" })
+    ),
   });
 
   y += 70;
@@ -153,17 +155,17 @@ export function createLandingLayout(editor: Editor) {
     props: {
       w: 300,
       h: 40,
-      text: "Writing & ideas",
+      text: blogHeading,
       fontSize: 22,
       showArrow: true,
       arrowDirection: "down",
     },
-    meta: { componentType: "annotation", variationId: "blog-heading" },
+    meta: withContent({ componentType: "annotation", variationId: "blog-heading" }, bind("landing.blogHeading", blogHeading)),
   });
 
   y += 70;
 
-  for (const post of blogPosts) {
+  blogPosts.forEach((post, i) => {
     editor.createShape({
       type: "annotation",
       x: LEFT_PAD,
@@ -176,11 +178,14 @@ export function createLandingLayout(editor: Editor) {
         showArrow: false,
         arrowDirection: "right",
       },
-      meta: {
-        componentType: "annotation",
-        variationId: `blog-${post.title.toLowerCase().replace(/\s+/g, "-")}`,
-        href: post.href,
-      },
+      meta: withContent(
+        {
+          componentType: "annotation",
+          variationId: `blog-${post.title.toLowerCase().replace(/\s+/g, "-")}`,
+          href: post.href,
+        },
+        bind(`landing.blogPosts.${i}.title`, post.title)
+      ),
     });
 
     y += 24;
@@ -197,14 +202,14 @@ export function createLandingLayout(editor: Editor) {
         showArrow: false,
         arrowDirection: "right",
       },
-      meta: {
-        componentType: "annotation",
-        variationId: `blog-desc-${post.title.toLowerCase().replace(/\s+/g, "-")}`,
-      },
+      meta: withContent(
+        { componentType: "annotation", variationId: `blog-desc-${post.title.toLowerCase().replace(/\s+/g, "-")}` },
+        bind(`landing.blogPosts.${i}.description`, post.description)
+      ),
     });
 
     y += 40;
-  }
+  });
 
   y += 20;
 
@@ -221,7 +226,7 @@ export function createLandingLayout(editor: Editor) {
       showArrow: true,
       arrowDirection: "down",
     },
-    meta: { componentType: "annotation", variationId: "outside-work-heading" },
+    meta: withContent({ componentType: "annotation", variationId: "outside-work-heading" }, bind("landing.outsideWork.heading", outsideWork.heading)),
   });
 
   y += 70;
@@ -264,7 +269,7 @@ export function createLandingLayout(editor: Editor) {
       showArrow: false,
       arrowDirection: "right",
     },
-    meta: { componentType: "annotation", variationId: "teams-heading" },
+    meta: withContent({ componentType: "annotation", variationId: "teams-heading" }, bind("landing.teamsWorkedWith.heading", teamsWorkedWith.heading)),
   });
 
   y += 50;
@@ -310,7 +315,7 @@ export function createLandingLayout(editor: Editor) {
       showArrow: false,
       arrowDirection: "right",
     },
-    meta: { componentType: "annotation", variationId: "footer-closing" },
+    meta: withContent({ componentType: "annotation", variationId: "footer-closing" }, bind("landing.footerClosing", footerClosing)),
   });
 
   y += 45;
@@ -320,11 +325,10 @@ export function createLandingLayout(editor: Editor) {
     x: LEFT_PAD,
     y,
     props: { w: 140, h: 36, label: footerCta.label },
-    meta: {
-      componentType: "button",
-      variationId: "footer-cta",
-      href: footerCta.href,
-    },
+    meta: withContent(
+      { componentType: "button", variationId: "footer-cta", href: footerCta.href },
+      bind("landing.footerCta.label", footerCta.label, { prop: "label" })
+    ),
   });
 
   centerCamera(editor);

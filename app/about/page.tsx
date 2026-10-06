@@ -23,7 +23,7 @@ const navLinks = [
 
 export default function AboutPage() {
   return (
-    <PageShell navLinks={navLinks} pageKey="about" onCreateLayout={createAboutLayout}>
+    <PageShell navLinks={navLinks} pageKey="about-v3" onCreateLayout={createAboutLayout}>
       <h1>{aboutTitle}</h1>
       {aboutParagraphs.map((p, i) => (
         <p key={i}>{p}</p>

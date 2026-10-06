@@ -10,3 +10,5 @@ export const socials = [
   { label: "Medium", url: "https://medium.com/@preritayadav" },
   { label: "X", url: "https://x.com/preritayadav" },
 ];
+
+export const contactBackLabel = "\u2190 Back home";

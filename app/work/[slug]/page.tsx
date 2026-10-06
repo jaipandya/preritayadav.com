@@ -7,6 +7,7 @@ import { createWorkDetailLayout } from "@/lib/createWorkDetailLayout";
 import { getWorkBySlug } from "@/lib/workData";
 import Link from "next/link";
 import { CaseStudyGallery } from "@/components/ui/CaseStudyGallery";
+import { workPageLabels } from "@/lib/workPageContent";
 
 function TextContent({ text }: { text: string }) {
   return text.split(/\n{2,}/).map((paragraph, index) => (
@@ -48,16 +49,16 @@ export default function WorkDetailPage({
           </header>
 
           <dl>
-            <dt>Role</dt>
+            <dt>{workPageLabels.role}</dt>
             <dd>{data.role}</dd>
-            <dt>Duration</dt>
+            <dt>{workPageLabels.duration}</dt>
             <dd>{data.duration}</dd>
-            <dt>Tools</dt>
+            <dt>{workPageLabels.tools}</dt>
             <dd>{data.tools}</dd>
           </dl>
 
-          <section aria-label={data.overviewTitle ?? "Overview"}>
-            <h2>{data.overviewTitle ?? "Overview"}</h2>
+          <section aria-label={data.overviewTitle ?? workPageLabels.overview}>
+            <h2>{data.overviewTitle ?? workPageLabels.overview}</h2>
             <TextContent text={data.overview} />
           </section>
 
@@ -67,20 +68,20 @@ export default function WorkDetailPage({
             </section>
           ) : (
             <>
-              <section aria-label={data.challengeTitle ?? "The Challenge"}>
-                <h2>{data.challengeTitle ?? "The Challenge"}</h2>
+              <section aria-label={data.challengeTitle ?? workPageLabels.challenge}>
+                <h2>{data.challengeTitle ?? workPageLabels.challenge}</h2>
                 <TextContent text={data.challenge} />
               </section>
 
               {data.processIntro && (
-                <section aria-label="Design Process">
-                  <h2>Design Process</h2>
+                <section aria-label={workPageLabels.designProcess}>
+                  <h2>{workPageLabels.designProcess}</h2>
                   <TextContent text={data.processIntro} />
                 </section>
               )}
 
-              <section aria-label={data.processTitle ?? "Process"}>
-                <h2>{data.processTitle ?? "Process"}</h2>
+              <section aria-label={data.processTitle ?? workPageLabels.process}>
+                <h2>{data.processTitle ?? workPageLabels.process}</h2>
                 <ol>
                   {data.process.map((step, i) => (
                     <li key={i}>{step}</li>
@@ -89,15 +90,15 @@ export default function WorkDetailPage({
               </section>
 
               {data.approach.trim() && (
-                <section aria-label="Approach">
-                  <h2>Approach</h2>
+                <section aria-label={workPageLabels.approach}>
+                  <h2>{workPageLabels.approach}</h2>
                   <TextContent text={data.approach} />
                 </section>
               )}
 
               {data.keyContributions.length > 0 && (
                 <section aria-label="Key contributions">
-                  <h2>Key Contributions</h2>
+                  <h2>{workPageLabels.keyContributions}</h2>
                   <ul>
                     {data.keyContributions.map((item, i) => (
                       <li key={i}>{item}</li>
@@ -113,21 +114,21 @@ export default function WorkDetailPage({
                 </section>
               ))}
 
-              <section aria-label="Outcome">
-                <h2>Outcome</h2>
+              <section aria-label={workPageLabels.outcome}>
+                <h2>{workPageLabels.outcome}</h2>
                 <TextContent text={data.outcome} />
               </section>
 
               {(data.showAtAGlance || data.atAGlanceImages?.length) && (
-                <section aria-label="At a glance">
-                  <h2>At a glance</h2>
+                <section aria-label={workPageLabels.atAGlance}>
+                  <h2>{workPageLabels.atAGlance}</h2>
                   {data.atAGlanceImages && <CaseStudyGallery images={data.atAGlanceImages} />}
                 </section>
               )}
 
               {(data.learnings || data.learningPoints) && (
-                <section aria-label="What I learned">
-                  <h2>What I learned</h2>
+                <section aria-label={workPageLabels.learned}>
+                  <h2>{workPageLabels.learned}</h2>
                   {data.learningPoints ? (
                     <ul>
                       {data.learningPoints.map((point) => <li key={point}>{point}</li>)}
@@ -139,8 +140,8 @@ export default function WorkDetailPage({
           )}
 
           <footer>
-            <Link href="/contact">Contact me</Link>
-            <Link href="/work">Back to work</Link>
+            <Link href="/contact">{workPageLabels.contactCta}</Link>
+            <Link href="/work">{workPageLabels.back}</Link>
           </footer>
         </>
       )}

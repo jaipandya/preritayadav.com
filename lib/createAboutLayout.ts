@@ -8,6 +8,7 @@ import {
   aboutCta,
   illustrations,
 } from "./aboutContent";
+import { bind, withContent } from "./contentOverrides";
 
 export function createAboutLayout(editor: Editor) {
   let y = 60;
@@ -28,7 +29,7 @@ export function createAboutLayout(editor: Editor) {
       fontSize: 38,
       showArrow: false,
     },
-    meta: { componentType: "annotation", variationId: "about-title" },
+    meta: withContent({ componentType: "annotation", variationId: "about-title" }, bind("about.title", aboutTitle)),
   });
 
   y += 85;
@@ -46,7 +47,10 @@ export function createAboutLayout(editor: Editor) {
         fontSize: 16,
         showArrow: false,
       },
-      meta: { componentType: "annotation", variationId: `about-p${i + 1}` },
+      meta: withContent(
+        { componentType: "annotation", variationId: `about-p${i + 1}` },
+        bind(`about.paragraphs.${i}`, aboutParagraphs[i])
+      ),
     });
 
     y += paragraphSpacing[i];
@@ -77,7 +81,7 @@ export function createAboutLayout(editor: Editor) {
       fontSize: 16,
       showArrow: false,
     },
-    meta: { componentType: "annotation", variationId: "about-outro" },
+    meta: withContent({ componentType: "annotation", variationId: "about-outro" }, bind("about.outro", aboutOutro)),
   });
 
   y += 100;
@@ -94,7 +98,7 @@ export function createAboutLayout(editor: Editor) {
       fontSize: 16,
       showArrow: false,
     },
-    meta: { componentType: "annotation", variationId: "about-footer-text" },
+    meta: withContent({ componentType: "annotation", variationId: "about-footer-text" }, bind("about.footerText", aboutFooterText)),
   });
 
   y += 70;
@@ -104,11 +108,10 @@ export function createAboutLayout(editor: Editor) {
     x: LEFT_PAD,
     y,
     props: { w: 140, h: 36, label: aboutCta.label },
-    meta: {
-      componentType: "button",
-      variationId: "about-cta",
-      href: aboutCta.href,
-    },
+    meta: withContent(
+      { componentType: "button", variationId: "about-cta", href: aboutCta.href },
+      bind("about.cta.label", aboutCta.label, { prop: "label" })
+    ),
   });
 
   centerCamera(editor);

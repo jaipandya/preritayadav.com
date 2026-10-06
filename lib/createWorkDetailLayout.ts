@@ -1,6 +1,8 @@
 import { AssetRecordType, type Editor } from "tldraw";
 import { CANVAS_W, LEFT_PAD, centerCamera, createBackButton } from "./layoutHelpers";
 import { getWorkBySlug, type WorkItem } from "./workData";
+import { bind, bindList, contentKey, withContent, type ContentBinding } from "./contentOverrides";
+import { workPageLabels, type WorkPageLabel } from "./workPageContent";
 
 export function createWorkDetailLayout(editor: Editor, slug: string) {
   const data = getWorkBySlug(slug);
@@ -46,33 +48,45 @@ const CW = CANVAS_W - LEFT_PAD * 2;
 function header(editor: Editor, data: WorkItem): number {
   let y = 40;
 
-  createBackButton(editor, LEFT_PAD, y, `${data.slug}-back`, { label: "← Back to work", href: "/work" });
+  createBackButton(editor, LEFT_PAD, y, `${data.slug}-back`, {
+    label: workPageLabels.back,
+    href: "/work",
+    labelKey: workKey(data.slug, "labels.back"),
+  });
   y += 60;
 
-  annotation(editor, data.slug, "company", y, data.company, 13, 300, 20);
+  annotation(editor, data.slug, "company", y, data.company, 13, 300, 20, LEFT_PAD, [bind(workKey(data.slug, "company"), data.company)]);
   y += 24;
 
   const titleHeight = data.title.length > 30 ? 84 : 45;
-  annotation(editor, data.slug, "title", y, data.title, 30, 500, titleHeight);
+  annotation(editor, data.slug, "title", y, data.title, 30, 500, titleHeight, LEFT_PAD, [bind(workKey(data.slug, "title"), data.title)]);
   y += titleHeight + 5;
 
   const taglineHeight = data.summaryTagline || data.previewText ? textHeight(data.tagline, 15) : 30;
-  annotation(editor, data.slug, "tagline", y, data.tagline, 15, CW, taglineHeight);
+  annotation(editor, data.slug, "tagline", y, data.tagline, 15, CW, taglineHeight, LEFT_PAD, [bind(workKey(data.slug, "tagline"), data.tagline)]);
   y += taglineHeight + 20;
 
   return y;
 }
 
 function metaRow(editor: Editor, slug: string, data: WorkItem, y: number): number {
-  const details = [
-    { label: "Role", value: data.role },
-    { label: "Duration", value: data.duration },
-    { label: "Tools", value: data.tools },
+  const details: Array<{ name: WorkPageLabel; value: string; path: string }> = [
+    { name: "role", value: data.role, path: "role" },
+    { name: "duration", value: data.duration, path: "duration" },
+    { name: "tools", value: data.tools, path: "tools" },
   ];
+  const labelH = Math.ceil(13 * LINE_HEIGHT);
+  let valueH = 0;
   details.forEach((d, i) => {
-    annotation(editor, slug, `meta-${i}`, y, `${d.label}\n${d.value}`, 13, 160, 50, LEFT_PAD + i * 180);
+    const x = LEFT_PAD + i * 180;
+    annotation(editor, slug, `meta-${i}-label`, y, workPageLabels[d.name], 13, 160, labelH, x, [
+      bind(workKey(slug, `labels.${d.name}`), workPageLabels[d.name]),
+    ]);
+    const h = textHeight(d.value, 13, 160);
+    annotation(editor, slug, `meta-${i}`, y + labelH, d.value, 13, 160, h, x, [bind(workKey(slug, d.path), d.value)]);
+    valueH = Math.max(valueH, h);
   });
-  return y + 80;
+  return y + labelH + valueH + 40;
 }
 
 function heroCard(editor: Editor, data: WorkItem, y: number): number {
@@ -81,7 +95,11 @@ function heroCard(editor: Editor, data: WorkItem, y: number): number {
     x: LEFT_PAD,
     y,
     props: { w: CW, h: 160, number: data.number, title: data.company, description: data.summaryTagline ?? data.tagline, mediaType: data.illustrationType },
-    meta: { componentType: "project-card", variationId: `${data.slug}-hero-card` },
+    meta: withContent(
+      { componentType: "project-card", variationId: `${data.slug}-hero-card` },
+      bind(workKey(data.slug, "company"), data.company, { prop: "title" }),
+      bind(workKey(data.slug, data.summaryTagline ? "summaryTagline" : "tagline"), data.summaryTagline ?? data.tagline, { prop: "description" })
+    ),
   });
   return y + 190;
 }
@@ -93,73 +111,117 @@ const PARAGRAPH_GAP = 10; // between paragraphs inside a section
 const BULLET_GAP = 6; // between bullet items
 const SECTION_GAP = 32; // after a section ends
 
-/** Heading + body paragraphs. Returns y after the block, including SECTION_GAP. */
-function section(
-  editor: Editor, slug: string, y: number, label: string, text: string,
-  labelSize = 18, id = label.toLowerCase().replace(/\s+/g, "-")
-): number {
-  const labelH = Math.ceil(labelSize * LINE_HEIGHT);
-  annotation(editor, slug, `${id}-label`, y, label, labelSize, 300, labelH);
-  y += labelH + LABEL_GAP;
-  return paragraphs(editor, slug, y, id, text, 14) + SECTION_GAP;
+/** Content key for a field of a work item, e.g. `work.fitpass-partner-app.overview`. */
+function workKey(slug: string, path: string | number): string {
+  return contentKey("work", slug, path);
 }
 
-/** One annotation per paragraph (any newline starts a new one). Returns y after the last, no trailing gap. */
-function paragraphs(editor: Editor, slug: string, y: number, id: string, text: string, fontSize: number): number {
+/** A heading and the work-item path its text is stored under. */
+type Heading = { text: string; key: string };
+
+/**
+ * Heading for a section. Uses the work item's own title field when it has one (e.g. `overviewTitle`),
+ * otherwise the shared default label, overridable per case study as `labels.<name>`.
+ */
+function heading(data: WorkItem, name: WorkPageLabel, field?: "overviewTitle" | "challengeTitle" | "processTitle"): Heading {
+  const custom = field ? data[field] : undefined;
+  return custom ? { text: custom, key: field! } : { text: workPageLabels[name], key: `labels.${name}` };
+}
+
+type SectionOpts = {
+  /** Path of the body field in WorkItem (e.g. "overview", "additionalSections.0.body"). */
+  key: string;
+  labelSize?: number;
+  id?: string;
+};
+
+/** Heading + body paragraphs. Returns y after the block, including SECTION_GAP. */
+function section(
+  editor: Editor, slug: string, y: number, head: Heading, text: string,
+  { key, labelSize = 18, id = head.text.toLowerCase().replace(/\s+/g, "-") }: SectionOpts
+): number {
+  y = headingShape(editor, slug, y, head, labelSize, id);
+  return paragraphs(editor, slug, y, id, text, 14, key) + SECTION_GAP;
+}
+
+/** Creates the heading shape and returns y where the content below it starts. */
+function headingShape(
+  editor: Editor, slug: string, y: number, head: Heading, size: number, id: string, extra: ContentBinding[] = []
+): number {
+  const h = Math.ceil(size * LINE_HEIGHT);
+  annotation(editor, slug, `${id}-label`, y, head.text, size, 300, h, LEFT_PAD, [
+    bind(workKey(slug, head.key), head.text),
+    ...extra,
+  ]);
+  return y + h + LABEL_GAP;
+}
+
+/**
+ * One annotation per paragraph (any newline starts a new one). Returns y after the last, no trailing gap.
+ * With `key` (a WorkItem path), each paragraph is bound to that field with its index as `part`.
+ */
+function paragraphs(editor: Editor, slug: string, y: number, id: string, text: string, fontSize: number, key?: string): number {
   const parts = text.split(/\n+/).map((p) => p.trim()).filter(Boolean);
   parts.forEach((part, i) => {
     const h = textHeight(part, fontSize);
-    annotation(editor, slug, i === 0 ? id : `${id}-${i}`, y, part, fontSize, CW, h);
+    annotation(
+      editor, slug, i === 0 ? id : `${id}-${i}`, y, part, fontSize, CW, h, LEFT_PAD,
+      key ? [bind(workKey(slug, key), part, { part: i })] : []
+    );
     y += h + (i < parts.length - 1 ? PARAGRAPH_GAP : 0);
   });
   return y;
 }
 
-function bulletList(editor: Editor, slug: string, y: number, label: string, items: string[]): number {
-  const sid = label.toLowerCase().replace(/\s+/g, "-");
-  const labelH = Math.ceil(18 * LINE_HEIGHT);
-  annotation(editor, slug, `${sid}-label`, y, label, 18, 300, labelH);
-  y += labelH + LABEL_GAP;
+/**
+ * Heading + bullets, bound as one list (`keyPath` is the WorkItem array field, e.g. "keyContributions").
+ * On the canvas a bullet can be edited, deleted, duplicated, reordered, or split with Enter.
+ */
+function bulletList(editor: Editor, slug: string, y: number, head: Heading, items: string[], keyPath: string): number {
+  const sid = head.text.toLowerCase().replace(/\s+/g, "-");
+  const listKey = workKey(slug, keyPath);
+  const prefix = "· ";
+  y = headingShape(editor, slug, y, head, 18, sid, [bindList(listKey, items, { head: true })]);
   items.forEach((item, i) => {
-    const text = `· ${item}`;
+    const text = `${prefix}${item}`;
     const h = textHeight(text, 14);
-    annotation(editor, slug, `${sid}-${i}`, y, text, 14, CW, h);
+    annotation(editor, slug, `${sid}-${i}`, y, text, 14, CW, h, LEFT_PAD, [bindList(listKey, items, { prefix })]);
     y += h + (i < items.length - 1 ? BULLET_GAP : 0);
   });
   return y + SECTION_GAP;
 }
 
-function glanceLabel(editor: Editor, slug: string, y: number): number {
-  const h = Math.ceil(18 * LINE_HEIGHT);
-  annotation(editor, slug, "at-a-glance-label", y, "At a glance", 18, 300, h);
-  return y + h + LABEL_GAP;
+function glanceLabel(editor: Editor, data: WorkItem, y: number): number {
+  return headingShape(editor, data.slug, y, heading(data, "atAGlance"), 18, "at-a-glance");
 }
 
-function processTimeline(editor: Editor, slug: string, y: number, steps: string[], title = "Process"): number {
-  const labelH = Math.ceil(18 * LINE_HEIGHT);
-  annotation(editor, slug, "process-label", y, title, 18, 200, labelH);
-  y += labelH + LABEL_GAP;
+function processTimeline(editor: Editor, data: WorkItem, y: number, steps: string[]): number {
+  const slug = data.slug;
+  y = headingShape(editor, slug, y, heading(data, "process", "processTitle"), 18, "process");
 
   const fontSize = 12;
   const arrowW = 20;
   const perRow = 4;
   const stepW = (CW - arrowW * (perRow - 1)) / perRow;
   const rowGap = 18;
+  const numberH = Math.ceil(fontSize * LINE_HEIGHT);
 
   for (let start = 0; start < steps.length; start += perRow) {
     const end = Math.min(start + perRow, steps.length);
-    const labels = steps.slice(start, end).map((step, i) => `${String(start + i + 1).padStart(2, "0")}\n${step}`);
-    const rowH = Math.max(...labels.map((text) => textHeight(text, fontSize, stepW)));
+    const labelH = Math.max(...steps.slice(start, end).map((step) => textHeight(step, fontSize, stepW)));
 
     for (let i = start; i < end; i++) {
       const x = LEFT_PAD + (i - start) * (stepW + arrowW);
-      annotation(editor, slug, `step-${i}`, y, labels[i - start], fontSize, stepW, rowH, x);
+      annotation(editor, slug, `step-${i}-number`, y, String(i + 1).padStart(2, "0"), fontSize, stepW, numberH, x);
+      annotation(editor, slug, `step-${i}`, y + numberH, steps[i], fontSize, stepW, labelH, x, [
+        bind(workKey(slug, `process.${i}`), steps[i]),
+      ]);
       if (i < end - 1) {
         // Arrow sits in the gutter, level with the step number
-        annotation(editor, slug, `arrow-${i}`, y, "→", fontSize, arrowW, Math.ceil(fontSize * LINE_HEIGHT), x + stepW);
+        annotation(editor, slug, `arrow-${i}`, y, "→", fontSize, arrowW, numberH, x + stepW);
       }
     }
-    y += rowH + rowGap;
+    y += numberH + labelH + rowGap;
   }
   return y - rowGap + SECTION_GAP;
 }
@@ -225,24 +287,29 @@ function imageGallery(editor: Editor, data: WorkItem, y: number): number {
   return y - 12 + SECTION_GAP;
 }
 
-function footerCta(editor: Editor, slug: string, y: number) {
+function footerCta(editor: Editor, data: WorkItem, y: number) {
   editor.createShape({
     type: "hand-drawn-button",
     x: CANVAS_W / 2 - 70,
     y,
-    props: { w: 140, h: 36, label: "Contact me" },
-    meta: { componentType: "button", variationId: `${slug}-footer-cta`, href: "/contact" },
+    props: { w: 140, h: 36, label: workPageLabels.contactCta },
+    meta: withContent(
+      { componentType: "button", variationId: `${data.slug}-footer-cta`, href: "/contact" },
+      bind(workKey(data.slug, "labels.contactCta"), workPageLabels.contactCta, { prop: "label" })
+    ),
   });
 }
 
 function annotation(
   editor: Editor, slug: string, vid: string, y: number,
-  text: string, fontSize: number, w: number, h: number, x = LEFT_PAD
+  text: string, fontSize: number, w: number, h: number, x = LEFT_PAD,
+  bindings: ContentBinding[] = []
 ) {
+  const meta = { componentType: "annotation", variationId: `${slug}-${vid}` };
   editor.createShape({
     type: "annotation", x, y,
     props: { w, h, text, fontSize, showArrow: false, arrowDirection: "right" },
-    meta: { componentType: "annotation", variationId: `${slug}-${vid}` },
+    meta: bindings.length ? withContent(meta, ...bindings) : meta,
   });
 }
 
@@ -284,171 +351,181 @@ function textHeight(text: string, fontSize = 14, width = CW): number {
 // ─── Layout: Process-Heavy (Fitpass) ────────────────────────────
 
 function layoutProcessHeavy(editor: Editor, data: WorkItem) {
+  const slug = data.slug;
   let y = header(editor, data);
-  y = metaRow(editor, data.slug, data, y);
+  y = metaRow(editor, slug, data, y);
   y = heroCard(editor, data, y);
 
-  y = section(editor, data.slug, y, "Overview", data.overview);
-  y = section(editor, data.slug, y, "The Challenge", data.challenge);
+  y = section(editor, slug, y, heading(data, "overview", "overviewTitle"), data.overview, { key: "overview" });
+  y = section(editor, slug, y, heading(data, "challenge", "challengeTitle"), data.challenge, { key: "challenge" });
 
   if (data.processIntro) {
-    y = section(editor, data.slug, y, "Design Process", data.processIntro);
+    y = section(editor, slug, y, heading(data, "designProcess"), data.processIntro, { key: "processIntro" });
   }
 
-  y = processTimeline(editor, data.slug, y, data.process);
+  y = processTimeline(editor, data, y, data.process);
 
-  y = imagePlaceholders(editor, data.slug, y);
+  y = imagePlaceholders(editor, slug, y);
 
-  y = section(editor, data.slug, y, "Approach", data.approach);
-  y = bulletList(editor, data.slug, y, "Key Contributions", data.keyContributions);
-  y = section(editor, data.slug, y, "Outcome", data.outcome);
+  y = section(editor, slug, y, heading(data, "approach"), data.approach, { key: "approach" });
+  y = bulletList(editor, slug, y, heading(data, "keyContributions"), data.keyContributions, "keyContributions");
+  y = section(editor, slug, y, heading(data, "outcome"), data.outcome, { key: "outcome" });
   if (data.showAtAGlance) {
-    y = glanceLabel(editor, data.slug, y);
+    y = glanceLabel(editor, data, y);
   }
   if (data.learnings) {
-    y = section(editor, data.slug, y, "What I learned", data.learnings);
+    y = section(editor, slug, y, heading(data, "learned"), data.learnings, { key: "learnings" });
   }
 
-  footerCta(editor, data.slug, y);
+  footerCta(editor, data, y);
 }
 
 // ─── Layout: Before-After (Abhiloans) ──────────────────────────
 
 function layoutBeforeAfter(editor: Editor, data: WorkItem) {
+  const slug = data.slug;
   let y = header(editor, data);
-  y = metaRow(editor, data.slug, data, y);
+  y = metaRow(editor, slug, data, y);
   y = heroCard(editor, data, y);
 
-  y = section(editor, data.slug, y, "Overview", data.overview);
+  y = section(editor, slug, y, heading(data, "overview", "overviewTitle"), data.overview, { key: "overview" });
 
   // Before state
-  y = section(editor, data.slug, y, data.challengeTitle ?? "The Problem", data.challenge, 20, "before");
+  y = section(editor, slug, y, heading(data, "problem", "challengeTitle"), data.challenge, {
+    key: "challenge", labelSize: 20, id: "before",
+  });
 
   // Process
-  y = processTimeline(editor, data.slug, y, data.process);
+  y = processTimeline(editor, data, y, data.process);
 
   // After state
-  y = section(editor, data.slug, y, "Approach", data.approach, 20, "after");
+  y = section(editor, slug, y, heading(data, "approach"), data.approach, { key: "approach", labelSize: 20, id: "after" });
 
   if (!data.atAGlanceImages?.length) {
-    y = imagePlaceholders(editor, data.slug, y);
+    y = imagePlaceholders(editor, slug, y);
   }
 
-  y = bulletList(editor, data.slug, y, "Key Contributions", data.keyContributions);
-  y = section(editor, data.slug, y, "Outcome", data.outcome);
+  y = bulletList(editor, slug, y, heading(data, "keyContributions"), data.keyContributions, "keyContributions");
+  y = section(editor, slug, y, heading(data, "outcome"), data.outcome, { key: "outcome" });
   if (data.atAGlanceImages?.length) {
-    y = imageGallery(editor, data, glanceLabel(editor, data.slug, y));
+    y = imageGallery(editor, data, glanceLabel(editor, data, y));
   }
   if (data.learnings) {
-    y = section(editor, data.slug, y, "What I learned", data.learnings);
+    y = section(editor, slug, y, heading(data, "learned"), data.learnings, { key: "learnings" });
   }
 
-  footerCta(editor, data.slug, y);
+  footerCta(editor, data, y);
 }
 
 // ─── Layout: Preview (Ema) ────────────────────────────────────
 
 function layoutPreview(editor: Editor, data: WorkItem) {
+  const slug = data.slug;
   let y = header(editor, data);
-  y = metaRow(editor, data.slug, data, y);
+  y = metaRow(editor, slug, data, y);
   y = heroCard(editor, data, y);
-  y = section(editor, data.slug, y, data.overviewTitle ?? "Overview", data.overview);
+  y = section(editor, slug, y, heading(data, "overview", "overviewTitle"), data.overview, { key: "overview" });
 
   if (data.previewText) {
-    y = paragraphs(editor, data.slug, y, "project-preview", data.previewText, 14) + SECTION_GAP;
+    y = paragraphs(editor, slug, y, "project-preview", data.previewText, 14, "previewText") + SECTION_GAP;
   }
 
-  footerCta(editor, data.slug, y);
+  footerCta(editor, data, y);
 }
 
 // ─── Layout: Narrative (ZkAGI) ────────────────────────────────
 
 function layoutNarrative(editor: Editor, data: WorkItem) {
+  const slug = data.slug;
   let y = header(editor, data);
-  y = metaRow(editor, data.slug, data, y);
+  y = metaRow(editor, slug, data, y);
   y = heroCard(editor, data, y);
 
-  y = section(editor, data.slug, y, data.overviewTitle ?? "Overview", data.overview);
-  y = section(editor, data.slug, y, "The Challenge", data.challenge);
-  y = processTimeline(editor, data.slug, y, data.process, data.processTitle);
+  y = section(editor, slug, y, heading(data, "overview", "overviewTitle"), data.overview, { key: "overview" });
+  y = section(editor, slug, y, heading(data, "challenge", "challengeTitle"), data.challenge, { key: "challenge" });
+  y = processTimeline(editor, data, y, data.process);
 
-  y = imagePlaceholders(editor, data.slug, y);
+  y = imagePlaceholders(editor, slug, y);
 
-  y = section(editor, data.slug, y, "Approach", data.approach);
-  y = bulletList(editor, data.slug, y, "Key Contributions", data.keyContributions);
-  y = section(editor, data.slug, y, "Outcome", data.outcome);
+  y = section(editor, slug, y, heading(data, "approach"), data.approach, { key: "approach" });
+  y = bulletList(editor, slug, y, heading(data, "keyContributions"), data.keyContributions, "keyContributions");
+  y = section(editor, slug, y, heading(data, "outcome"), data.outcome, { key: "outcome" });
   if (data.learnings) {
-    y = section(editor, data.slug, y, "What I learned", data.learnings);
+    y = section(editor, slug, y, heading(data, "learned"), data.learnings, { key: "learnings" });
   }
 
-  footerCta(editor, data.slug, y);
+  footerCta(editor, data, y);
 }
 
 // ─── Layout: Standard (Epic, Super Teacher) ─────────────────────
 
 function layoutStandard(editor: Editor, data: WorkItem) {
+  const slug = data.slug;
   let y = header(editor, data);
-  y = metaRow(editor, data.slug, data, y);
+  y = metaRow(editor, slug, data, y);
   y = heroCard(editor, data, y);
 
-  y = section(editor, data.slug, y, "Overview", data.overview);
-  y = section(editor, data.slug, y, "The Challenge", data.challenge);
-  y = processTimeline(editor, data.slug, y, data.process, data.processTitle);
+  y = section(editor, slug, y, heading(data, "overview", "overviewTitle"), data.overview, { key: "overview" });
+  y = section(editor, slug, y, heading(data, "challenge", "challengeTitle"), data.challenge, { key: "challenge" });
+  y = processTimeline(editor, data, y, data.process);
   if (data.approach) {
-    y = section(editor, data.slug, y, "Approach", data.approach);
+    y = section(editor, slug, y, heading(data, "approach"), data.approach, { key: "approach" });
   }
   if (data.keyContributions.length > 0) {
-    y = bulletList(editor, data.slug, y, "Key Contributions", data.keyContributions);
+    y = bulletList(editor, slug, y, heading(data, "keyContributions"), data.keyContributions, "keyContributions");
   }
 
   const researchSections = !data.approach && data.keyContributions.length === 0 && !!data.additionalSections?.length;
   if (researchSections) {
-    y = imagePlaceholders(editor, data.slug, y);
+    y = imagePlaceholders(editor, slug, y);
   }
 
-  for (const extra of data.additionalSections ?? []) {
-    y = section(editor, data.slug, y, extra.title, extra.body);
-  }
+  (data.additionalSections ?? []).forEach((extra, i) => {
+    y = section(editor, slug, y, { text: extra.title, key: `additionalSections.${i}.title` }, extra.body, {
+      key: `additionalSections.${i}.body`,
+    });
+  });
 
   if (!data.showAtAGlance && !researchSections) {
-    y = imagePlaceholders(editor, data.slug, y);
+    y = imagePlaceholders(editor, slug, y);
   }
 
-  y = section(editor, data.slug, y, "Outcome", data.outcome);
+  y = section(editor, slug, y, heading(data, "outcome"), data.outcome, { key: "outcome" });
 
   if (data.showAtAGlance) {
-    y = glanceLabel(editor, data.slug, y);
+    y = glanceLabel(editor, data, y);
     y = data.atAGlanceImages?.length
       ? imageGallery(editor, data, y)
-      : imagePlaceholders(editor, data.slug, y);
+      : imagePlaceholders(editor, slug, y);
   }
   if (data.learningPoints) {
-    y = bulletList(editor, data.slug, y, "What I learned", data.learningPoints);
+    y = bulletList(editor, slug, y, heading(data, "learned"), data.learningPoints, "learningPoints");
   } else if (data.learnings) {
-    y = section(editor, data.slug, y, "What I learned", data.learnings);
+    y = section(editor, slug, y, heading(data, "learned"), data.learnings, { key: "learnings" });
   }
 
-  footerCta(editor, data.slug, y);
+  footerCta(editor, data, y);
 }
 
 // ─── Layout: Minimal (Portfolio, Toppr, BirdTab) ────────────────
 
 function layoutMinimal(editor: Editor, data: WorkItem) {
+  const slug = data.slug;
   let y = header(editor, data);
-  y = metaRow(editor, data.slug, data, y);
+  y = metaRow(editor, slug, data, y);
 
   // Single paragraph overview + challenge combined
-  y = section(editor, data.slug, y, "About", data.overview);
+  y = section(editor, slug, y, heading(data, "about"), data.overview, { key: "overview" });
 
   y = heroCard(editor, data, y);
 
   // Compact approach + contributions
-  y = section(editor, data.slug, y, "What I Did", data.approach);
+  y = section(editor, slug, y, heading(data, "whatIDid"), data.approach, { key: "approach" });
 
   // Key contributions as a compact list
-  y = bulletList(editor, data.slug, y, "Highlights", data.keyContributions);
+  y = bulletList(editor, slug, y, heading(data, "highlights"), data.keyContributions, "keyContributions");
 
-  y = section(editor, data.slug, y, "Outcome", data.outcome);
+  y = section(editor, slug, y, heading(data, "outcome"), data.outcome, { key: "outcome" });
 
-  footerCta(editor, data.slug, y);
+  footerCta(editor, data, y);
 }

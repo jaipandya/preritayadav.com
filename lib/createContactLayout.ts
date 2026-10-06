@@ -4,12 +4,14 @@ import {
   contactTitle,
   contactSubtitle,
   contactEmail,
+  contactBackLabel,
 } from "./contactContent";
+import { bind, withContent } from "./contentOverrides";
 
 export function createContactLayout(editor: Editor) {
   let y = 40;
 
-  createBackButton(editor, LEFT_PAD, y, "contact-back");
+  createBackButton(editor, LEFT_PAD, y, "contact-back", { label: contactBackLabel, labelKey: "contact.backLabel" });
 
   y += 70;
 
@@ -26,7 +28,7 @@ export function createContactLayout(editor: Editor) {
       showArrow: false,
       arrowDirection: "right",
     },
-    meta: { componentType: "annotation", variationId: "contact-title" },
+    meta: withContent({ componentType: "annotation", variationId: "contact-title" }, bind("contact.title", contactTitle)),
   });
 
   y += 60;
@@ -43,7 +45,7 @@ export function createContactLayout(editor: Editor) {
       showArrow: false,
       arrowDirection: "right",
     },
-    meta: { componentType: "annotation", variationId: "contact-subtitle" },
+    meta: withContent({ componentType: "annotation", variationId: "contact-subtitle" }, bind("contact.subtitle", contactSubtitle)),
   });
 
   y += 80;
@@ -61,11 +63,10 @@ export function createContactLayout(editor: Editor) {
       showArrow: false,
       arrowDirection: "right",
     },
-    meta: {
-      componentType: "annotation",
-      variationId: "contact-email",
-      href: `mailto:${contactEmail}`,
-    },
+    meta: withContent(
+      { componentType: "annotation", variationId: "contact-email", href: `mailto:${contactEmail}` },
+      bind("contact.email", contactEmail)
+    ),
   });
 
   y += 60;

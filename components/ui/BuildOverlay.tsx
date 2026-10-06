@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import { commitOverridesFromCanvases } from "@/lib/contentOverrides";
 
 const BUILD_LINES: Array<{ text: string; delay: number }> = [
   { text: "▸ Launching build agent...", delay: 0 },
@@ -528,6 +529,8 @@ export function BuildButton({
   const renderedPath = `/rendered${pathname === "/" ? "" : pathname}`;
 
   const handleComplete = useCallback(() => {
+    // Canvas saves are debounced, so collect again now that the build has run for a few seconds.
+    commitOverridesFromCanvases();
     router.push(renderedPath);
   }, [router, renderedPath]);
 
@@ -535,6 +538,7 @@ export function BuildButton({
     let cached = false;
     try { cached = sessionStorage.getItem("prerita-build-done") === "1"; } catch {}
     setIsCached(cached);
+    commitOverridesFromCanvases();
     setBuilding(true);
   }, []);
 

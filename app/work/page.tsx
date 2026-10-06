@@ -6,6 +6,7 @@ import { workItems, getMainWork, getArchivedWork } from "@/lib/workData";
 import {
   workTitle,
   workSubtitle,
+  workListingCtaLabel,
   archiveTitle,
   archiveSubtitle,
 } from "@/lib/workListingContent";
@@ -25,7 +26,7 @@ const archived = getArchivedWork();
 
 export default function WorkPage() {
   return (
-    <PageShell navLinks={navLinks} pageKey="work-listing" onCreateLayout={createWorkListingLayout}>
+    <PageShell navLinks={navLinks} pageKey="work-listing-v3" onCreateLayout={createWorkListingLayout}>
       <h1>{workTitle}</h1>
       <p>{workSubtitle}</p>
 
@@ -53,7 +54,7 @@ export default function WorkPage() {
         ))}
       </section>
 
-      <a href="/contact">Contact me</a>
+      <a href="/contact">{workListingCtaLabel}</a>
     </PageShell>
   );
 }
