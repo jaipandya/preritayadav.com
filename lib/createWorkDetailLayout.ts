@@ -17,6 +17,9 @@ export function createWorkDetailLayout(editor: Editor, slug: string) {
   }
 
   switch (data.layoutFormat) {
+    case "preview":
+      layoutPreview(editor, data);
+      break;
     case "process-heavy":
       layoutProcessHeavy(editor, data);
       break;
@@ -52,7 +55,7 @@ function header(editor: Editor, data: WorkItem): number {
   annotation(editor, data.slug, "title", y, data.title, 30, 500, 45);
   y += 50;
 
-  const taglineHeight = data.summaryTagline ? textHeight(data.tagline) : 30;
+  const taglineHeight = data.summaryTagline || data.previewText ? textHeight(data.tagline) : 30;
   annotation(editor, data.slug, "tagline", y, data.tagline, 15, CW, taglineHeight);
   y += taglineHeight + 20;
 
@@ -246,7 +249,24 @@ function layoutBeforeAfter(editor: Editor, data: WorkItem) {
   footerCta(editor, data.slug, y);
 }
 
-// ─── Layout: Narrative (Ema, ZkAGI) ────────────────────────────
+// ─── Layout: Preview (Ema) ────────────────────────────────────
+
+function layoutPreview(editor: Editor, data: WorkItem) {
+  let y = header(editor, data);
+  y = metaRow(editor, data.slug, data, y);
+  y = heroCard(editor, data, y);
+  y = section(editor, data.slug, y, data.overviewTitle ?? "Overview", data.overview);
+
+  if (data.previewText) {
+    const h = textHeight(data.previewText);
+    annotation(editor, data.slug, "project-preview", y, data.previewText, 14, CW, h);
+    y += h + 24;
+  }
+
+  footerCta(editor, data.slug, y);
+}
+
+// ─── Layout: Narrative (ZkAGI) ────────────────────────────────
 
 function layoutNarrative(editor: Editor, data: WorkItem) {
   let y = header(editor, data);

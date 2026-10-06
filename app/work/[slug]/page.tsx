@@ -55,62 +55,70 @@ export default function WorkDetailPage({
             <dd>{data.tools}</dd>
           </dl>
 
-          <section aria-label="Overview">
-            <h2>Overview</h2>
+          <section aria-label={data.overviewTitle ?? "Overview"}>
+            <h2>{data.overviewTitle ?? "Overview"}</h2>
             <TextContent text={data.overview} />
           </section>
 
-          <section aria-label={data.challengeTitle ?? "The Challenge"}>
-            <h2>{data.challengeTitle ?? "The Challenge"}</h2>
-            <TextContent text={data.challenge} />
-          </section>
-
-          {data.processIntro && (
-            <section aria-label="Design Process">
-              <h2>Design Process</h2>
-              <TextContent text={data.processIntro} />
+          {data.previewText ? (
+            <section aria-label="Project preview">
+              <TextContent text={data.previewText} />
             </section>
-          )}
+          ) : (
+            <>
+              <section aria-label={data.challengeTitle ?? "The Challenge"}>
+                <h2>{data.challengeTitle ?? "The Challenge"}</h2>
+                <TextContent text={data.challenge} />
+              </section>
 
-          <section aria-label="Process">
-            <h2>Process</h2>
-            <ol>
-              {data.process.map((step, i) => (
-                <li key={i}>{step}</li>
-              ))}
-            </ol>
-          </section>
+              {data.processIntro && (
+                <section aria-label="Design Process">
+                  <h2>Design Process</h2>
+                  <TextContent text={data.processIntro} />
+                </section>
+              )}
 
-          <section aria-label="Approach">
-            <h2>Approach</h2>
-            <TextContent text={data.approach} />
-          </section>
+              <section aria-label="Process">
+                <h2>Process</h2>
+                <ol>
+                  {data.process.map((step, i) => (
+                    <li key={i}>{step}</li>
+                  ))}
+                </ol>
+              </section>
 
-          <section aria-label="Key contributions">
-            <h2>Key Contributions</h2>
-            <ul>
-              {data.keyContributions.map((item, i) => (
-                <li key={i}>{item}</li>
-              ))}
-            </ul>
-          </section>
+              <section aria-label="Approach">
+                <h2>Approach</h2>
+                <TextContent text={data.approach} />
+              </section>
 
-          <section aria-label="Outcome">
-            <h2>Outcome</h2>
-            <TextContent text={data.outcome} />
-          </section>
+              <section aria-label="Key contributions">
+                <h2>Key Contributions</h2>
+                <ul>
+                  {data.keyContributions.map((item, i) => (
+                    <li key={i}>{item}</li>
+                  ))}
+                </ul>
+              </section>
 
-          {data.showAtAGlance && (
-            <section aria-label="At a glance">
-              <h2>At a glance</h2>
-            </section>
-          )}
+              <section aria-label="Outcome">
+                <h2>Outcome</h2>
+                <TextContent text={data.outcome} />
+              </section>
 
-          {data.learnings && (
-            <section aria-label="What I learned">
-              <h2>What I learned</h2>
-              <TextContent text={data.learnings} />
-            </section>
+              {data.showAtAGlance && (
+                <section aria-label="At a glance">
+                  <h2>At a glance</h2>
+                </section>
+              )}
+
+              {data.learnings && (
+                <section aria-label="What I learned">
+                  <h2>What I learned</h2>
+                  <TextContent text={data.learnings} />
+                </section>
+              )}
+            </>
           )}
 
           <footer>

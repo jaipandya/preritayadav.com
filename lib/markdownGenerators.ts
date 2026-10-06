@@ -193,57 +193,62 @@ function workItemToMarkdown(data: WorkItem): string {
   lines.push(`| **Tools** | ${data.tools} |`);
   lines.push("");
 
-  lines.push("## Overview");
+  lines.push(`## ${data.overviewTitle ?? "Overview"}`);
   lines.push("");
   pushText(data.overview);
   lines.push("");
 
-  lines.push(`## ${data.challengeTitle ?? "The Challenge"}`);
-  lines.push("");
-  pushText(data.challenge);
-  lines.push("");
-
-  if (data.processIntro) {
-    lines.push("## Design Process");
+  if (data.previewText) {
+    pushText(data.previewText);
     lines.push("");
-    pushText(data.processIntro);
+  } else {
+    lines.push(`## ${data.challengeTitle ?? "The Challenge"}`);
     lines.push("");
-  }
-
-  lines.push("## Process");
-  lines.push("");
-  data.process.forEach((step, i) => {
-    lines.push(`${i + 1}. ${step}`);
-  });
-  lines.push("");
-
-  lines.push("## Approach");
-  lines.push("");
-  pushText(data.approach);
-  lines.push("");
-
-  lines.push("## Key Contributions");
-  lines.push("");
-  for (const item of data.keyContributions) {
-    lines.push(`- ${item}`);
-  }
-  lines.push("");
-
-  lines.push("## Outcome");
-  lines.push("");
-  pushText(data.outcome);
-  lines.push("");
-
-  if (data.showAtAGlance) {
-    lines.push("## At a glance");
+    pushText(data.challenge);
     lines.push("");
-  }
 
-  if (data.learnings) {
-    lines.push("## What I learned");
+    if (data.processIntro) {
+      lines.push("## Design Process");
+      lines.push("");
+      pushText(data.processIntro);
+      lines.push("");
+    }
+
+    lines.push("## Process");
     lines.push("");
-    pushText(data.learnings);
+    data.process.forEach((step, i) => {
+      lines.push(`${i + 1}. ${step}`);
+    });
     lines.push("");
+
+    lines.push("## Approach");
+    lines.push("");
+    pushText(data.approach);
+    lines.push("");
+
+    lines.push("## Key Contributions");
+    lines.push("");
+    for (const item of data.keyContributions) {
+      lines.push(`- ${item}`);
+    }
+    lines.push("");
+
+    lines.push("## Outcome");
+    lines.push("");
+    pushText(data.outcome);
+    lines.push("");
+
+    if (data.showAtAGlance) {
+      lines.push("## At a glance");
+      lines.push("");
+    }
+
+    if (data.learnings) {
+      lines.push("## What I learned");
+      lines.push("");
+      pushText(data.learnings);
+      lines.push("");
+    }
   }
 
   lines.push("---");

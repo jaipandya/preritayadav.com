@@ -10,6 +10,8 @@ export interface WorkItem {
   tools: string;
   illustrationType: string;
   overview: string;
+  overviewTitle?: string;
+  previewText?: string;
   challenge: string;
   challengeTitle?: string;
   process: string[];
@@ -22,7 +24,7 @@ export interface WorkItem {
   layoutVersion?: number;
   featured: boolean;
   archived: boolean;
-  layoutFormat: "standard" | "narrative" | "process-heavy" | "before-after" | "minimal";
+  layoutFormat: "standard" | "narrative" | "process-heavy" | "before-after" | "minimal" | "preview";
 }
 
 // --- FEATURED WORK (shown on homepage + work page) ---
@@ -128,42 +130,28 @@ const abhiloans: WorkItem = {
 const ema: WorkItem = {
   slug: "ema-persona-chatbot",
   number: "03",
-  title: "Persona & Chatbot Builder",
+  title: "Ema Personas & Chatbot Builder",
   tagline:
-    "Making enterprise AI agent creation intuitive for non-technical users",
+    "Designing a system for configuring, managing and using reusable AI-powered workflows across an organisation",
   company: "Ema",
   role: "Product Designer",
-  duration: "4 months",
-  tools: "Figma, FigJam, Storybook",
+  duration: "6 months",
+  tools: "Figma, FigJam",
   illustrationType: "ema",
+  overviewTitle: "Context",
   overview:
-    "Ema is an enterprise AI platform — backed by $25M in funding — that provides \"Universal AI employees\" to automate complex business workflows. The platform integrates with 200+ enterprise applications using its proprietary EmaFusion technology (combining 100+ LLMs). I designed the persona builder and chatbot setup experience — the core interfaces through which enterprise teams create, configure, and deploy custom AI agents across their organization.",
-  challenge:
-    "Ema's platform handles deeply technical AI configuration — selecting models, defining agent behaviors, setting data permissions, and connecting to enterprise tools. The challenge was designing interfaces where HR managers, IT admins, and operations teams (not AI engineers) could confidently create and configure AI agents. The system needed to expose powerful configuration options while keeping the experience approachable, and it had to reflect Ema's emphasis on data governance, SOC2/HIPAA compliance, and enterprise-grade security.",
-  process: [
-    "Stakeholder Alignment",
-    "User Persona Mapping",
-    "Information Architecture",
-    "Persona Builder UX",
-    "Chatbot Config Flow",
-    "Integration Design",
-    "Design Review Cycles",
-  ],
-  approach:
-    "I mapped the different user types — from technical admins to business users — and designed progressive configuration flows that matched each audience's mental model. For the persona builder, I created a guided, step-by-step experience that abstracted LLM selection and prompt engineering into intuitive choices. For the chatbot setup, I designed integration touchpoints that made connecting enterprise tools feel like a natural extension of the configuration flow. Throughout, I embedded security and compliance signals directly into the UI rather than relegating them to settings.",
-  keyContributions: [
-    "Designed the persona builder — a guided flow for creating custom AI agents with specific behaviors and knowledge domains",
-    "Created the chatbot setup and configuration experience with clear steps from creation to deployment",
-    "Designed integration touchpoints for connecting AI agents with 200+ enterprise applications",
-    "Balanced configuration depth for technical users with simplicity for business users through progressive disclosure",
-    "Embedded data governance, security, and compliance indicators directly into configuration flows",
-    "Built a consistent component language across persona management, chatbot config, and agent monitoring",
-  ],
-  outcome:
-    "Delivered an intuitive platform that enabled enterprise teams — not just engineers — to create, configure, and deploy custom AI agents. The persona builder became a key differentiator for Ema, making AI agent creation accessible to non-technical users while preserving the configurability that technical teams needed. The design supported Ema's growth as they scaled across enterprises handling 250,000+ employees.",
+    "Ema is an enterprise AI platform that provides AI Employees to automate complex business workflows, backed by $140M in total funding. The platform connects with 250+ enterprise applications and uses EmaFusion™, its proprietary model-fusion technology that combines 100+ AI models to handle different tasks.\n\nEma Personas explored how AI-powered workflows could be configured, managed, and reused across an organisation.",
+  previewText:
+    "The experience had two distinct sides. For admins, the initial approach was template-based, giving them a way to configure and manage reusable workflows. For end users, those capabilities came together through Persona-based conversational experiences.\n\nI worked across these experiences, helping shape how Personas were created, managed, and ultimately used.\n\nBecause of the nature of the project, only a glimpse of the work is shown here.\n\nFor more about the project, design process, and solutions, get in touch.",
+  challenge: "",
+  process: [],
+  approach: "",
+  keyContributions: [],
+  outcome: "",
+  layoutVersion: 2,
   featured: true,
   archived: false,
-  layoutFormat: "narrative",
+  layoutFormat: "preview",
 };
 
 // --- MAIN WORK (shown on work page, not homepage) ---

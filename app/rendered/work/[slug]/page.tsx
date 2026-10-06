@@ -95,121 +95,140 @@ export default function RenderedWorkDetail({
         variants={fadeUp}
         custom={0}
       >
-        <h2>Overview</h2>
+        <h2>{work.overviewTitle ?? "Overview"}</h2>
         <TextContent text={work.overview} />
       </motion.div>
 
-      <motion.div
-        className="r-case-section"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.15 }}
-        variants={fadeUp}
-        custom={0}
-        aria-label={work.challengeTitle ?? "The Challenge"}
-      >
-        <h2>{work.challengeTitle ?? "The Challenge"}</h2>
-        <TextContent text={work.challenge} />
-      </motion.div>
+      {work.previewText ? (
+        <>
+          <motion.div
+            className="r-case-section"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.15 }}
+            variants={fadeUp}
+            custom={0}
+            aria-label="Project preview"
+          >
+            <TextContent text={work.previewText} />
+          </motion.div>
+          <Link href="/rendered/contact" className="r-work-cta">Contact me</Link>
+        </>
+      ) : (
+        <>
+          <motion.div
+            className="r-case-section"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.15 }}
+            variants={fadeUp}
+            custom={0}
+            aria-label={work.challengeTitle ?? "The Challenge"}
+          >
+            <h2>{work.challengeTitle ?? "The Challenge"}</h2>
+            <TextContent text={work.challenge} />
+          </motion.div>
 
-      {work.processIntro && (
-        <motion.div
-          className="r-case-section"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.15 }}
-          variants={fadeUp}
-          custom={0}
-          aria-label="Design Process"
-        >
-          <h2>Design Process</h2>
-          <TextContent text={work.processIntro} />
-        </motion.div>
-      )}
+          {work.processIntro && (
+            <motion.div
+              className="r-case-section"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.15 }}
+              variants={fadeUp}
+              custom={0}
+              aria-label="Design Process"
+            >
+              <h2>Design Process</h2>
+              <TextContent text={work.processIntro} />
+            </motion.div>
+          )}
 
-      <motion.div
-        className="r-case-section"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.15 }}
-        variants={fadeUp}
-        custom={0}
-      >
-        <h2>Process</h2>
-        <div className="r-case-process">
-          {work.process.map((step) => (
-            <span key={step} className="r-case-process-step">{step}</span>
-          ))}
-        </div>
-      </motion.div>
+          <motion.div
+            className="r-case-section"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.15 }}
+            variants={fadeUp}
+            custom={0}
+          >
+            <h2>Process</h2>
+            <div className="r-case-process">
+              {work.process.map((step) => (
+                <span key={step} className="r-case-process-step">{step}</span>
+              ))}
+            </div>
+          </motion.div>
 
-      <motion.div
-        className="r-case-section"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.15 }}
-        variants={fadeUp}
-        custom={0}
-      >
-        <h2>Approach</h2>
-        <TextContent text={work.approach} />
-      </motion.div>
+          <motion.div
+            className="r-case-section"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.15 }}
+            variants={fadeUp}
+            custom={0}
+          >
+            <h2>Approach</h2>
+            <TextContent text={work.approach} />
+          </motion.div>
 
-      <motion.div
-        className="r-case-section"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.1 }}
-        variants={fadeUp}
-        custom={0}
-      >
-        <h2>Key Contributions</h2>
-        <ul>
-          {work.keyContributions.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
-      </motion.div>
+          <motion.div
+            className="r-case-section"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.1 }}
+            variants={fadeUp}
+            custom={0}
+          >
+            <h2>Key Contributions</h2>
+            <ul>
+              {work.keyContributions.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </motion.div>
 
-      <motion.div
-        className="r-case-section"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.15 }}
-        variants={fadeUp}
-        custom={0}
-      >
-        <h2>Outcome</h2>
-        <TextContent text={work.outcome} />
-      </motion.div>
+          <motion.div
+            className="r-case-section"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.15 }}
+            variants={fadeUp}
+            custom={0}
+          >
+            <h2>Outcome</h2>
+            <TextContent text={work.outcome} />
+          </motion.div>
 
-      {work.showAtAGlance && (
-        <motion.div
-          className="r-case-section"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.15 }}
-          variants={fadeUp}
-          custom={0}
-          aria-label="At a glance"
-        >
-          <h2>At a glance</h2>
-        </motion.div>
-      )}
+          {work.showAtAGlance && (
+            <motion.div
+              className="r-case-section"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.15 }}
+              variants={fadeUp}
+              custom={0}
+              aria-label="At a glance"
+            >
+              <h2>At a glance</h2>
+            </motion.div>
+          )}
 
-      {work.learnings && (
-        <motion.div
-          className="r-case-section"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.15 }}
-          variants={fadeUp}
-          custom={0}
-          aria-label="What I learned"
-        >
-          <h2>What I learned</h2>
-          <TextContent text={work.learnings} />
-        </motion.div>
+          {work.learnings && (
+            <motion.div
+              className="r-case-section"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.15 }}
+              variants={fadeUp}
+              custom={0}
+              aria-label="What I learned"
+            >
+              <h2>What I learned</h2>
+              <TextContent text={work.learnings} />
+            </motion.div>
+          )}
+        </>
       )}
 
       <div style={{ padding: "56px 0", display: "flex", justifyContent: "space-between", gap: 24, flexWrap: "wrap" }}>
