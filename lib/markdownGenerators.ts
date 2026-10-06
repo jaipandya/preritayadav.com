@@ -44,7 +44,7 @@ export function generateLandingMarkdown(): string {
   lines.push("");
   lines.push(`${hero.greeting}`);
   lines.push("");
-  lines.push(hero.subtitle.replace("\n", " — "));
+  lines.push(hero.subtitle.replace("\n", ". "));
   lines.push("");
 
   lines.push(`## ${featuredWorkHeading}`);
@@ -62,7 +62,7 @@ export function generateLandingMarkdown(): string {
   lines.push(`## ${blogHeading}`);
   lines.push("");
   for (const post of blogPosts) {
-    lines.push(`- [${post.title}](${post.href}) — ${post.description}`);
+    lines.push(`- [${post.title}](${post.href}): ${post.description}`);
   }
   lines.push("");
 
@@ -187,7 +187,7 @@ function workItemToMarkdown(data: WorkItem): string {
 
   lines.push(`# ${data.title}`);
   lines.push("");
-  lines.push(`**${data.company}** — ${data.tagline}`);
+  lines.push(`**${data.company}**: ${data.tagline}`);
   lines.push("");
 
   lines.push("| | |");

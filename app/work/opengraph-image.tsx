@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 import { OgTemplate, OG_SIZE, StackedPapersDoodle } from "@/lib/ogTemplate";
 
 export const runtime = "edge";
-export const alt = "Work by Prerita Yadav — Product Designer";
+export const alt = "Work by Prerita Yadav, Product Designer";
 export const size = OG_SIZE;
 export const contentType = "image/png";
 

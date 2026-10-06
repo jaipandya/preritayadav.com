@@ -97,7 +97,7 @@ const abhiloans: WorkItem = {
   tools: "Figma, Maze",
   illustrationType: "abhiloans",
   overview:
-    "Abhiloans (by Knab Finance) is a fintech platform trusted by over 500,000 Indians that lets users borrow against mutual funds, shares, and bonds — getting funds disbursed within 4 hours without impacting their credit score. I redesigned the onboarding flow to make the journey from sign-up to loan application fast, intuitive, and friction-free, directly targeting the high drop-off rates in the existing multi-step process.",
+    "Abhiloans (by Knab Finance) is a fintech platform trusted by over 500,000 Indians that lets users borrow against mutual funds, shares, and bonds, with funds disbursed within 4 hours and no impact on their credit score. I redesigned the onboarding flow to make the journey from sign-up to loan application fast, intuitive, and friction-free, directly targeting the high drop-off rates in the existing multi-step process.",
   challengeTitle: "The Problem",
   challenge:
     "Getting a loan against your investments involves several financial and compliance-related steps.\nThe existing onboarding required users to navigate through multiple stages before completing their loan application. Progress was not always clear, information had to be entered more than once, and users frequently dropped off at key moments, particularly during KYC verification and securities pledging.\n\nThe challenge was to make a complex financial process feel simple and predictable, without removing the steps required to complete it",
@@ -304,9 +304,9 @@ const portfolio: WorkItem = {
   tools: "Figma, Next.js, tldraw, Tailwind CSS",
   illustrationType: "portfolio",
   overview:
-    "Designed and developed preritayadav.com — a portfolio that rejects template conventions in favor of an interactive canvas experience. Built with Next.js and tldraw, the site uses hand-drawn shapes, wobbly borders, and a sketch-like visual language to turn the portfolio itself into a piece of design work.",
+    "Designed and developed preritayadav.com, a portfolio that rejects template conventions in favor of an interactive canvas experience. Built with Next.js and tldraw, the site uses hand-drawn shapes, wobbly borders, and a sketch-like visual language to turn the portfolio itself into a piece of design work.",
   challenge:
-    "Designer portfolios tend to look the same — clean grids, sans-serif type, predictable layouts. The challenge was building something that felt genuinely personal and memorable while remaining functional, accessible, and professional. The site needed to be a portfolio and a demonstration of design thinking simultaneously.",
+    "Designer portfolios tend to look the same: clean grids, sans-serif type, predictable layouts. The challenge was building something that felt genuinely personal and memorable while remaining functional, accessible, and professional. The site needed to be a portfolio and a demonstration of design thinking simultaneously.",
   process: [
     "Concept Exploration",
     "Visual Language Definition",
@@ -316,7 +316,7 @@ const portfolio: WorkItem = {
     "Iteration",
   ],
   approach:
-    "I explored the idea of a hand-drawn canvas as the primary interaction model — treating the portfolio like a living sketchbook rather than a collection of pages. Using tldraw as the rendering engine, I designed custom shape components (project cards, annotations, buttons), developed the wobbly visual language, and built a browse-only interaction mode that lets visitors navigate without editing tools.",
+    "I explored the idea of a hand-drawn canvas as the primary interaction model, treating the portfolio like a living sketchbook rather than a collection of pages. Using tldraw as the rendering engine, I designed custom shape components (project cards, annotations, buttons), developed the wobbly visual language, and built a browse-only interaction mode that lets visitors navigate without editing tools.",
   keyContributions: [
     "Conceived the hand-drawn canvas concept as a portfolio medium",
     "Designed custom tldraw shapes for project cards, annotations, buttons, and image frames",
@@ -457,7 +457,7 @@ const mentorDashboard: WorkItem = {
   tools: "Figma, Sketch",
   illustrationType: "toppr",
   overview:
-    "Toppr is India's leading adaptive learning platform, using AI to deliver personalized education to over a million students across K12 syllabi. During my first month at Toppr, I collaborated on the Mentor Dashboard — a tool that empowers mentors to monitor student progress in real time, track learning milestones, and communicate directly with parents about their child's performance.",
+    "Toppr is India's leading adaptive learning platform, using AI to deliver personalized education to over a million students across K12 syllabi. During my first month at Toppr, I collaborated on the Mentor Dashboard, a tool that empowers mentors to monitor student progress in real time, track learning milestones, and communicate directly with parents about their child's performance.",
   challenge:
     "Mentors at Toppr needed to track dozens of students simultaneously, each with unique learning paths generated by the platform's AI. The existing tools gave mentors raw data but no structured way to identify which students needed attention, what milestones had been hit or missed, or how to communicate progress to parents. The dashboard needed to surface actionable insights from complex adaptive learning data.",
   process: [
@@ -468,7 +468,7 @@ const mentorDashboard: WorkItem = {
     "Design Review",
   ],
   approach:
-    "I worked with the product and data teams to understand what signals mattered most to mentors — which students were falling behind, who was making strong progress, and what patterns needed parent communication. The dashboard design prioritized at-a-glance status for each student, drill-down views for detailed progress, and integrated parent communication tools so mentors could act on insights without switching contexts.",
+    "I worked with the product and data teams to understand what signals mattered most to mentors: which students were falling behind, who was making strong progress, and what patterns needed parent communication. The dashboard design prioritized at-a-glance status for each student, drill-down views for detailed progress, and integrated parent communication tools so mentors could act on insights without switching contexts.",
   keyContributions: [
     "Designed real-time student progress monitoring views for mentors",
     "Created at-a-glance status indicators that surfaced students needing attention",
@@ -477,7 +477,7 @@ const mentorDashboard: WorkItem = {
     "Collaborated with data team to translate adaptive learning metrics into mentor-friendly insights",
   ],
   outcome:
-    "Delivered a mentor dashboard that transformed raw adaptive learning data into actionable student insights, enabling mentors to proactively support students and keep parents informed — all within a single, focused interface.",
+    "Delivered a mentor dashboard that transformed raw adaptive learning data into actionable student insights, enabling mentors to proactively support students and keep parents informed, all within a single, focused interface.",
   featured: false,
   archived: true,
   layoutVersion: 5,
@@ -496,9 +496,9 @@ const birdTab: WorkItem = {
   tools: "Figma, React, Chrome APIs",
   illustrationType: "birdtab",
   overview:
-    "BirdTab is a personal project — a Chrome extension for bird enthusiasts where every new tab reveals a beautiful bird from your region. It's a small, joyful piece of software that turns the mundane act of opening a browser tab into a moment of discovery and connection with the natural world.",
+    "BirdTab is a personal project: a Chrome extension for bird enthusiasts where every new tab reveals a beautiful bird from your region. It's a small, joyful piece of software that turns the mundane act of opening a browser tab into a moment of discovery and connection with the natural world.",
   challenge:
-    "New tab extensions are a crowded space, but most focus on productivity or generic nature photography. The challenge was designing something specifically for bird lovers — with regional relevance, species information, and a visual experience that makes you pause and appreciate rather than immediately navigate away.",
+    "New tab extensions are a crowded space, but most focus on productivity or generic nature photography. The challenge was designing something specifically for bird lovers, with regional relevance, species information, and a visual experience that makes you pause and appreciate rather than immediately navigate away.",
   process: [
     "Concept",
     "Bird Data Research",
@@ -508,7 +508,7 @@ const birdTab: WorkItem = {
     "Beta Testing",
   ],
   approach:
-    "I designed the experience around the moment of delight — the split second when a new tab opens and you see a bird you recognize (or one you've never seen before). The design is deliberately minimal: a full-bleed photograph, the bird's name, and a subtle region indicator. Everything else stays out of the way. Regional data comes from bird observation APIs to show species actually found near the user.",
+    "I designed the experience around the moment of delight: the split second when a new tab opens and you see a bird you recognize (or one you've never seen before). The design is deliberately minimal: a full-bleed photograph, the bird's name, and a subtle region indicator. Everything else stays out of the way. Regional data comes from bird observation APIs to show species actually found near the user.",
   keyContributions: [
     "Conceived and designed the product from idea to implementation",
     "Created a minimal, photography-first interface that prioritizes the bird",
@@ -517,7 +517,7 @@ const birdTab: WorkItem = {
     "Built the Chrome extension with React and browser APIs",
   ],
   outcome:
-    "A small, personal project that brings a moment of calm and curiosity to every new browser tab — turning a utility action into a chance to learn about the birds that share your environment.",
+    "A small, personal project that brings a moment of calm and curiosity to every new browser tab, turning a utility action into a chance to learn about the birds that share your environment.",
   featured: false,
   archived: true,
   layoutVersion: 5,

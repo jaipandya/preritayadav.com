@@ -35,7 +35,7 @@ export default function Home() {
       <header>
         <p>{hero.greeting}</p>
         <h1>{hero.name}</h1>
-        <p>{hero.subtitle.replace("\n", " — ")}</p>
+        <p>{hero.subtitle.replace("\n", ". ")}</p>
         <a href={hero.cta.href}>{hero.cta.label}</a>
       </header>
 

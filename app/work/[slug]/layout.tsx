@@ -14,10 +14,10 @@ export async function generateMetadata({
   }
 
   return {
-    title: `${item.title} — ${item.company}`,
+    title: `${item.title}, ${item.company}`,
     description: item.tagline,
     openGraph: {
-      title: `${item.title} — ${item.company} | Prerita Yadav`,
+      title: `${item.title}, ${item.company} | Prerita Yadav`,
       description: item.tagline,
     },
   };

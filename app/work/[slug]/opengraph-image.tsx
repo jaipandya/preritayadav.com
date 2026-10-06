@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 import { getWorkBySlug, workItems } from "@/lib/workData";
 import { OgTemplate, OG_SIZE, PencilDoodle } from "@/lib/ogTemplate";
 
-export const alt = "Prerita Yadav — Case Study";
+export const alt = "Prerita Yadav, Case Study";
 export const size = OG_SIZE;
 export const contentType = "image/png";
 
