@@ -78,8 +78,8 @@ export default function WorkDetailPage({
                 </section>
               )}
 
-              <section aria-label="Process">
-                <h2>Process</h2>
+              <section aria-label={data.processTitle ?? "Process"}>
+                <h2>{data.processTitle ?? "Process"}</h2>
                 <ol>
                   {data.process.map((step, i) => (
                     <li key={i}>{step}</li>
@@ -101,6 +101,13 @@ export default function WorkDetailPage({
                 </ul>
               </section>
 
+              {data.additionalSections?.map((section) => (
+                <section key={section.title} aria-label={section.title}>
+                  <h2>{section.title}</h2>
+                  <TextContent text={section.body} />
+                </section>
+              ))}
+
               <section aria-label="Outcome">
                 <h2>Outcome</h2>
                 <TextContent text={data.outcome} />
@@ -112,10 +119,14 @@ export default function WorkDetailPage({
                 </section>
               )}
 
-              {data.learnings && (
+              {(data.learnings || data.learningPoints) && (
                 <section aria-label="What I learned">
                   <h2>What I learned</h2>
-                  <TextContent text={data.learnings} />
+                  {data.learningPoints ? (
+                    <ul>
+                      {data.learningPoints.map((point) => <li key={point}>{point}</li>)}
+                    </ul>
+                  ) : data.learnings ? <TextContent text={data.learnings} /> : null}
                 </section>
               )}
             </>

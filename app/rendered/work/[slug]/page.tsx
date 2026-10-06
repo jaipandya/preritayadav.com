@@ -151,8 +151,9 @@ export default function RenderedWorkDetail({
             viewport={{ once: true, amount: 0.15 }}
             variants={fadeUp}
             custom={0}
+            aria-label={work.processTitle ?? "Process"}
           >
-            <h2>Process</h2>
+            <h2>{work.processTitle ?? "Process"}</h2>
             <div className="r-case-process">
               {work.process.map((step) => (
                 <span key={step} className="r-case-process-step">{step}</span>
@@ -188,6 +189,22 @@ export default function RenderedWorkDetail({
             </ul>
           </motion.div>
 
+          {work.additionalSections?.map((section) => (
+            <motion.div
+              key={section.title}
+              className="r-case-section"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.15 }}
+              variants={fadeUp}
+              custom={0}
+              aria-label={section.title}
+            >
+              <h2>{section.title}</h2>
+              <TextContent text={section.body} />
+            </motion.div>
+          ))}
+
           <motion.div
             className="r-case-section"
             initial="hidden"
@@ -214,7 +231,7 @@ export default function RenderedWorkDetail({
             </motion.div>
           )}
 
-          {work.learnings && (
+          {(work.learnings || work.learningPoints) && (
             <motion.div
               className="r-case-section"
               initial="hidden"
@@ -225,7 +242,11 @@ export default function RenderedWorkDetail({
               aria-label="What I learned"
             >
               <h2>What I learned</h2>
-              <TextContent text={work.learnings} />
+              {work.learningPoints ? (
+                <ul>
+                  {work.learningPoints.map((point) => <li key={point}>{point}</li>)}
+                </ul>
+              ) : work.learnings ? <TextContent text={work.learnings} /> : null}
             </motion.div>
           )}
         </>

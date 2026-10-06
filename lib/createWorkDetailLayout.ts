@@ -52,8 +52,9 @@ function header(editor: Editor, data: WorkItem): number {
   annotation(editor, data.slug, "company", y, data.company, 13, 300, 20);
   y += 24;
 
-  annotation(editor, data.slug, "title", y, data.title, 30, 500, 45);
-  y += 50;
+  const titleHeight = data.title.length > 30 ? 84 : 45;
+  annotation(editor, data.slug, "title", y, data.title, 30, 500, titleHeight);
+  y += titleHeight + 5;
 
   const taglineHeight = data.summaryTagline || data.previewText ? textHeight(data.tagline) : 30;
   annotation(editor, data.slug, "tagline", y, data.tagline, 15, CW, taglineHeight);
@@ -107,8 +108,8 @@ function bulletList(editor: Editor, slug: string, y: number, label: string, item
   return y + 16;
 }
 
-function processTimeline(editor: Editor, slug: string, y: number, steps: string[]): number {
-  annotation(editor, slug, "process-label", y, "Process", 18, 200, 28);
+function processTimeline(editor: Editor, slug: string, y: number, steps: string[], title = "Process"): number {
+  annotation(editor, slug, "process-label", y, title, 18, 200, 28);
   y += 40;
 
   const stepW = 68;
@@ -306,13 +307,30 @@ function layoutStandard(editor: Editor, data: WorkItem) {
 
   y = section(editor, data.slug, y, "Overview", data.overview);
   y = section(editor, data.slug, y, "The Challenge", data.challenge);
-  y = processTimeline(editor, data.slug, y, data.process);
+  y = processTimeline(editor, data.slug, y, data.process, data.processTitle);
   y = section(editor, data.slug, y, "Approach", data.approach);
-  y = bulletList(editor, data.slug, y, "Key Contributions", data.keyContributions);
+  y = bulletList(editor, data.slug, y, "Key Contributions", data.keyContributions, !!data.additionalSections);
 
-  y = imagePlaceholders(editor, data.slug, y);
+  for (const extra of data.additionalSections ?? []) {
+    y = section(editor, data.slug, y, extra.title, extra.body);
+  }
+
+  if (!data.showAtAGlance) {
+    y = imagePlaceholders(editor, data.slug, y);
+  }
 
   y = section(editor, data.slug, y, "Outcome", data.outcome);
+
+  if (data.showAtAGlance) {
+    annotation(editor, data.slug, "at-a-glance-label", y, "At a glance", 18, 300, 28);
+    y += 40;
+    y = imagePlaceholders(editor, data.slug, y);
+  }
+  if (data.learningPoints) {
+    y = bulletList(editor, data.slug, y, "What I learned", data.learningPoints, true);
+  } else if (data.learnings) {
+    y = section(editor, data.slug, y, "What I learned", data.learnings);
+  }
 
   footerCta(editor, data.slug, y);
 }

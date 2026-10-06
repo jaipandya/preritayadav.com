@@ -15,12 +15,15 @@ export interface WorkItem {
   challenge: string;
   challengeTitle?: string;
   process: string[];
+  processTitle?: string;
   processIntro?: string;
   approach: string;
   keyContributions: string[];
+  additionalSections?: { title: string; body: string }[];
   outcome: string;
   showAtAGlance?: boolean;
   learnings?: string;
+  learningPoints?: string[];
   layoutVersion?: number;
   featured: boolean;
   archived: boolean;
@@ -158,40 +161,59 @@ const ema: WorkItem = {
 
 const epic: WorkItem = {
   slug: "epic-reading-onboarding",
-  number: "04",
-  title: "Onboarding Redesign",
+  number: "01",
+  title: "Redesigning the Explore Page for Epic",
   tagline:
-    "Unifying the first-time experience across mobile, web, and tablet for 50M kids",
+    "Making it easier for kids to discover something they want to read",
+  summaryTagline: "Redesigning the Explore Page for Epic",
   company: "Epic",
-  role: "UX Designer",
-  duration: "3 months",
-  tools: "Figma, Miro, UserTesting",
+  role: "Product Designer",
+  duration: "2 month",
+  tools: "Figma, FigJam",
   illustrationType: "epic",
   overview:
-    "Epic is a digital reading platform for kids under 12 — used by 50 million children and 2 million teachers globally, with a presence in 90% of US elementary schools. Acquired by BYJU'S for $500M, Epic offers 40,000+ books from publishers like HarperCollins, National Geographic, and Encyclopaedia Britannica. I redesigned the homepage and optimized the onboarding flow across mobile, web, and tablet to create a consistent, engaging first experience for young readers and their parents.",
+    "During my time at Epic, I worked across a range of product initiatives, from tackling churn and improving retention to designing cinematic content pages and rethinking how kids discover books.\n\nOf all the projects I worked on, redesigning the Explore page was one of the most fun to work on. It brought together a lot of the things I enjoy about product design: understanding how people discover content, creating visual systems for large content libraries, and thinking about how the same experience should adapt across web and tablet.",
   challenge:
-    "Each platform — mobile, web, and tablet — had evolved independently, resulting in inconsistent onboarding flows that confused both parents signing up and kids getting started. The mobile app had different steps than the web experience, tablet had its own variation, and there was no unified approach to guiding new users. For a product serving 50M kids across multiple devices, this fragmentation meant lost signups and a disjointed brand experience.",
+    "Kids don't always know what they want to read. They might be looking for books about a favourite character, trying to find the next book in a series, looking for something seasonal, or simply browsing for something interesting.\nThe existing Explore experience relied heavily on rows of content and general search. This made it harder to discover content through specific interests and could feel overwhelming when many books were shown together.\n\nThe opportunity was to make discovery more visual, more varied, and easier to navigate.",
+  processTitle: "Design Process",
   process: [
-    "Cross-platform Audit",
-    "Competitive Research",
-    "User Journey Mapping",
-    "Low-fi Wireframes",
-    "Stakeholder Review",
-    "High-fi Design",
-    "Platform QA",
+    "Existing Experience Audit",
+    "Discovery Patterns",
+    "Content Organisation",
+    "Explore Page Concepts",
+    "Responsive Layouts",
+    "High-fidelity Design",
   ],
   approach:
-    "I started by auditing the existing onboarding across all three platforms, documenting every divergence. I then researched onboarding patterns in other children's apps and educational platforms to identify best practices. Working from low-fidelity wireframes, I designed a unified onboarding architecture that adapted to each platform's strengths while maintaining a consistent core flow. Multiple rounds of stakeholder feedback refined the designs before I produced high-fidelity screens for both web and mobile.",
+    "I looked at the different questions a child might have when opening Explore:\n“Show me books about my favourite character.”\n“Where's the next book in the series I'm reading?”\n“What are the popular books?”\n“I don't know what to read. Show me something interesting.”\nThese became the foundation for rethinking how content could be organised on the page.\nInstead of relying on the same type of content rail throughout, the redesigned Explore experience introduced different ways to browse, including characters, topics, series, popular books, new releases and themed collections.",
   keyContributions: [
-    "Conducted a comprehensive audit of onboarding across iOS, Android, web, and tablet",
-    "Benchmarked competitor onboarding patterns in children's educational apps",
-    "Designed a unified onboarding architecture adaptable across all platforms",
-    "Created low-fidelity wireframes to rapidly explore and validate approaches",
-    "Delivered high-fidelity designs for web and mobile with platform-appropriate adaptations",
-    "Ensured visual and interaction consistency while respecting platform conventions",
+    "Redesigned the Explore page around multiple discovery behaviours",
+    "Introduced Browse by Characters to help kids find books through familiar characters",
+    "Created dedicated character experiences with related books and content",
+    "Added clearer ways to discover the next book in a series",
+    "Introduced topic and theme-based discovery",
+    "Created more distinct treatments for popular books and top charts",
+    "Added themed collections around occasions such as Halloween and topics such as dinosaurs",
+    "Reworked content rails to create more visual variety and hierarchy",
+    "Explored responsive layouts that scale content density across different screen sizes",
+    "Designed a 12-column grid system to adapt the layout between tablet and larger web screens",
+  ],
+  additionalSections: [
+    {
+      title: "Designing for Different Screens",
+      body:
+        "The Explore page needed to work across different screen sizes without simply stretching the same layout.\n\nOn larger screens, the existing layout could show too much content in a single row, making the page feel dense.\n\nThe redesign introduced a responsive grid and adjusted the number and size of cards based on available space, keeping the browsing experience more balanced across devices.",
+    },
   ],
   outcome:
-    "Produced a cohesive, cross-platform onboarding flow that gave new users — parents and kids alike — a consistent introduction to Epic regardless of device. The redesigned flow reduced friction during sign-up and helped users reach the reading experience faster, supporting Epic's mission to get more kids reading.",
+    "The redesigned Explore experience created more ways for kids to discover books based on their interests, characters, topics, series and current context.\n\nIt also established a more consistent foundation for the Explore experience across web and tablet, while allowing the content density and layout to adapt to each screen size.",
+  showAtAGlance: true,
+  learningPoints: [
+    "For a content-heavy product, discovery isn't just about having more content.",
+    "It's about giving people different ways into that content",
+    "For kids especially, familiar characters, visual themes, series and curiosity can be just as useful as a search box when deciding what to read next.",
+  ],
+  layoutVersion: 2,
   featured: false,
   archived: false,
   layoutFormat: "standard",

@@ -214,7 +214,7 @@ function workItemToMarkdown(data: WorkItem): string {
       lines.push("");
     }
 
-    lines.push("## Process");
+    lines.push(`## ${data.processTitle ?? "Process"}`);
     lines.push("");
     data.process.forEach((step, i) => {
       lines.push(`${i + 1}. ${step}`);
@@ -233,6 +233,13 @@ function workItemToMarkdown(data: WorkItem): string {
     }
     lines.push("");
 
+    for (const section of data.additionalSections ?? []) {
+      lines.push(`## ${section.title}`);
+      lines.push("");
+      pushText(section.body);
+      lines.push("");
+    }
+
     lines.push("## Outcome");
     lines.push("");
     pushText(data.outcome);
@@ -243,10 +250,14 @@ function workItemToMarkdown(data: WorkItem): string {
       lines.push("");
     }
 
-    if (data.learnings) {
+    if (data.learnings || data.learningPoints) {
       lines.push("## What I learned");
       lines.push("");
-      pushText(data.learnings);
+      if (data.learningPoints) {
+        data.learningPoints.forEach((point) => lines.push(`- ${point}`));
+      } else if (data.learnings) {
+        pushText(data.learnings);
+      }
       lines.push("");
     }
   }
