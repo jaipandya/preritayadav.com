@@ -88,8 +88,7 @@ const BUILD_LINES: Array<{ text: string; delay: number }> = [
   { text: "  app/rendered/layout.tsx:", delay: 250 },
   { text: "    <main>{children}</main> + <FloatingBar />", delay: 320 },
   { text: "    Content gate: no flash of the old text while your edits load", delay: 340 },
-  { text: "    Canonical: https://preritayadav.com (sketch is primary)", delay: 300 },
-  { text: "    robots: noindex, follow", delay: 200 },
+  { text: "    robots: noindex, follow (the sketch is the version search engines index)", delay: 300 },
   { text: "", delay: 400 },
 
   { text: "▸ Compiling...", delay: 800 },

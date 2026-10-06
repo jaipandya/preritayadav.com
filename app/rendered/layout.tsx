@@ -13,9 +13,6 @@ export const metadata: Metadata = {
     default: "Prerita Yadav, Product Designer",
     template: "%s | Prerita Yadav",
   },
-  alternates: {
-    canonical: "https://preritayadav.com",
-  },
   robots: {
     index: false,
     follow: true,

@@ -1,7 +1,6 @@
 import { ImageResponse } from "next/og";
 import { OgTemplate, OG_SIZE, SpeechBubbleDoodle } from "@/lib/ogTemplate";
 
-export const runtime = "edge";
 export const alt = "Prerita Yadav, Product Designer";
 export const size = OG_SIZE;
 export const contentType = "image/png";

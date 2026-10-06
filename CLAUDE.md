@@ -54,6 +54,10 @@ The "build agent" log shown when switching to the rendered site (`BUILD_LINES` a
 
 Update it when a change to `/rendered` (or the content it reads) makes a line wrong or adds or changes something major. Examples: a work item, page, route or component is added or removed (counts, `[n/N]` page steps, static generation list), the typeface or colour tokens change, the layout or navigation pattern changes. Skip it for small tweaks (spacing, copy edits, bug fixes) that no log line refers to. When you edit it, follow the copywriting rules (no em dashes) and check the numbers against the code, not memory.
 
+### SEO
+
+The canvas site is the one search engines index; `/rendered/*`, `/md/*`, `/blog/*` and `/meta/*` are `noindex`. Every new public page needs a layout using `pageMetadata` from `lib/seo.ts`, an `opengraph-image.tsx` (no `runtime = "edge"`), and a `app/sitemap.ts` entry. Details and the Search Console steps are in `docs/seo.md`.
+
 ### Component decomposition
 
 When building or modifying features, keep components small and focused. Extract shared logic into hooks (`lib/`) and shared UI into components (`components/`). If you find yourself copying code between shape utils or layout creators, extract it into a shared module first.

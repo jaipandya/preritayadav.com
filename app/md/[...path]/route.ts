@@ -31,6 +31,7 @@ export async function GET(
   }
 
   return new Response(markdown, {
-    headers: { "Content-Type": "text/markdown; charset=utf-8" },
+    // Plain-text copy of the page for people and AI agents. The page itself is what search engines index.
+    headers: { "Content-Type": "text/markdown; charset=utf-8", "X-Robots-Tag": "noindex" },
   });
 }

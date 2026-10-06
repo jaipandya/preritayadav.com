@@ -164,9 +164,9 @@ export function OgTemplate({
           />
         </g>
 
-        {/* Dashed URL rail above footer */}
+        {/* Dashed rail under the URL (below the text, so a long URL never runs through it) */}
         <path
-          d={`M ${frameInset + 80} ${H - 110} L ${frameInset + 320} ${H - 110}`}
+          d={`M ${frameInset + 80} ${H - 72} L ${frameInset + 320} ${H - 72}`}
           fill="none"
           stroke={SUBTLE}
           strokeWidth={1.5}
@@ -212,7 +212,7 @@ export function OgTemplate({
 
         <div
           style={{
-            fontSize: title.length > 28 ? 76 : 88,
+            fontSize: title.length > 40 ? 60 : title.length > 22 ? 68 : 88,
             fontWeight: 700,
             color: INK,
             lineHeight: 1.04,
@@ -231,7 +231,7 @@ export function OgTemplate({
         {subtitle && (
           <div
             style={{
-              fontSize: 32,
+              fontSize: title.length > 22 ? 28 : 32,
               color: DIM,
               lineHeight: 1.38,
               maxWidth: 880,
@@ -262,7 +262,7 @@ export function OgTemplate({
         <div
           style={{
             position: "absolute",
-            top: 110,
+            top: 64,
             right: 140,
             display: "flex",
           }}

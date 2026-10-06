@@ -13,11 +13,13 @@ export const metadata: Metadata = {
   },
   description:
     "Portfolio of Prerita Yadav, a product designer crafting intuitive, human-centered experiences. Explore selected work, case studies, and design thinking.",
-  // TODO: Remove robots noindex before launch
   robots: {
-    index: false,
-    follow: false,
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
   },
+  // Google Search Console HTML-tag verification. Not needed if the domain is verified through DNS.
+  verification: process.env.GOOGLE_SITE_VERIFICATION ? { google: process.env.GOOGLE_SITE_VERIFICATION } : undefined,
   openGraph: {
     title: "Prerita Yadav, Product Designer",
     description:
