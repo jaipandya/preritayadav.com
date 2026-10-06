@@ -79,7 +79,7 @@ const fitpass: WorkItem = {
   showAtAGlance: true,
   learnings:
     "Operational products don't always need more features. They need a better way to bring the right information together.\n\nFor the Partner App, the biggest shift was moving from a collection of features to an experience organised around the partner's day.",
-  layoutVersion: 2,
+  layoutVersion: 4,
   featured: true,
   archived: false,
   layoutFormat: "process-heavy",
@@ -177,7 +177,7 @@ const abhiloans: WorkItem = {
       row: 2,
     },
   ],
-  layoutVersion: 3,
+  layoutVersion: 5,
   featured: true,
   archived: false,
   layoutFormat: "before-after",
@@ -204,7 +204,7 @@ const ema: WorkItem = {
   approach: "",
   keyContributions: [],
   outcome: "",
-  layoutVersion: 2,
+  layoutVersion: 4,
   featured: true,
   archived: false,
   layoutFormat: "preview",
@@ -286,7 +286,7 @@ const epic: WorkItem = {
       height: 1202,
     },
   ],
-  layoutVersion: 3,
+  layoutVersion: 5,
   featured: false,
   archived: false,
   layoutFormat: "standard",
@@ -329,6 +329,7 @@ const portfolio: WorkItem = {
     "A one-of-a-kind portfolio experience that doubles as a demonstration of design and development craft. The hand-drawn aesthetic creates a memorable first impression, the canvas-based navigation invites exploration, and the technical implementation showcases the ability to bridge design vision with engineering execution.",
   featured: false,
   archived: false,
+  layoutVersion: 3,
   layoutFormat: "minimal",
 };
 
@@ -393,7 +394,7 @@ const superTeacher: WorkItem = {
     "The final concept brought the key fee management workflows into one structured experience, from setting up fees to tracking payments and following up with students.\n\nMore importantly, the project helped us move beyond designing individual screens and think about how a system should support frequent actions, edge cases, and different levels of information within the same workflow.",
   learnings:
     "Design gets better through iteration\nOur first flow was not our final flow. As we moved from research to wireframes, reviews, and testing, several decisions changed. The project reinforced that a good solution often comes from repeatedly questioning and refining the first idea.\n\nResearch changes what you design\nTalking to teachers made the problem more concrete. Instead of designing a generic payment dashboard, we had to account for the actual situations teachers deal with when managing multiple batches and students.\n\nSystems thinking matters\nFee management is a collection of connected workflows rather than a single feature. Thinking about setup, tracking, reminders, payments, and edge cases together helped us design a more coherent experience rather than a collection of individual screens.",
-  layoutVersion: 2,
+  layoutVersion: 4,
   featured: false,
   archived: true,
   layoutFormat: "standard",
@@ -438,7 +439,7 @@ const zkagi: WorkItem = {
     "The project resulted in a complete landing page concept that gave ZkAGI a clearer way to introduce its product and communicate its technical positioning.\nWhile the page is no longer live, the project remains a useful snapshot of an early exploration in designing for a technical AI product.",
   learnings:
     "Working on ZkAGI was a good exercise in making complex products feel understandable without making them feel simplistic.\n\nIt also reinforced how much of landing-page design happens before the visual design itself: deciding what information matters, what comes first, and how someone should move through the story.",
-  layoutVersion: 2,
+  layoutVersion: 4,
   featured: false,
   archived: true,
   layoutFormat: "narrative",
@@ -479,6 +480,7 @@ const mentorDashboard: WorkItem = {
     "Delivered a mentor dashboard that transformed raw adaptive learning data into actionable student insights, enabling mentors to proactively support students and keep parents informed — all within a single, focused interface.",
   featured: false,
   archived: true,
+  layoutVersion: 3,
   layoutFormat: "minimal",
 };
 
@@ -518,6 +520,7 @@ const birdTab: WorkItem = {
     "A small, personal project that brings a moment of calm and curiosity to every new browser tab — turning a utility action into a chance to learn about the birds that share your environment.",
   featured: false,
   archived: true,
+  layoutVersion: 3,
   layoutFormat: "minimal",
 };
 

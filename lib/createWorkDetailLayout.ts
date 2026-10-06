@@ -56,7 +56,7 @@ function header(editor: Editor, data: WorkItem): number {
   annotation(editor, data.slug, "title", y, data.title, 30, 500, titleHeight);
   y += titleHeight + 5;
 
-  const taglineHeight = data.summaryTagline || data.previewText ? textHeight(data.tagline) : 30;
+  const taglineHeight = data.summaryTagline || data.previewText ? textHeight(data.tagline, 15) : 30;
   annotation(editor, data.slug, "tagline", y, data.tagline, 15, CW, taglineHeight);
   y += taglineHeight + 20;
 
@@ -86,55 +86,82 @@ function heroCard(editor: Editor, data: WorkItem, y: number): number {
   return y + 190;
 }
 
-function section(editor: Editor, slug: string, y: number, label: string, text: string): number {
-  const sid = label.toLowerCase().replace(/\s+/g, "-");
-  annotation(editor, slug, `${sid}-label`, y, label, 18, 300, 28);
-  y += 32;
-  const h = textHeight(text);
-  annotation(editor, slug, sid, y, text, 14, CW, h);
-  return y + h + 24;
+// Vertical rhythm. Every text block uses these so gaps stay uniform.
+const LINE_HEIGHT = 1.2; // matches AnnotationShapeUtil for fontSize <= 24
+const LABEL_GAP = 12; // section heading to its first line of body
+const PARAGRAPH_GAP = 10; // between paragraphs inside a section
+const BULLET_GAP = 6; // between bullet items
+const SECTION_GAP = 32; // after a section ends
+
+/** Heading + body paragraphs. Returns y after the block, including SECTION_GAP. */
+function section(
+  editor: Editor, slug: string, y: number, label: string, text: string,
+  labelSize = 18, id = label.toLowerCase().replace(/\s+/g, "-")
+): number {
+  const labelH = Math.ceil(labelSize * LINE_HEIGHT);
+  annotation(editor, slug, `${id}-label`, y, label, labelSize, 300, labelH);
+  y += labelH + LABEL_GAP;
+  return paragraphs(editor, slug, y, id, text, 14) + SECTION_GAP;
 }
 
-function bulletList(editor: Editor, slug: string, y: number, label: string, items: string[], wrapItems = false): number {
+/** One annotation per paragraph (any newline starts a new one). Returns y after the last, no trailing gap. */
+function paragraphs(editor: Editor, slug: string, y: number, id: string, text: string, fontSize: number): number {
+  const parts = text.split(/\n+/).map((p) => p.trim()).filter(Boolean);
+  parts.forEach((part, i) => {
+    const h = textHeight(part, fontSize);
+    annotation(editor, slug, i === 0 ? id : `${id}-${i}`, y, part, fontSize, CW, h);
+    y += h + (i < parts.length - 1 ? PARAGRAPH_GAP : 0);
+  });
+  return y;
+}
+
+function bulletList(editor: Editor, slug: string, y: number, label: string, items: string[]): number {
   const sid = label.toLowerCase().replace(/\s+/g, "-");
-  annotation(editor, slug, `${sid}-label`, y, label, 18, 300, 28);
-  y += 35;
-  for (let i = 0; i < items.length; i++) {
-    const text = `· ${items[i]}`;
-    const h = wrapItems ? Math.max(24, textHeight(text)) : 24;
-    annotation(editor, slug, `${sid}-${i}`, y, text, 13, CW, h, LEFT_PAD);
-    y += h + 4;
-  }
-  return y + 16;
+  const labelH = Math.ceil(18 * LINE_HEIGHT);
+  annotation(editor, slug, `${sid}-label`, y, label, 18, 300, labelH);
+  y += labelH + LABEL_GAP;
+  items.forEach((item, i) => {
+    const text = `· ${item}`;
+    const h = textHeight(text, 14);
+    annotation(editor, slug, `${sid}-${i}`, y, text, 14, CW, h);
+    y += h + (i < items.length - 1 ? BULLET_GAP : 0);
+  });
+  return y + SECTION_GAP;
+}
+
+function glanceLabel(editor: Editor, slug: string, y: number): number {
+  const h = Math.ceil(18 * LINE_HEIGHT);
+  annotation(editor, slug, "at-a-glance-label", y, "At a glance", 18, 300, h);
+  return y + h + LABEL_GAP;
 }
 
 function processTimeline(editor: Editor, slug: string, y: number, steps: string[], title = "Process"): number {
-  annotation(editor, slug, "process-label", y, title, 18, 200, 28);
-  y += 40;
+  const labelH = Math.ceil(18 * LINE_HEIGHT);
+  annotation(editor, slug, "process-label", y, title, 18, 200, labelH);
+  y += labelH + LABEL_GAP;
 
-  const stepW = 68;
-  const stepGap = 6;
-  const perRow = Math.min(steps.length, 4);
-  const rows = Math.ceil(steps.length / perRow);
+  const fontSize = 12;
+  const arrowW = 20;
+  const perRow = 4;
+  const stepW = (CW - arrowW * (perRow - 1)) / perRow;
+  const rowGap = 18;
 
-  for (let row = 0; row < rows; row++) {
-    const start = row * perRow;
+  for (let start = 0; start < steps.length; start += perRow) {
     const end = Math.min(start + perRow, steps.length);
-    const count = end - start;
-    const rowW = count * stepW + (count - 1) * stepGap;
-    const rowX = LEFT_PAD + (CW - rowW) / 2;
+    const labels = steps.slice(start, end).map((step, i) => `${String(start + i + 1).padStart(2, "0")}\n${step}`);
+    const rowH = Math.max(...labels.map((text) => textHeight(text, fontSize, stepW)));
 
     for (let i = start; i < end; i++) {
-      const col = i - start;
-      const x = rowX + col * (stepW + stepGap);
-      annotation(editor, slug, `step-${i}`, y, `${String(i + 1).padStart(2, "0")}\n${steps[i]}`, 10, stepW, 52, x);
-      if (col < count - 1) {
-        annotation(editor, slug, `arrow-${i}`, y + 16, "→", 12, stepGap, 20, x + stepW);
+      const x = LEFT_PAD + (i - start) * (stepW + arrowW);
+      annotation(editor, slug, `step-${i}`, y, labels[i - start], fontSize, stepW, rowH, x);
+      if (i < end - 1) {
+        // Arrow sits in the gutter, level with the step number
+        annotation(editor, slug, `arrow-${i}`, y, "→", fontSize, arrowW, Math.ceil(fontSize * LINE_HEIGHT), x + stepW);
       }
     }
-    y += 70;
+    y += rowH + rowGap;
   }
-  return y + 10;
+  return y - rowGap + SECTION_GAP;
 }
 
 function imagePlaceholders(editor: Editor, slug: string, y: number): number {
@@ -193,9 +220,9 @@ function imageGallery(editor: Editor, data: WorkItem, y: number): number {
       });
       x += w + gap;
     }
-    y += h + 24;
+    y += h + 12;
   }
-  return y;
+  return y - 12 + SECTION_GAP;
 }
 
 function footerCta(editor: Editor, slug: string, y: number) {
@@ -219,13 +246,39 @@ function annotation(
   });
 }
 
-function textHeight(text: string): number {
-  const charsPerLine = Math.floor(CW / 7);
-  const lines = text.split("\n").reduce(
-    (total, line) => total + Math.max(1, Math.ceil(line.length / charsPerLine)),
-    0
-  );
-  return Math.max(40, lines * 18 + 10);
+let measureCtx: CanvasRenderingContext2D | null | undefined;
+
+/** Pixel width of `text` in Loranthus, or an em-based estimate if the font is not loaded yet. */
+function textWidth(text: string, fontSize: number): number {
+  if (measureCtx === undefined) {
+    measureCtx = typeof document === "undefined" ? null : document.createElement("canvas").getContext("2d");
+  }
+  const font = `${fontSize}px Loranthus`;
+  if (measureCtx && document.fonts.check(font)) {
+    measureCtx.font = font;
+    return measureCtx.measureText(text).width;
+  }
+  return text.length * fontSize * 0.5;
+}
+
+/** Greedy word-wrap height of `text` rendered at `fontSize` in a `width` px box. */
+function textHeight(text: string, fontSize = 14, width = CW): number {
+  let lines = 0;
+  for (const raw of text.split("\n")) {
+    let line = 1;
+    let current = "";
+    for (const word of raw.split(/\s+/).filter(Boolean)) {
+      const next = current ? `${current} ${word}` : word;
+      if (current && textWidth(next, fontSize) > width) {
+        line++;
+        current = word;
+      } else {
+        current = next;
+      }
+    }
+    lines += line;
+  }
+  return Math.ceil(lines * fontSize * LINE_HEIGHT);
 }
 
 // ─── Layout: Process-Heavy (Fitpass) ────────────────────────────
@@ -247,11 +300,10 @@ function layoutProcessHeavy(editor: Editor, data: WorkItem) {
   y = imagePlaceholders(editor, data.slug, y);
 
   y = section(editor, data.slug, y, "Approach", data.approach);
-  y = bulletList(editor, data.slug, y, "Key Contributions", data.keyContributions, true);
+  y = bulletList(editor, data.slug, y, "Key Contributions", data.keyContributions);
   y = section(editor, data.slug, y, "Outcome", data.outcome);
   if (data.showAtAGlance) {
-    annotation(editor, data.slug, "at-a-glance-label", y, "At a glance", 18, 300, 28);
-    y += 52;
+    y = glanceLabel(editor, data.slug, y);
   }
   if (data.learnings) {
     y = section(editor, data.slug, y, "What I learned", data.learnings);
@@ -270,31 +322,22 @@ function layoutBeforeAfter(editor: Editor, data: WorkItem) {
   y = section(editor, data.slug, y, "Overview", data.overview);
 
   // Before state
-  annotation(editor, data.slug, "before-label", y, data.challengeTitle ?? "The Problem", 20, 300, 32);
-  y += 36;
-  const challengeH = textHeight(data.challenge);
-  annotation(editor, data.slug, "before-text", y, data.challenge, 14, CW, challengeH);
-  y += challengeH + 24;
+  y = section(editor, data.slug, y, data.challengeTitle ?? "The Problem", data.challenge, 20, "before");
 
   // Process
   y = processTimeline(editor, data.slug, y, data.process);
 
   // After state
-  annotation(editor, data.slug, "after-label", y, "Approach", 20, 300, 32);
-  y += 36;
-  const approachH = textHeight(data.approach);
-  annotation(editor, data.slug, "after-text", y, data.approach, 14, CW, approachH);
-  y += approachH + 24;
+  y = section(editor, data.slug, y, "Approach", data.approach, 20, "after");
 
   if (!data.atAGlanceImages?.length) {
     y = imagePlaceholders(editor, data.slug, y);
   }
 
-  y = bulletList(editor, data.slug, y, "Key Contributions", data.keyContributions, true);
+  y = bulletList(editor, data.slug, y, "Key Contributions", data.keyContributions);
   y = section(editor, data.slug, y, "Outcome", data.outcome);
   if (data.atAGlanceImages?.length) {
-    annotation(editor, data.slug, "at-a-glance-label", y, "At a glance", 18, 300, 28);
-    y = imageGallery(editor, data, y + 40);
+    y = imageGallery(editor, data, glanceLabel(editor, data.slug, y));
   }
   if (data.learnings) {
     y = section(editor, data.slug, y, "What I learned", data.learnings);
@@ -312,9 +355,7 @@ function layoutPreview(editor: Editor, data: WorkItem) {
   y = section(editor, data.slug, y, data.overviewTitle ?? "Overview", data.overview);
 
   if (data.previewText) {
-    const h = textHeight(data.previewText);
-    annotation(editor, data.slug, "project-preview", y, data.previewText, 14, CW, h);
-    y += h + 24;
+    y = paragraphs(editor, data.slug, y, "project-preview", data.previewText, 14) + SECTION_GAP;
   }
 
   footerCta(editor, data.slug, y);
@@ -334,7 +375,7 @@ function layoutNarrative(editor: Editor, data: WorkItem) {
   y = imagePlaceholders(editor, data.slug, y);
 
   y = section(editor, data.slug, y, "Approach", data.approach);
-  y = bulletList(editor, data.slug, y, "Key Contributions", data.keyContributions, true);
+  y = bulletList(editor, data.slug, y, "Key Contributions", data.keyContributions);
   y = section(editor, data.slug, y, "Outcome", data.outcome);
   if (data.learnings) {
     y = section(editor, data.slug, y, "What I learned", data.learnings);
@@ -357,7 +398,7 @@ function layoutStandard(editor: Editor, data: WorkItem) {
     y = section(editor, data.slug, y, "Approach", data.approach);
   }
   if (data.keyContributions.length > 0) {
-    y = bulletList(editor, data.slug, y, "Key Contributions", data.keyContributions, !!data.additionalSections);
+    y = bulletList(editor, data.slug, y, "Key Contributions", data.keyContributions);
   }
 
   const researchSections = !data.approach && data.keyContributions.length === 0 && !!data.additionalSections?.length;
@@ -376,14 +417,13 @@ function layoutStandard(editor: Editor, data: WorkItem) {
   y = section(editor, data.slug, y, "Outcome", data.outcome);
 
   if (data.showAtAGlance) {
-    annotation(editor, data.slug, "at-a-glance-label", y, "At a glance", 18, 300, 28);
-    y += 40;
+    y = glanceLabel(editor, data.slug, y);
     y = data.atAGlanceImages?.length
       ? imageGallery(editor, data, y)
       : imagePlaceholders(editor, data.slug, y);
   }
   if (data.learningPoints) {
-    y = bulletList(editor, data.slug, y, "What I learned", data.learningPoints, true);
+    y = bulletList(editor, data.slug, y, "What I learned", data.learningPoints);
   } else if (data.learnings) {
     y = section(editor, data.slug, y, "What I learned", data.learnings);
   }
@@ -406,13 +446,7 @@ function layoutMinimal(editor: Editor, data: WorkItem) {
   y = section(editor, data.slug, y, "What I Did", data.approach);
 
   // Key contributions as a compact list
-  annotation(editor, data.slug, "highlights-label", y, "Highlights", 16, 200, 24);
-  y += 30;
-  for (let i = 0; i < data.keyContributions.length; i++) {
-    annotation(editor, data.slug, `highlight-${i}`, y, `→ ${data.keyContributions[i]}`, 13, CW, 22, LEFT_PAD);
-    y += 26;
-  }
-  y += 20;
+  y = bulletList(editor, data.slug, y, "Highlights", data.keyContributions);
 
   y = section(editor, data.slug, y, "Outcome", data.outcome);
 

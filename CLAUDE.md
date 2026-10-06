@@ -4,6 +4,10 @@
 
 Always use `bun` instead of `npm`, `yarn`, or `pnpm` for all operations (install, run, build, etc.).
 
+## Copywriting Rules
+
+**Never use em dashes (—) in any copy.** This applies to all user-facing text: content modules in `lib/`, case study data, page metadata, sr-only HTML, markdown endpoints, and any new strings you write. Rewrite the sentence instead, using a period, comma, colon, parentheses, or "and"/"but" as fits. Do not swap in a spaced en dash or double hyphen as a workaround.
+
 ## Architecture Principles
 
 ### Reuse before creating
