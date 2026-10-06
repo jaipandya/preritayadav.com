@@ -1,4 +1,4 @@
-import type { Editor } from "tldraw";
+import { AssetRecordType, type Editor } from "tldraw";
 import { CANVAS_W, LEFT_PAD, centerCamera, createBackButton } from "./layoutHelpers";
 import { getWorkBySlug, type WorkItem } from "./workData";
 
@@ -151,6 +151,53 @@ function imagePlaceholders(editor: Editor, slug: string, y: number): number {
   return y + 200;
 }
 
+function imageGallery(editor: Editor, data: WorkItem, y: number): number {
+  const rows = new Map<number, { image: NonNullable<WorkItem["atAGlanceImages"]>[number]; index: number }[]>();
+  for (const [index, image] of (data.atAGlanceImages ?? []).entries()) {
+    const row = image.row ?? index;
+    const images = rows.get(row) ?? [];
+    images.push({ image, index });
+    rows.set(row, images);
+  }
+
+  for (const images of rows.values()) {
+    const gap = 12;
+    const availableWidth = CW - gap * (images.length - 1);
+    const totalRatio = images.reduce((sum, { image }) => sum + image.width / image.height, 0);
+    const h = availableWidth / totalRatio;
+    let x = LEFT_PAD;
+
+    for (const { image, index } of images) {
+      const assetId = AssetRecordType.createId(`${data.slug}-glance-${index}`);
+      editor.createAssets([{
+        id: assetId,
+        typeName: "asset",
+        type: "image",
+        props: {
+          name: image.src.split("/").pop() ?? image.alt,
+          src: image.src,
+          w: image.width,
+          h: image.height,
+          mimeType: "image/webp",
+          isAnimated: false,
+        },
+        meta: {},
+      }]);
+      const w = h * image.width / image.height;
+      editor.createShape({
+        type: "image",
+        x,
+        y,
+        props: { w, h, assetId, altText: image.alt },
+        meta: { componentType: "case-study-image", variationId: `${data.slug}-glance-${index}` },
+      });
+      x += w + gap;
+    }
+    y += h + 24;
+  }
+  return y;
+}
+
 function footerCta(editor: Editor, slug: string, y: number) {
   editor.createShape({
     type: "hand-drawn-button",
@@ -239,10 +286,16 @@ function layoutBeforeAfter(editor: Editor, data: WorkItem) {
   annotation(editor, data.slug, "after-text", y, data.approach, 14, CW, approachH);
   y += approachH + 24;
 
-  y = imagePlaceholders(editor, data.slug, y);
+  if (!data.atAGlanceImages?.length) {
+    y = imagePlaceholders(editor, data.slug, y);
+  }
 
   y = bulletList(editor, data.slug, y, "Key Contributions", data.keyContributions, true);
   y = section(editor, data.slug, y, "Outcome", data.outcome);
+  if (data.atAGlanceImages?.length) {
+    annotation(editor, data.slug, "at-a-glance-label", y, "At a glance", 18, 300, 28);
+    y = imageGallery(editor, data, y + 40);
+  }
   if (data.learnings) {
     y = section(editor, data.slug, y, "What I learned", data.learnings);
   }
@@ -325,7 +378,9 @@ function layoutStandard(editor: Editor, data: WorkItem) {
   if (data.showAtAGlance) {
     annotation(editor, data.slug, "at-a-glance-label", y, "At a glance", 18, 300, 28);
     y += 40;
-    y = imagePlaceholders(editor, data.slug, y);
+    y = data.atAGlanceImages?.length
+      ? imageGallery(editor, data, y)
+      : imagePlaceholders(editor, data.slug, y);
   }
   if (data.learningPoints) {
     y = bulletList(editor, data.slug, y, "What I learned", data.learningPoints, true);

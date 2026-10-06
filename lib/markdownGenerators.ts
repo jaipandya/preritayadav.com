@@ -249,9 +249,13 @@ function workItemToMarkdown(data: WorkItem): string {
     pushText(data.outcome);
     lines.push("");
 
-    if (data.showAtAGlance) {
+    if (data.showAtAGlance || data.atAGlanceImages?.length) {
       lines.push("## At a glance");
       lines.push("");
+      for (const image of data.atAGlanceImages ?? []) {
+        lines.push(`![${image.alt}](${image.src})`);
+        lines.push("");
+      }
     }
 
     if (data.learnings || data.learningPoints) {

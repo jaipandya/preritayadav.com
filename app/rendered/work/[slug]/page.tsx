@@ -6,6 +6,7 @@ import { use } from "react";
 import { motion } from "motion/react";
 import { getWorkBySlug, workItems } from "@/lib/workData";
 import { fadeUp, ease } from "@/lib/renderedAnimations";
+import { CaseStudyGallery } from "@/components/ui/CaseStudyGallery";
 
 function ArrowLeft() {
   return (
@@ -221,18 +222,14 @@ export default function RenderedWorkDetail({
             <TextContent text={work.outcome} />
           </motion.div>
 
-          {work.showAtAGlance && (
-            <motion.div
+          {(work.showAtAGlance || work.atAGlanceImages?.length) && (
+            <section
               className="r-case-section"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.15 }}
-              variants={fadeUp}
-              custom={0}
               aria-label="At a glance"
             >
               <h2>At a glance</h2>
-            </motion.div>
+              {work.atAGlanceImages && <CaseStudyGallery images={work.atAGlanceImages} />}
+            </section>
           )}
 
           {(work.learnings || work.learningPoints) && (

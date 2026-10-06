@@ -6,6 +6,7 @@ import { PageShell } from "@/components/PageShell";
 import { createWorkDetailLayout } from "@/lib/createWorkDetailLayout";
 import { getWorkBySlug } from "@/lib/workData";
 import Link from "next/link";
+import { CaseStudyGallery } from "@/components/ui/CaseStudyGallery";
 
 function TextContent({ text }: { text: string }) {
   return text.split(/\n{2,}/).map((paragraph, index) => (
@@ -117,9 +118,10 @@ export default function WorkDetailPage({
                 <TextContent text={data.outcome} />
               </section>
 
-              {data.showAtAGlance && (
+              {(data.showAtAGlance || data.atAGlanceImages?.length) && (
                 <section aria-label="At a glance">
                   <h2>At a glance</h2>
+                  {data.atAGlanceImages && <CaseStudyGallery images={data.atAGlanceImages} />}
                 </section>
               )}
 

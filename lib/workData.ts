@@ -22,6 +22,7 @@ export interface WorkItem {
   additionalSections?: { title: string; body: string }[];
   outcome: string;
   showAtAGlance?: boolean;
+  atAGlanceImages?: { src: string; alt: string; width: number; height: number; row?: number }[];
   learnings?: string;
   learningPoints?: string[];
   layoutVersion?: number;
@@ -124,7 +125,59 @@ const abhiloans: WorkItem = {
     "The redesigned flow brought greater structure and continuity to a complex financial journey. Users could understand where they were in the process, what was required next, and what they were applying for without having to navigate the entire journey at once.\n\nThe experience made a multi-step loan application feel more guided while continuing to accommodate the compliance and third-party requirements behind the scenes.",
   learnings:
     "Financial products often come with complexity that design cannot simply remove.\nThe opportunity is to organise that complexity so users don't have to carry it themselves.",
-  layoutVersion: 2,
+  showAtAGlance: true,
+  atAGlanceImages: [
+    {
+      src: "/work/abhiloans-onboarding/hero.webp",
+      alt: "Abhiloans onboarding hero with the mobile instant-loan welcome screen",
+      width: 876,
+      height: 592,
+      row: 0,
+    },
+    {
+      src: "/work/abhiloans-onboarding/desktop-loan-options.webp",
+      alt: "Desktop loan repayment comparison between overdraft and term loan options",
+      width: 836,
+      height: 493,
+      row: 1,
+    },
+    {
+      src: "/work/abhiloans-onboarding/mobile-welcome.webp",
+      alt: "Mobile Abhiloans welcome screen inviting users to check their loan amount",
+      width: 235,
+      height: 497,
+      row: 1,
+    },
+    {
+      src: "/work/abhiloans-onboarding/investment-type.webp",
+      alt: "Onboarding investment selection between mutual funds and shares and bonds",
+      width: 265,
+      height: 579,
+      row: 2,
+    },
+    {
+      src: "/work/abhiloans-onboarding/loan-amount.webp",
+      alt: "Loan eligibility screen with mobile number and PAN number fields",
+      width: 290,
+      height: 579,
+      row: 2,
+    },
+    {
+      src: "/work/abhiloans-onboarding/repayment-options.webp",
+      alt: "Mobile repayment selection showing overdraft and term loan options",
+      width: 290,
+      height: 579,
+      row: 2,
+    },
+    {
+      src: "/work/abhiloans-onboarding/emi-plan.webp",
+      alt: "EMI plan selection with monthly instalments and loan summary details",
+      width: 265,
+      height: 579,
+      row: 2,
+    },
+  ],
+  layoutVersion: 3,
   featured: true,
   archived: false,
   layoutFormat: "before-after",
@@ -213,7 +266,27 @@ const epic: WorkItem = {
     "It's about giving people different ways into that content",
     "For kids especially, familiar characters, visual themes, series and curiosity can be just as useful as a search box when deciding what to read next.",
   ],
-  layoutVersion: 2,
+  atAGlanceImages: [
+    {
+      src: "/work/epic-explore/before-after.webp",
+      alt: "Epic Explore page: the old design compared with the redesigned discovery experience",
+      width: 2136,
+      height: 1202,
+    },
+    {
+      src: "/work/epic-explore/browse-by-characters.webp",
+      alt: "Browse by Characters carousel with familiar characters and top charts on Epic",
+      width: 2136,
+      height: 1202,
+    },
+    {
+      src: "/work/epic-explore/character-page.webp",
+      alt: "Dedicated Scaredy Monster character page showing related books and videos on Epic",
+      width: 2136,
+      height: 1202,
+    },
+  ],
+  layoutVersion: 3,
   featured: false,
   archived: false,
   layoutFormat: "standard",
