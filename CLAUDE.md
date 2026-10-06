@@ -46,7 +46,7 @@ Text edited on the WIP canvas is carried to the rendered site (same browser only
 - Do not put editable decoration in a shape (like a label plus value in one text). Use separate shapes.
 - When a layout creator changes shape structure, bump that page's layout version (`layoutVersion` in `workData.ts`, or the `-vN` page key on static pages).
 - Run `bun test` after changing layout creators, bindings or `lib/contentOverrides.ts`.
-- New rendered-site copy must come from `lib/` and be shown through `useContent` / `useContentList`, inside the `ContentGate` (see the doc). Do not change `app/rendered` or `components/rendered` for this until the redesign is wired.
+- New rendered-site copy must come from `lib/` and be shown through the `components/rendered/Content.tsx` components (`Content`, `ContentParagraphs`, `ContentList`, ...), inside the `ContentGate` (see the doc). Case study headings come from `lib/caseStudySections.ts`, which must match the canvas labels per layout format (`bun test` checks it). The rendered design is described in `docs/rendered-design.md`.
 
 ### Component decomposition
 

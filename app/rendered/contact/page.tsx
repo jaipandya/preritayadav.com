@@ -1,67 +1,59 @@
-"use client";
-
-import { motion } from "motion/react";
 import {
   contactTitle,
   contactSubtitle,
   contactEmail,
+  contactBackLabel,
   socials,
 } from "@/lib/contactContent";
-import { fadeUp, staggerContainer } from "@/lib/renderedAnimations";
+import { Content, ContentEmailRow } from "@/components/rendered/Content";
+import { SocialIcon } from "@/components/rendered/SocialIcon";
+import { BackLink } from "@/components/rendered/BackLink";
 
-function ExternalArrow() {
-  return (
-    <svg width={14} height={14} viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth={1.3} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M4 10L10 4M10 4H5M10 4v5" />
-    </svg>
-  );
+/** "https://www.linkedin.com/in/preritayadav/" becomes "linkedin.com/in/preritayadav". */
+function displayUrl(url: string) {
+  const { host, pathname } = new URL(url);
+  return `${host.replace(/^www\./, "")}${pathname.replace(/\/$/, "")}`;
 }
 
 export default function RenderedContactPage() {
   return (
-    <div className="r-container">
-      <motion.div
-        className="r-contact-hero"
-        initial="hidden"
-        animate="visible"
-        variants={staggerContainer}
-      >
-        <motion.h1 variants={fadeUp} custom={0}>
-          {contactTitle}
-        </motion.h1>
-        <motion.p variants={fadeUp} custom={1}>
-          {contactSubtitle.replace("\n", " ")}
-        </motion.p>
+    <div className="r-col">
+      <BackLink href="/rendered">
+        <Content k="contact.backLabel" fallback={contactBackLabel} />
+      </BackLink>
 
-        <motion.a
-          href={`mailto:${contactEmail}`}
-          variants={fadeUp}
-          custom={2}
-          className="r-hero-cta"
-          style={{ display: "inline-flex" }}
-        >
-          {contactEmail}
-        </motion.a>
+      <header className="r-hero">
+        <h1 className="r-title">
+          <Content k="contact.title" fallback={contactTitle} />
+        </h1>
+        <p className="r-sub" style={{ marginTop: 12 }}>
+          <Content k="contact.subtitle" fallback={contactSubtitle} inline />
+        </p>
+      </header>
 
-        <motion.div
-          variants={fadeUp}
-          custom={3}
-          style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 48 }}
-        >
+      <div className="r-section" style={{ marginTop: 40 }}>
+        <div className="r-rows">
+          <ContentEmailRow k="contact.email" fallback={contactEmail}>
+            <span className="r-mark" aria-hidden="true">
+              <SocialIcon name="Email" />
+            </span>
+          </ContentEmailRow>
           {socials.map((s) => (
-            <a
-              key={s.label}
-              href={s.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="r-contact-pill"
-            >
-              {s.label}
-              <ExternalArrow />
+            <a key={s.label} href={s.url} target="_blank" rel="noopener noreferrer" className="r-row">
+              <span className="r-row-lead">
+                <span className="r-mark" aria-hidden="true">
+                  <SocialIcon name={s.label} />
+                </span>
+                <span className="r-row-main">
+                  <span className="r-row-title">{s.label}</span>
+                  <span className="r-row-desc">{displayUrl(s.url)}</span>
+                </span>
+              </span>
+              <span className="r-row-trail" aria-hidden="true">&#8599;</span>
             </a>
           ))}
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
     </div>
   );
 }

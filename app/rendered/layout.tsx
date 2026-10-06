@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
-import { RenderedNav } from "@/components/rendered/RenderedNav";
-import { RenderedFooter } from "@/components/rendered/RenderedFooter";
-import { SketchToggle } from "@/components/rendered/SketchToggle";
+import { Geist, Geist_Mono } from "next/font/google";
+import { ContentGate } from "@/components/content/ContentGate";
+import { FloatingBar } from "@/components/rendered/FloatingBar";
 import "./rendered.css";
+
+const sans = Geist({ subsets: ["latin"], variable: "--font-r-sans", display: "swap" });
+const mono = Geist_Mono({ subsets: ["latin"], variable: "--font-r-mono", display: "swap", weight: "400" });
 
 export const metadata: Metadata = {
   title: {
-    default: "Prerita Yadav — Product Designer",
+    default: "Prerita Yadav, Product Designer",
     template: "%s | Prerita Yadav",
   },
   alternates: {
@@ -24,12 +27,11 @@ export default function RenderedLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rendered-root">
-      <div className="r-grain" aria-hidden="true" />
-      <RenderedNav />
-      <main>{children}</main>
-      <RenderedFooter />
-      <SketchToggle />
+    <div className={`rendered-root ${sans.variable} ${mono.variable}`}>
+      <ContentGate>
+        <main>{children}</main>
+      </ContentGate>
+      <FloatingBar />
     </div>
   );
 }

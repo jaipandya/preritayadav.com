@@ -1,271 +1,155 @@
-"use client";
-
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { use } from "react";
-import { motion } from "motion/react";
+import type { Metadata } from "next";
 import { getWorkBySlug, workItems } from "@/lib/workData";
-import { fadeUp, ease } from "@/lib/renderedAnimations";
+import { workPageLabels } from "@/lib/workPageContent";
+import { caseStudySections } from "@/lib/caseStudySections";
+import { renderedCaseStudyNavLabel } from "@/lib/renderedChrome";
+import { Content, ContentList, ContentParagraphs } from "@/components/rendered/Content";
+import { Mark } from "@/components/rendered/Mark";
+import { BackLink } from "@/components/rendered/BackLink";
+import { FloatingBack } from "@/components/rendered/FloatingBack";
 import { CaseStudyGallery } from "@/components/ui/CaseStudyGallery";
 
-function ArrowLeft() {
-  return (
-    <svg width={18} height={18} viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M14 9H4M8 5L4 9l4 4" />
-    </svg>
-  );
+export function generateStaticParams() {
+  return workItems.map((item) => ({ slug: item.slug }));
 }
 
-function ArrowRight() {
-  return (
-    <svg width={18} height={18} viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M4 9h10M10 5l4 4-4 4" />
-    </svg>
-  );
+// Titles use the defaults on purpose: overrides are not applied to metadata.
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const item = getWorkBySlug((await params).slug);
+  if (!item) return { title: "Project Not Found" };
+  return { title: `${item.title}, ${item.company}`, description: item.tagline };
 }
 
-function TextContent({ text }: { text: string }) {
-  return text.split(/\n{2,}/).map((paragraph, index) => (
-    <p key={index} style={{ whiteSpace: "pre-line" }}>{paragraph}</p>
-  ));
-}
-
-export default function RenderedWorkDetail({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
-  const { slug } = use(params);
+export default async function RenderedWorkDetail({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   const work = getWorkBySlug(slug);
-
   if (!work) return notFound();
 
-  const currentIndex = workItems.findIndex((w) => w.slug === slug);
-  const next = workItems[currentIndex + 1];
-  const prev = workItems[currentIndex - 1];
+  const k = (path: string) => `work.${slug}.${path}`;
+  const sections = caseStudySections(work);
+  const index = workItems.findIndex((w) => w.slug === slug);
+  const neighbours = [workItems[index - 1], workItems[index + 1]].filter(Boolean);
+
+  const meta = [
+    { name: "role", value: work.role },
+    { name: "duration", value: work.duration },
+    { name: "tools", value: work.tools },
+  ] as const;
 
   return (
-    <div className="r-container">
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.4 }}
-        style={{ paddingTop: 32 }}
-      >
-        <Link href="/rendered/work" className="r-work-cta" style={{ gap: 8, marginTop: 0 }}>
-          <ArrowLeft /> All work
-        </Link>
-      </motion.div>
+    <div className="r-col">
+      <FloatingBack href="/rendered/work" k={k("labels.back")} fallback={workPageLabels.back} />
 
-      <motion.div
-        className="r-case-hero"
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, delay: 0.1, ease }}
-      >
-        <p className="r-case-company">{work.company}</p>
-        <h1>{work.title}</h1>
-        <p className="r-case-tagline">{work.tagline}</p>
-      </motion.div>
+      <BackLink href="/rendered/work">
+        <Content k={k("labels.back")} fallback={workPageLabels.back} />
+      </BackLink>
 
-      <motion.div
-        className="r-case-meta"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.2, ease }}
-      >
-        <div className="r-case-meta-item">
-          <label>Role</label>
-          <span>{work.role}</span>
+      <header>
+        <div className="r-case-head">
+          <Mark slug={slug} company={work.company} size="lg" />
+          <div>
+            <p className="r-small">
+              <Content k={k("company")} fallback={work.company} />
+            </p>
+            <h1 className="r-title">
+              <Content k={k("title")} fallback={work.title} />
+            </h1>
+          </div>
         </div>
-        <div className="r-case-meta-item">
-          <label>Duration</label>
-          <span>{work.duration}</span>
-        </div>
-        <div className="r-case-meta-item">
-          <label>Tools</label>
-          <span>{work.tools}</span>
-        </div>
-      </motion.div>
-
-      <motion.div
-        className="r-case-section"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.15 }}
-        variants={fadeUp}
-        custom={0}
-      >
-        <h2>{work.overviewTitle ?? "Overview"}</h2>
-        <TextContent text={work.overview} />
-      </motion.div>
-
-      {work.previewText ? (
-        <>
-          <motion.div
-            className="r-case-section"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.15 }}
-            variants={fadeUp}
-            custom={0}
-            aria-label="Project preview"
-          >
-            <TextContent text={work.previewText} />
-          </motion.div>
-          <Link href="/rendered/contact" className="r-work-cta">Contact me</Link>
-        </>
-      ) : (
-        <>
-          <motion.div
-            className="r-case-section"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.15 }}
-            variants={fadeUp}
-            custom={0}
-            aria-label={work.challengeTitle ?? "The Challenge"}
-          >
-            <h2>{work.challengeTitle ?? "The Challenge"}</h2>
-            <TextContent text={work.challenge} />
-          </motion.div>
-
-          {work.processIntro && (
-            <motion.div
-              className="r-case-section"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.15 }}
-              variants={fadeUp}
-              custom={0}
-              aria-label="Design Process"
-            >
-              <h2>Design Process</h2>
-              <TextContent text={work.processIntro} />
-            </motion.div>
-          )}
-
-          <motion.div
-            className="r-case-section"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.15 }}
-            variants={fadeUp}
-            custom={0}
-            aria-label={work.processTitle ?? "Process"}
-          >
-            <h2>{work.processTitle ?? "Process"}</h2>
-            <div className="r-case-process">
-              {work.process.map((step) => (
-                <span key={step} className="r-case-process-step">{step}</span>
-              ))}
+        <p className="r-lede r-case-lede">
+          <Content k={k("tagline")} fallback={work.tagline} />
+        </p>
+        <dl className="r-meta">
+          {meta.map(({ name, value }) => (
+            <div key={name} className="r-meta-item">
+              <dt className="r-mono-small">
+                <Content k={k(`labels.${name}`)} fallback={workPageLabels[name]} />
+              </dt>
+              <dd>
+                <span>
+                  <Content k={k(name)} fallback={value} />
+                </span>
+              </dd>
             </div>
-          </motion.div>
-
-          {work.approach.trim() && (
-            <motion.div
-              className="r-case-section"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.15 }}
-              variants={fadeUp}
-              custom={0}
-            >
-              <h2>Approach</h2>
-              <TextContent text={work.approach} />
-            </motion.div>
-          )}
-
-          {work.keyContributions.length > 0 && (
-            <motion.div
-              className="r-case-section"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.1 }}
-              variants={fadeUp}
-              custom={0}
-            >
-              <h2>Key Contributions</h2>
-              <ul>
-                {work.keyContributions.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            </motion.div>
-          )}
-
-          {work.additionalSections?.map((section) => (
-            <motion.div
-              key={section.title}
-              className="r-case-section"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.15 }}
-              variants={fadeUp}
-              custom={0}
-              aria-label={section.title}
-            >
-              <h2>{section.title}</h2>
-              <TextContent text={section.body} />
-            </motion.div>
           ))}
+        </dl>
+      </header>
 
-          <motion.div
-            className="r-case-section"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.15 }}
-            variants={fadeUp}
-            custom={0}
-          >
-            <h2>Outcome</h2>
-            <TextContent text={work.outcome} />
-          </motion.div>
-
-          {(work.showAtAGlance || work.atAGlanceImages?.length) && (
-            <section
-              className="r-case-section"
-              aria-label="At a glance"
-            >
-              <h2>At a glance</h2>
-              {work.atAGlanceImages && <CaseStudyGallery images={work.atAGlanceImages} />}
+      <div className="r-case-body">
+        {sections.map((section) => {
+          if (section.kind === "text") {
+            return (
+              <section key={section.id} className="r-block">
+                {section.heading && (
+                  <h2 className="r-label">
+                    <Content k={section.heading.key} fallback={section.heading.fallback} />
+                  </h2>
+                )}
+                <ContentParagraphs k={section.body.key} fallback={section.body.fallback} />
+              </section>
+            );
+          }
+          if (section.kind === "list") {
+            return (
+              <section key={section.id} className="r-block">
+                <h2 className="r-label">
+                  <Content k={section.heading.key} fallback={section.heading.fallback} />
+                </h2>
+                <ContentList k={section.list.key} fallback={section.list.fallback} />
+              </section>
+            );
+          }
+          if (section.kind === "process") {
+            return (
+              <section key={section.id} className="r-block">
+                <h2 className="r-label">
+                  <Content k={section.heading.key} fallback={section.heading.fallback} />
+                </h2>
+                <ol className="r-steps">
+                  {section.steps.map((step) => (
+                    <li key={step.key}>
+                      <Content k={step.key} fallback={step.fallback} />
+                    </li>
+                  ))}
+                </ol>
+              </section>
+            );
+          }
+          return (
+            <section key={section.id} className="r-block">
+              <h2 className="r-label">
+                <Content k={section.heading.key} fallback={section.heading.fallback} />
+              </h2>
+              <div className="r-tray">
+                <CaseStudyGallery images={section.images} />
+              </div>
             </section>
-          )}
-
-          {(work.learnings || work.learningPoints) && (
-            <motion.div
-              className="r-case-section"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.15 }}
-              variants={fadeUp}
-              custom={0}
-              aria-label="What I learned"
-            >
-              <h2>What I learned</h2>
-              {work.learningPoints ? (
-                <ul>
-                  {work.learningPoints.map((point) => <li key={point}>{point}</li>)}
-                </ul>
-              ) : work.learnings ? <TextContent text={work.learnings} /> : null}
-            </motion.div>
-          )}
-        </>
-      )}
-
-      <div style={{ padding: "56px 0", display: "flex", justifyContent: "space-between", gap: 24, flexWrap: "wrap" }}>
-        {prev ? (
-          <Link href={`/rendered/work/${prev.slug}`} className="r-work-cta" style={{ marginTop: 0 }}>
-            <ArrowLeft /> {prev.company}: {prev.title}
-          </Link>
-        ) : <span />}
-        {next && (
-          <Link href={`/rendered/work/${next.slug}`} className="r-work-cta" style={{ marginTop: 0 }}>
-            {next.company}: {next.title}
-            <ArrowRight />
-          </Link>
-        )}
+          );
+        })}
       </div>
+
+      <nav className="r-rows r-rows-pair" aria-label={renderedCaseStudyNavLabel}>
+        {neighbours.map((item) => (
+          <Link key={item.slug} href={`/rendered/work/${item.slug}`} className="r-row">
+            <span className="r-row-lead">
+              <Mark slug={item.slug} company={item.company} />
+              <span className="r-row-title">
+                <Content k={`work.${item.slug}.company`} fallback={item.company} />
+                <span className="r-row-title-sub">
+                  <Content k={`work.${item.slug}.title`} fallback={item.title} />
+                </span>
+              </span>
+            </span>
+          </Link>
+        ))}
+        <Link href="/rendered/contact" className="r-row">
+          <span className="r-row-plain">
+            <Content k={k("labels.contactCta")} fallback={workPageLabels.contactCta} />
+          </span>
+        </Link>
+      </nav>
     </div>
   );
 }

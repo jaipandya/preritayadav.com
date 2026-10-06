@@ -20,14 +20,14 @@ export function CaseStudyGallery({ images }: { images: CaseStudyImage[] }) {
   });
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 24, width: "100%" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 12, width: "100%" }}>
       {[...rows.entries()].map(([row, rowImages]) => (
         <div key={row} style={{ display: "flex", gap: 12, width: "100%" }}>
           {rowImages.map((image) => {
             const totalRatio = rowImages.reduce((sum, item) => sum + item.width / item.height, 0);
             const fraction = (image.width / image.height) / totalRatio;
             const gapWidth = 12 * (rowImages.length - 1);
-            const sizes = `(max-width: 640px) calc(${fraction * 100}vw - ${(40 + gapWidth) * fraction}px), (max-width: 840px) calc(${fraction * 100}vw - ${(64 + gapWidth) * fraction}px), ${Math.ceil((776 - gapWidth) * fraction)}px`;
+            const sizes = `(max-width: 540px) calc(${fraction * 100}vw - ${(80 + gapWidth) * fraction}px), ${Math.ceil((460 - gapWidth) * fraction)}px`;
             return (
             <a
               key={image.src}

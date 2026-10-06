@@ -5,7 +5,7 @@ Goal: text edited on the WIP (tldraw) site shows up on the rendered site after t
 Status:
 
 - **WIP side: done.** Every text a user can edit on the canvas is bound to a content field.
-- **Rendered site: not wired yet, on purpose** (it is being redesigned). Follow "Wiring the rendered site" below when the redesign lands. `app/rendered` and `components/rendered` have not been changed.
+- **Rendered site: wired** in the minimal redesign (`docs/rendered-design.md`). Every content text goes through `components/rendered/Content.tsx`, the case study sections come from `lib/caseStudySections.ts`, and the layout uses the gate. "Wiring the rendered site" below is how it is done and how to keep it that way.
 
 ## How it works
 
@@ -31,7 +31,9 @@ Files:
 | --- | --- |
 | `lib/contentOverrides.ts` | Keys, `bind` / `bindList` / `withContent` (WIP side), `collectOverrides` / `commitOverridesFromCanvases` (Build), `read/write/clearOverrides`, `resolveContent` / `resolveContentList`. No React. |
 | `lib/useContentOverrides.ts` | `useContent(key, fallback)`, `useContentList(key, fallback)`, `useContentReady()` for client components. |
-| `components/content/ContentGate.tsx`, `ContentGateHead.tsx` | No-flash gate for the rendered layout (see below). Not used yet. |
+| `components/content/ContentGate.tsx`, `ContentGateHead.tsx` | No-flash gate for the rendered layout (see below). Used in `app/rendered/layout.tsx`. |
+| `components/rendered/Content.tsx` | `Content`, `ContentParagraphs`, `ContentList`, `ContentLines`, `ContentEmailLink`, `CardTitle`: the client leaves every rendered page uses for content text. |
+| `lib/caseStudySections.ts` | Ordered sections of a case study with the content key and default of every heading and body, per `layoutFormat`. Mirrors `createWorkDetailLayout.ts`; `tests/caseStudySections.test.ts` fails if the two drift apart. |
 | `lib/workPageContent.ts` | Default labels of a case study page (headings, Role/Duration/Tools, buttons). |
 | `components/ui/BuildOverlay.tsx` | `BuildButton` calls `commitOverridesFromCanvases()` on click and again on "Visit rendered page". |
 | `components/canvas/useCanvasPersistence.ts` | `reset` also clears overrides. Older-version canvases are pruned on load. |
@@ -75,6 +77,15 @@ On the canvas a user can:
 Build reads each list shape's lines, strips the `· ` marker, drops empty lines, orders by position and stores the array if it differs from the default.
 
 Other lists stay text-per-item (items carry non-text data): `process.<i>`, `landing.blogPosts.<i>`, `about.paragraphs.<i>`.
+
+## Bound on the canvas but not rendered
+
+- `work.<slug>.summaryTagline`: only used by the canvas hero card (a decorative card the rendered page does not draw). The rendered page shows `work.<slug>.tagline`.
+- `work.<slug>.labels.atAGlance` when a case study has no images (process-heavy canvases show a bare heading). The rendered page skips an empty gallery.
+
+## Rendered fields that are not content keys
+
+Floating bar labels (`Home`, `Work`, `About`, `Let's talk`), the outside work items, the team names and the social labels are fixed or imported without a key, because the canvas has no editable text for them.
 
 ## What is not editable (and so has no key)
 
@@ -153,24 +164,31 @@ Rules:
 
 ### 2. No flash of default text: `ContentGate`
 
-Overrides live in `localStorage`, so the server can only render defaults. To avoid showing them before the override applies, use the gate in the rendered layout (`app/rendered/layout.tsx`):
+Overrides live in `localStorage`, so the server can only render defaults. To avoid showing them before the override applies:
 
 ```tsx
-import { ContentGate } from "@/components/content/ContentGate";
-import { ContentGateHead } from "@/components/content/ContentGateHead";
+// app/layout.tsx (root layout, server component)
+<html lang="en" suppressHydrationWarning>
+  <head><ContentGateHead /> ...</head>
 
-// inside <html>
-<head><ContentGateHead /></head>
-<body><ContentGate>{children}</ContentGate></body>
+// app/rendered/layout.tsx
+<div className="rendered-root ...">
+  <ContentGate><main>{children}</main></ContentGate>
+  <FloatingBar />   {/* chrome, holds no content text */}
+</div>
 ```
 
 How it works:
 
-- An inline `<head>` script adds `content-pending` to `<html>` only if `prerita-content-overrides` exists. **Visitors without overrides paint immediately and see no change.**
-- While pending, CSS sets `visibility: hidden` on the gate content. The text stays in the HTML, so crawlers and the no-JS case still get the defaults. Without JS the class is never added.
+- `ContentGateHead` (a style and an inline script) is rendered once in the root `<head>`. It must not live in the rendered layout: that layout is created on the client when a visitor navigates from the WIP site, and React warns about scripts rendered on the client.
+- The script adds `content-pending` to `<html>` only when the path is under `/rendered` **and** `prerita-content-overrides` exists. **Visitors without overrides paint immediately and see no change**, and other pages are untouched.
+- `suppressHydrationWarning` on `<html>` is needed because the script changes its class before React hydrates (same pattern as next-themes).
+- While pending, CSS sets `visibility: hidden` on `[data-content-gate]`. The text stays in the HTML, so crawlers and the no-JS case still get the defaults.
 - `ContentGate` removes the class in a layout effect once `useContentReady()` is true. That flips in the same render pass in which `useContent` returns the overrides, so the reveal and the override land together.
-- A spinner (pure CSS, `::after` on `<html>`) fades in only if this takes longer than about 200 ms, and respects `prefers-reduced-motion`.
-- Restyle the spinner in `ContentGateHead.tsx` to match the redesign. Keep the `content-pending` and `data-content-gate` names.
+- The spinner (`::after` on `<html>`) is scoped with `:has([data-content-gate])`, so a stray class can never leave a spinner stuck. It fades in only after about 200 ms and respects `prefers-reduced-motion`.
+- On a client-side navigation from the WIP site the script does not run, the page renders on the client with the overrides already readable, so nothing flashes.
+
+Verified in a browser by sampling every frame, on a hard load (rendered page in an iframe with overrides set) and on the real flow (edit on the canvas, Build, "Visit rendered page"): the first visible frame already shows the override and no frame shows default text.
 
 ### 3. Testing checklist
 

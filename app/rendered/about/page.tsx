@@ -1,7 +1,5 @@
-"use client";
-
+import Image from "next/image";
 import Link from "next/link";
-import { motion } from "motion/react";
 import {
   aboutTitle,
   aboutParagraphs,
@@ -9,63 +7,55 @@ import {
   aboutFooterText,
   aboutCta,
 } from "@/lib/aboutContent";
-import { fadeUp, staggerContainer, ease } from "@/lib/renderedAnimations";
+import { Content } from "@/components/rendered/Content";
+import { aboutPortrait } from "@/lib/renderedChrome";
 
-function ArrowRight() {
-  return (
-    <svg width={18} height={18} viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M4 9h10M10 5l4 4-4 4" />
-    </svg>
-  );
-}
 
 export default function RenderedAboutPage() {
   return (
-    <div className="r-container">
-      <motion.div
-        className="r-about-hero"
-        initial="hidden"
-        animate="visible"
-        variants={staggerContainer}
-      >
-        <motion.h1 variants={fadeUp} custom={0}>
-          {aboutTitle}
-        </motion.h1>
+    <div className="r-col">
+      <header>
+        <h1 className="r-title">
+          <Content k="about.title" fallback={aboutTitle} />
+        </h1>
+      </header>
 
-        <div className="r-about-content">
-          {aboutParagraphs.map((p, i) => (
-            <motion.p key={i} variants={fadeUp} custom={i + 1}>
-              {p}
-            </motion.p>
-          ))}
+      <figure className="r-tray" style={{ marginTop: 32 }}>
+        <Image
+          src={aboutPortrait.src}
+          alt={aboutPortrait.alt}
+          width={aboutPortrait.width}
+          height={aboutPortrait.height}
+          sizes="(max-width: 540px) calc(100vw - 80px), 460px"
+          priority
+          style={{ width: "100%", height: "auto" }}
+        />
+      </figure>
 
-          <motion.p
-            variants={fadeUp}
-            custom={aboutParagraphs.length + 1}
-            style={{ color: "var(--r-text)", fontFamily: "var(--r-serif)", fontSize: 19, fontStyle: "italic", lineHeight: 1.65, marginTop: 12 }}
-          >
-            {aboutOutro}
-          </motion.p>
-        </div>
-      </motion.div>
+      <div className="r-prose" data-tone="dark" style={{ marginTop: 40 }}>
+        {aboutParagraphs.map((p, i) => (
+          <p key={i} style={{ whiteSpace: "pre-line" }}>
+            <Content k={`about.paragraphs.${i}`} fallback={p} />
+          </p>
+        ))}
+      </div>
 
-      <hr className="r-divider" />
+      <p className="r-lede" style={{ marginTop: 40 }}>
+        <Content k="about.outro" fallback={aboutOutro} />
+      </p>
 
-      <motion.section
-        className="r-section"
-        initial={{ opacity: 0, y: 24 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.2 }}
-        transition={{ duration: 0.7, ease }}
-      >
-        <p style={{ fontSize: 17, lineHeight: 1.8, color: "var(--r-text-secondary)", maxWidth: 600, marginBottom: 32 }}>
-          {aboutFooterText}
+      <footer className="r-end">
+        <p className="r-sub">
+          <Content k="about.footerText" fallback={aboutFooterText} />
         </p>
-        <Link href="/rendered/contact" className="r-hero-cta">
-          {aboutCta.label}
-          <ArrowRight />
-        </Link>
-      </motion.section>
+        <div className="r-rows" style={{ marginTop: 8 }}>
+          <Link href="/rendered/contact" className="r-row">
+            <span className="r-row-plain">
+              <Content k="about.cta.label" fallback={aboutCta.label} />
+            </span>
+          </Link>
+        </div>
+      </footer>
     </div>
   );
 }

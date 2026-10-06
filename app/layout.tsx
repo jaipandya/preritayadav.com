@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { Viewport } from "next";
+import { ContentGateHead } from "@/components/content/ContentGateHead";
 import "./globals.css";
 
 const siteUrl = "https://preritayadav.com";
@@ -7,20 +8,20 @@ const siteUrl = "https://preritayadav.com";
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Prerita Yadav — Product Designer",
+    default: "Prerita Yadav, Product Designer",
     template: "%s | Prerita Yadav",
   },
   description:
-    "Portfolio of Prerita Yadav — a product designer crafting intuitive, human-centered experiences. Explore selected work, case studies, and design thinking.",
+    "Portfolio of Prerita Yadav, a product designer crafting intuitive, human-centered experiences. Explore selected work, case studies, and design thinking.",
   // TODO: Remove robots noindex before launch
   robots: {
     index: false,
     follow: false,
   },
   openGraph: {
-    title: "Prerita Yadav — Product Designer",
+    title: "Prerita Yadav, Product Designer",
     description:
-      "Portfolio of Prerita Yadav — a product designer crafting intuitive, human-centered experiences.",
+      "Portfolio of Prerita Yadav, a product designer crafting intuitive, human-centered experiences.",
     url: siteUrl,
     siteName: "Prerita Yadav",
     type: "website",
@@ -28,9 +29,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Prerita Yadav — Product Designer",
+    title: "Prerita Yadav, Product Designer",
     description:
-      "Portfolio of Prerita Yadav — a product designer crafting intuitive, human-centered experiences.",
+      "Portfolio of Prerita Yadav, a product designer crafting intuitive, human-centered experiences.",
   },
 };
 
@@ -59,8 +60,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
+        <ContentGateHead />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

@@ -1,29 +1,30 @@
-"use client";
-
 import Link from "next/link";
-import { motion } from "motion/react";
 import {
   workTitle,
   workSubtitle,
   archiveTitle,
   archiveSubtitle,
+  workListingBackLabel,
+  workListingCtaLabel,
 } from "@/lib/workListingContent";
-import { getMainWork, getArchivedWork } from "@/lib/workData";
-import { fadeUp, staggerContainer, ease } from "@/lib/renderedAnimations";
+import { getMainWork, getArchivedWork, type WorkItem } from "@/lib/workData";
+import { Content, CardTitle } from "@/components/rendered/Content";
+import { Mark } from "@/components/rendered/Mark";
+import { BackLink } from "@/components/rendered/BackLink";
 
-function CompanyMark({ company }: { company: string }) {
+function WorkRow({ item }: { item: WorkItem }) {
   return (
-    <span className="r-company-mark" aria-label={company} title={company}>
-      {company.charAt(0)}
-    </span>
-  );
-}
-
-function ArrowRight() {
-  return (
-    <svg width={18} height={18} viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M4 9h10M10 5l4 4-4 4" />
-    </svg>
+    <Link href={`/rendered/work/${item.slug}`} className="r-row">
+      <span className="r-row-lead">
+        <Mark slug={item.slug} company={item.company} />
+        <span className="r-row-main">
+          <CardTitle slug={item.slug} company={item.company} title={item.title} />
+          <span className="r-row-desc">
+            <Content k={`work.${item.slug}.tagline`} fallback={item.tagline} />
+          </span>
+        </span>
+      </span>
+    </Link>
   );
 }
 
@@ -32,79 +33,51 @@ export default function RenderedWorkPage() {
   const archived = getArchivedWork();
 
   return (
-    <div className="r-container">
-      <motion.div
-        className="r-work-page-header"
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, ease }}
-      >
-        <h1>{workTitle}</h1>
-        <p>{workSubtitle}</p>
-      </motion.div>
+    <div className="r-col">
+      <BackLink href="/rendered">
+        <Content k="workListing.backLabel" fallback={workListingBackLabel} />
+      </BackLink>
 
-      <motion.div
-        className="r-work-page-group"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.05 }}
-        variants={staggerContainer}
-      >
-        <motion.div className="r-work-page-group-label" variants={fadeUp} custom={0}>
-          Featured &amp; Recent
-        </motion.div>
+      <header className="r-hero">
+        <h1 className="r-title">
+          <Content k="workListing.title" fallback={workTitle} />
+        </h1>
+        <p className="r-sub" style={{ marginTop: 12 }}>
+          <Content k="workListing.subtitle" fallback={workSubtitle} />
+        </p>
+      </header>
 
-        <div className="r-work-list">
-          {main.map((item, i) => (
-            <motion.div key={item.slug} variants={fadeUp} custom={i + 1}>
-              <Link href={`/rendered/work/${item.slug}`} className="r-work-item">
-                <CompanyMark company={item.company} />
-                <div className="r-work-meta">
-                  <span className="r-work-company">{item.company}</span>
-                  <span className="r-work-title">{item.title}</span>
-                  <span className="r-work-tagline">{item.tagline}</span>
-                </div>
-                <span className="r-work-arrow"><ArrowRight /></span>
-              </Link>
-            </motion.div>
+      <section className="r-section" style={{ marginTop: 40 }} aria-label={workTitle}>
+        <div className="r-rows">
+          {main.map((item) => (
+            <WorkRow key={item.slug} item={item} />
           ))}
         </div>
-      </motion.div>
+      </section>
 
-      <motion.div
-        className="r-work-page-group"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.05 }}
-        variants={staggerContainer}
-      >
-        <motion.div className="r-work-page-group-label" variants={fadeUp} custom={0}>
-          {archiveTitle}
-        </motion.div>
-        <motion.p
-          variants={fadeUp}
-          custom={1}
-          style={{ fontSize: 15, color: "var(--r-text-secondary)", marginBottom: 32 }}
-        >
-          {archiveSubtitle}
-        </motion.p>
-
-        <div className="r-work-list">
-          {archived.map((item, i) => (
-            <motion.div key={item.slug} variants={fadeUp} custom={i + 2}>
-              <Link href={`/rendered/work/${item.slug}`} className="r-work-item">
-                <CompanyMark company={item.company} />
-                <div className="r-work-meta">
-                  <span className="r-work-company">{item.company}</span>
-                  <span className="r-work-title">{item.title}</span>
-                  <span className="r-work-tagline">{item.tagline}</span>
-                </div>
-                <span className="r-work-arrow"><ArrowRight /></span>
-              </Link>
-            </motion.div>
+      <section className="r-section" aria-labelledby="archive-heading">
+        <h2 className="r-label" id="archive-heading">
+          <Content k="workListing.archiveTitle" fallback={archiveTitle} />
+        </h2>
+        <p className="r-sub">
+          <Content k="workListing.archiveSubtitle" fallback={archiveSubtitle} />
+        </p>
+        <div className="r-rows">
+          {archived.map((item) => (
+            <WorkRow key={item.slug} item={item} />
           ))}
         </div>
-      </motion.div>
+      </section>
+
+      <div className="r-end">
+        <div className="r-rows">
+          <Link href="/rendered/contact" className="r-row">
+            <span className="r-row-plain">
+              <Content k="workListing.ctaLabel" fallback={workListingCtaLabel} />
+            </span>
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }
