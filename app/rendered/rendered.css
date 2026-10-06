@@ -436,3 +436,8 @@ a.r-row:hover .r-ext { color: var(--r-muted); }
 }
 .r-skip:focus { transform: none; outline: 2px solid var(--r-text); outline-offset: 2px; }
 .rendered-root a.r-skip { color: #fff; }
+
+/* A field erased on the WIP canvas renders as empty text: hide the element instead of leaving a gap. */
+.rendered-root :is(h1, h2, h3, h4, p, a):empty {
+  display: none;
+}

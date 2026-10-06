@@ -56,8 +56,6 @@ export function useCanvasPersistence(pageKey: string) {
     status: "loading",
   });
   const [needsInitialLayout, setNeedsInitialLayout] = useState(false);
-  // Set once Reset is clicked: no autosave may write the canvas back, and repeat clicks are ignored.
-  const resettingRef = useRef(false);
   const cancelSaveRef = useRef<() => void>(() => {});
 
   useEffect(() => {
@@ -85,7 +83,6 @@ export function useCanvasPersistence(pageKey: string) {
     }
 
     const debouncedSave = debounce(() => {
-      if (resettingRef.current) return;
       const snapshot = getSnapshot(s);
       localStorage.setItem(persistenceKey, JSON.stringify(snapshot));
     }, 500);
@@ -99,11 +96,11 @@ export function useCanvasPersistence(pageKey: string) {
     };
   }, [persistenceKey, store]);
 
-  const reset = useCallback(() => {
-    if (resettingRef.current) return;
-    resettingRef.current = true;
-    // A pending autosave (or one triggered by the pointer moving over the canvas) would otherwise
-    // write the old canvas back after the clear below, and the reload would restore it.
+  /**
+   * Forget every saved edit, then let the caller put the default layout back in the live editor.
+   * No page reload, so it is instant. A pending autosave is cancelled first, or it would write the old canvas back.
+   */
+  const reset = useCallback((applyDefaults: () => void) => {
     cancelSaveRef.current();
     // Clear all prerita-wip-* keys, not just the current page
     const keysToRemove: string[] = [];
@@ -116,8 +113,7 @@ export function useCanvasPersistence(pageKey: string) {
     keysToRemove.forEach((key) => localStorage.removeItem(key));
     // Back to defaults everywhere, including the rendered site.
     clearOverrides();
-    // Defer reload so the reset sound (~160ms) has time to play out.
-    setTimeout(() => window.location.reload(), 260);
+    applyDefaults();
   }, []);
 
   return { store, loadingState, reset, needsInitialLayout };

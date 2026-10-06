@@ -14,7 +14,7 @@ const { createAboutLayout } = await import("../lib/createAboutLayout");
 const { createContactLayout } = await import("../lib/createContactLayout");
 const { createLandingLayout } = await import("../lib/createLandingLayout");
 const { createWorkListingLayout } = await import("../lib/createWorkListingLayout");
-const { collectOverrides, parseOverrides } = await import("../lib/contentOverrides");
+const { collectOverrides, parseOverrides, boundKeysOf, BOUND_KEYS_META } = await import("../lib/contentOverrides");
 const { workItems } = await import("../lib/workData");
 
 type Binding = { key: string; part?: number; list?: boolean; head?: boolean; prop: string };
@@ -41,6 +41,16 @@ function fakeEditor(): Fake {
 
 const snapshot = ({ shapes }: Fake) => ({
   document: { store: Object.fromEntries(shapes.map((s, i) => [`shape:${i}`, s])) },
+});
+
+/** Snapshot of a canvas whose page remembers the fields its layout created (as WipCanvas records them). */
+const snapshotWithKeys = (f: Fake, shapes: Shape[] = f.shapes) => ({
+  document: {
+    store: {
+      "page:page": { typeName: "page", meta: { [BOUND_KEYS_META]: boundKeysOf(f.shapes) } },
+      ...Object.fromEntries(shapes.map((s, i) => [`shape:${i}`, s])),
+    },
+  },
 });
 
 const shapesFor = ({ shapes }: Fake, key: string, part?: number) =>
@@ -205,6 +215,57 @@ describe("other pages", () => {
     expect(key.startsWith("workListing.cards.")).toBe(true);
     card.props.title = "Renamed";
     expect(collectOverrides([snapshot(f)])[key]).toBe("Renamed");
+  });
+});
+
+describe("erased text", () => {
+  test("erasing a text shape overrides its field with nothing", () => {
+    const f = fakeEditor();
+    createAboutLayout(f.editor);
+    const title = only(f, "about.title");
+    const remaining = f.shapes.filter((s) => s !== title);
+    expect(collectOverrides([snapshotWithKeys(f, remaining)])).toEqual({ "about.title": "" });
+  });
+
+  test("an erased paragraph is dropped from a field split across shapes", () => {
+    for (const item of workItems) {
+      const f = fakeEditor();
+      createWorkDetailLayout(f.editor, item.slug);
+      const split = f.shapes.find((s) => s.meta?.content?.some((b) => b.part === 1));
+      if (!split) continue;
+      const binding = split.meta!.content!.find((b) => b.part === 1)!;
+      const first = only(f, binding.key, 0);
+      const out = collectOverrides([snapshotWithKeys(f, f.shapes.filter((s) => s !== split))])[binding.key];
+      expect(out).toBe(first.props.text);
+      return;
+    }
+    throw new Error("no multi-paragraph field found");
+  });
+
+  test("a canvas without recorded fields (saved before this existed) deletes nothing", () => {
+    const f = fakeEditor();
+    createAboutLayout(f.editor);
+    const remaining = f.shapes.filter((s) => s !== only(f, "about.title"));
+    expect(collectOverrides([snapshot({ ...f, shapes: remaining })])).toEqual({});
+  });
+
+  test("restoring the shape removes the override again", () => {
+    const f = fakeEditor();
+    createAboutLayout(f.editor);
+    const erased = collectOverrides([snapshotWithKeys(f, f.shapes.filter((s) => s !== only(f, "about.title")))]);
+    expect(collectOverrides([snapshotWithKeys(f)], erased)).toEqual({});
+  });
+
+  test("a field still present on another canvas is not treated as erased", () => {
+    const landing = fakeEditor();
+    createLandingLayout(landing.editor);
+    const card = landing.shapes.find((s) => s.type === "project-card")!;
+    const key = card.meta!.content!.find((b) => b.prop === "description")!.key;
+    const detail = fakeEditor();
+    createWorkDetailLayout(detail.editor, key.split(".")[1]);
+    const landingWithoutCard = landing.shapes.filter((s) => s !== card);
+    const out = collectOverrides([snapshotWithKeys(landing, landingWithoutCard), snapshotWithKeys(detail)]);
+    expect(out[key]).toBeUndefined();
   });
 });
 

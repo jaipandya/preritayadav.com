@@ -17,6 +17,8 @@
 export const CONTENT_OVERRIDES_KEY = "prerita-content-overrides";
 export const CONTENT_OVERRIDES_EVENT = "prerita-content-overrides-change";
 export const WIP_STORAGE_PREFIX = "prerita-wip-";
+/** Page record meta holding the text fields the layout created, so Build can tell which ones were erased. */
+export const BOUND_KEYS_META = "boundKeys";
 
 /** A scalar field is stored as a string, a list field (bullets) as an array of strings. */
 export type ContentValue = string | string[];
@@ -157,11 +159,34 @@ function bindingsOf(shape: SnapshotShape): ContentBinding[] {
   );
 }
 
+/** Text fields (`key` or `key#part`) that the shapes of a freshly created layout bind. List fields are tracked by their heading. */
+export function boundKeysOf(shapes: Array<Pick<SnapshotShape, "meta">>): string[] {
+  const keys = new Set<string>();
+  for (const shape of shapes) {
+    for (const b of bindingsOf(shape)) {
+      if (!b.list) keys.add(b.part === undefined ? b.key : `${b.key}#${b.part}`);
+    }
+  }
+  return [...keys];
+}
+
+function expectedKeysOf(snapshot: unknown): string[] {
+  const store = (snapshot as { document?: { store?: Record<string, { typeName?: string; meta?: Record<string, unknown> }> } } | null)
+    ?.document?.store;
+  if (!store) return [];
+  return Object.values(store)
+    .filter((r) => r?.typeName === "page")
+    .flatMap((page) => {
+      const keys = page.meta?.[BOUND_KEYS_META];
+      return Array.isArray(keys) ? keys.filter((k): k is string => typeof k === "string") : [];
+    });
+}
+
 function stripPrefix(text: string, prefix?: string): string {
   return prefix && text.startsWith(prefix) ? text.slice(prefix.length) : text;
 }
 
-type Slot = { text: string; changed: boolean };
+type Slot = { text: string; changed: boolean; deleted?: boolean };
 type ListEntry = { text: string; x: number; y: number };
 type ListField = { base: string; items: ListEntry[] };
 
@@ -181,8 +206,10 @@ function listItemsOf(text: string, prefix?: string): string[] {
 export function collectOverrides(snapshots: unknown[], previous: ContentOverrides = {}): ContentOverrides {
   const fields = new Map<string, Map<number, Slot>>();
   const lists = new Map<string, ListField[]>();
+  const expected = new Set<string>();
 
   for (const snapshot of snapshots) {
+    expectedKeysOf(snapshot).forEach((k) => expected.add(k));
     const snapshotLists = new Map<string, ListField>();
 
     for (const shape of shapesOf(snapshot)) {
@@ -212,11 +239,20 @@ export function collectOverrides(snapshots: unknown[], previous: ContentOverride
     for (const [key, list] of snapshotLists) lists.set(key, [...(lists.get(key) ?? []), list]);
   }
 
+  // A text field the layout created that no canvas has any more was erased: the rendered page drops it too.
+  for (const entry of expected) {
+    const [key, part] = entry.split("#");
+    const index = part === undefined ? 0 : Number(part);
+    const parts = fields.get(key) ?? new Map<number, Slot>();
+    if (!parts.has(index)) parts.set(index, { text: "", changed: true, deleted: true });
+    fields.set(key, parts);
+  }
+
   const next = { ...previous };
 
   for (const [key, parts] of fields) {
     const slots = [...parts.entries()].sort(([a], [b]) => a - b).map(([, s]) => s);
-    if (slots.some((s) => s.changed)) next[key] = slots.map((s) => s.text).join("\n\n");
+    if (slots.some((s) => s.changed)) next[key] = slots.filter((s) => !s.deleted).map((s) => s.text).join("\n\n");
     else delete next[key];
   }
 

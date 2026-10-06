@@ -17,9 +17,11 @@ import { useCanvasPersistence } from "./useCanvasPersistence";
 import { CanvasUI } from "./CanvasUI";
 import { BrowserChrome } from "./BrowserChrome";
 import { getHref, isNavigable } from "@/lib/canvasMeta";
+import { BOUND_KEYS_META, boundKeysOf } from "@/lib/contentOverrides";
 import { CANVAS_W } from "@/lib/layoutHelpers";
 import { sounds } from "@/lib/sounds";
 import { attachCanvasSounds } from "@/lib/canvasSounds";
+import { attachNonPassiveTouch } from "@/lib/nonPassiveTouch";
 
 const DRAG_THRESHOLD = 5;
 
@@ -65,6 +67,22 @@ const uiOverrides: TLUiOverrides = {
 
 const customTools = [BrowseTool];
 
+/** Remember which text fields the layout created, so Build can tell when one is erased from the canvas. */
+function recordBoundKeys(editor: Editor) {
+  editor.updatePage({
+    id: editor.getCurrentPageId(),
+    meta: { [BOUND_KEYS_META]: boundKeysOf(editor.getCurrentPageShapes()) },
+  });
+}
+
+/** On mobile, zoom out so the canvas content fits better on the small screen. */
+function applyMobileCamera(editor: Editor) {
+  if (window.innerWidth >= 768) return;
+  const vb = editor.getViewportScreenBounds();
+  const z = 0.5;
+  editor.setCamera({ x: vb.width / 2 - (CANVAS_W / 2) * z, y: 0, z });
+}
+
 export function WipCanvas({
   pageKey,
   onCreateLayout,
@@ -80,18 +98,39 @@ export function WipCanvas({
   const pointerDownPos = useRef<{ x: number; y: number } | null>(null);
   const [canvasReady, setCanvasReady] = useState(false);
 
+  const editorRef = useRef<Editor | null>(null);
+
+  const handleReset = useCallback(() => {
+    reset(() => {
+      const editor = editorRef.current;
+      if (!editor) return;
+      editor.run(() => {
+        editor.setEditingShape(null);
+        editor.deleteShapes([...editor.getCurrentPageShapeIds()]);
+        editor.deleteAssets(editor.getAssets());
+        onCreateLayout?.(editor);
+        recordBoundKeys(editor);
+      });
+      editor.clearHistory();
+      editor.setCurrentTool("browse");
+      applyMobileCamera(editor);
+    });
+  }, [reset, onCreateLayout]);
+
   const components = useMemo<TLEditorComponents>(
     () => ({
-      InFrontOfTheCanvas: () => <CanvasUI onReset={reset} />,
+      InFrontOfTheCanvas: () => <CanvasUI onReset={handleReset} />,
     }),
-    [reset]
+    [handleReset]
   );
 
   const handleMount = useCallback(
     (editor: Editor) => {
+      editorRef.current = editor;
       if (needsInitialLayout && onCreateLayout && !layoutCreated.current) {
         layoutCreated.current = true;
         onCreateLayout(editor);
+        recordBoundKeys(editor);
       }
 
       // Set thin stroke for the draw tool
@@ -100,17 +139,7 @@ export function WipCanvas({
       // Set browse as the default tool
       editor.setCurrentTool("browse");
 
-      // On mobile, zoom out so the canvas content fits better on the small screen
-      const isMobile = window.innerWidth < 768;
-      if (isMobile) {
-        const vb = editor.getViewportScreenBounds();
-        const z = 0.5;
-        editor.setCamera({
-          x: vb.width / 2 - (CANVAS_W / 2) * z,
-          y: 0,
-          z,
-        });
-      }
+      applyMobileCamera(editor);
 
       // Cmd+0 / Ctrl+0 to reset zoom
       const handleKeyDown = (e: KeyboardEvent) => {
@@ -127,6 +156,7 @@ export function WipCanvas({
       };
       document.addEventListener("keydown", handleKeyDown);
 
+      attachNonPassiveTouch(editor);
       attachCanvasSounds(editor);
       warmCanvasImages(editor);
 

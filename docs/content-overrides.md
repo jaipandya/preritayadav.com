@@ -36,13 +36,14 @@ Files:
 | `lib/caseStudySections.ts` | Ordered sections of a case study with the content key and default of every heading and body, per `layoutFormat`. Mirrors `createWorkDetailLayout.ts`; `tests/caseStudySections.test.ts` fails if the two drift apart. |
 | `lib/workPageContent.ts` | Default labels of a case study page (headings, Role/Duration/Tools, buttons). |
 | `components/ui/BuildOverlay.tsx` | `BuildButton` calls `commitOverridesFromCanvases()` on click and again on "Visit rendered page". |
-| `components/canvas/useCanvasPersistence.ts` | `reset` also clears overrides. Older-version canvases are pruned on load. |
+| `components/canvas/useCanvasPersistence.ts` | `reset` also clears overrides (the canvas is rebuilt in place, no page reload). Older-version canvases are pruned on load. |
 
 Design decisions:
 
 - **Overrides are stored separately from the canvas snapshot.** The snapshot is discarded when a layout version changes; overrides survive. Build only updates keys it saw in a snapshot.
 - **Edit detection uses a hash of the default** (`binding.base`), not a copy of the text. A shape that was never edited produces no override, so changing a default in `lib/` still reaches users with an old canvas.
 - **Editing text back to the default removes the override.**
+- **Erasing a text shape hides that text on the rendered site.** When a layout is created, `WipCanvas` records the text fields it made in the page record's meta (`boundKeys`). Build treats a recorded field that no saved canvas has any more as erased and stores `""` for it (a split field drops just that paragraph). The rendered site hides empty headings, paragraphs and links with CSS `:empty`. A field that is still on another canvas (a shared key) is not treated as erased, and bringing the shape back (undo) removes the override. Canvases saved before this existed have no record, so erasing on them has no effect until the page is Reset.
 - **Scalar fields** are stored as strings. A multi-paragraph field is one string with paragraphs joined by a blank line (`\n\n`).
 - **List fields** (bullets) are stored as `string[]` and can be edited, deleted, duplicated, reordered and split (see below).
 

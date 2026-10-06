@@ -133,12 +133,10 @@ const CACHED_LINES: Array<{ text: string; delay: number }> = [
 
 export function BuildOverlay({
   onComplete,
-  onReset,
   onClose,
   cached = false,
 }: {
   onComplete: () => void;
-  onReset: () => void;
   onClose: () => void;
   cached?: boolean;
 }) {
@@ -380,15 +378,6 @@ export function BuildOverlay({
               Visit rendered page →
             </button>
             <button
-              className="build-btn build-btn-link"
-              onClick={(e) => {
-                e.stopPropagation();
-                onReset();
-              }}
-            >
-              Rebuild without cache
-            </button>
-            <button
               className="build-btn build-btn-ghost"
               onClick={(e) => {
                 e.stopPropagation();
@@ -428,13 +417,6 @@ export function BuildOverlay({
             padding: 6px 12px;
             border-radius: 4px;
           }
-          .build-btn-link {
-            background: none;
-            border: none;
-            color: #706c64;
-            font-size: 11px;
-            padding: 0;
-          }
           .build-btn-ghost {
             margin-left: auto;
             background: transparent;
@@ -446,7 +428,6 @@ export function BuildOverlay({
           }
           @media (hover: hover) {
             .build-btn-primary:hover { background: #E8BC5E; }
-            .build-btn-link:hover { color: #a8a49b; }
             .build-btn-ghost:hover { background: #1e1d1a; color: #d4d0c8; }
           }
           @media (max-width: 640px) {
@@ -466,9 +447,7 @@ export function BuildOverlay({
             .build-btn { min-height: 44px; font-size: 14px; }
             .build-btn-primary { order: 1; }
             .build-btn-ghost { order: 2; margin-left: 0; }
-            .build-btn-link { order: 3; padding: 0 8px; }
-          }
-          @keyframes blink {
+            @keyframes blink {
             50% { opacity: 0; }
           }
           .build-terminal-scroll::-webkit-scrollbar {
@@ -519,15 +498,6 @@ export function BuildButton({
     setIsCached(cached);
     commitOverridesFromCanvases();
     setBuilding(true);
-  }, []);
-
-  const handleReset = useCallback(() => {
-    try { sessionStorage.removeItem("prerita-build-done"); } catch {}
-    setBuilding(false);
-    setIsCached(false);
-    setTimeout(() => {
-      setBuilding(true);
-    }, 100);
   }, []);
 
   return (
@@ -599,7 +569,7 @@ export function BuildButton({
         Build
       </button>
 
-      {building && <BuildOverlay onComplete={handleComplete} onReset={handleReset} onClose={() => setBuilding(false)} cached={isCached} />}
+      {building && <BuildOverlay onComplete={handleComplete} onClose={() => setBuilding(false)} cached={isCached} />}
     </>
   );
 }
