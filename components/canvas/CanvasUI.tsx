@@ -36,6 +36,7 @@ export const CanvasUI = track(function CanvasUI({
   const currentTool = editor.getCurrentToolId();
   const [soundEnabled, toggleSound] = useSoundEnabled();
   const [isMobile, setIsMobile] = useState(false);
+  const [isTouch, setIsTouch] = useState(false);
 
   useEffect(() => {
     const media = window.matchMedia("(max-width: 640px)");
@@ -49,6 +50,30 @@ export const CanvasUI = track(function CanvasUI({
     return () => media.removeListener(update);
   }, []);
 
+  useEffect(() => {
+    const media = window.matchMedia("(pointer: coarse)");
+    const update = () => setIsTouch(media.matches);
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
+
+  // Double-tap is unreliable on a zoomed-out touch canvas, so offer an explicit way into text editing.
+  const selected = editor.getOnlySelectedShape();
+  const showEdit =
+    isTouch &&
+    currentTool === "select" &&
+    !!selected &&
+    editor.canEditShape(selected) &&
+    !editor.getEditingShapeId();
+
+  const startEditing = () => {
+    if (!selected) return;
+    editor.markHistoryStoppingPoint("editing shape");
+    editor.setEditingShape(selected);
+    editor.setCurrentTool("select.editing_shape", { target: "shape", shape: selected });
+  };
+
   const dividerStyle = {
     width: 1,
     background: "#ddd",
@@ -56,6 +81,34 @@ export const CanvasUI = track(function CanvasUI({
   } as const;
 
   return createPortal(
+    <>
+      {showEdit && (
+        <button
+          className="canvas-ui-toolbar"
+          onClick={withSound("text-begin", startEditing)}
+          onPointerDown={(e) => e.stopPropagation()}
+          style={{
+            position: "fixed",
+            bottom: 112,
+            left: "50%",
+            transform: "translateX(-50%)",
+            zIndex: 1000,
+            pointerEvents: "all",
+            height: 40,
+            padding: "0 16px",
+            borderRadius: 10,
+            border: "1.5px solid #1a1a1a",
+            background: "#1a1a1a",
+            color: "#fff",
+            fontFamily: "'Loranthus', sans-serif",
+            fontSize: 14,
+            cursor: "pointer",
+            boxShadow: "0 2px 12px rgba(0,0,0,0.15)",
+          }}
+        >
+          Edit text
+        </button>
+      )}
     <div
       className="canvas-ui-toolbar"
       style={{
@@ -130,7 +183,8 @@ export const CanvasUI = track(function CanvasUI({
       >
         {soundEnabled ? <SpeakerOnIcon /> : <SpeakerOffIcon />}
       </ToolbarIconButton>
-    </div>,
+    </div>
+    </>,
     document.body
   );
 });

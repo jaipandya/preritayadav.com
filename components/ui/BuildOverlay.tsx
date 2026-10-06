@@ -206,6 +206,7 @@ export function BuildOverlay({
       onClick={onClose}
     >
       <button
+        className="build-close-floating"
         onClick={onClose}
         aria-label="Close modal"
         style={{
@@ -241,12 +242,11 @@ export function BuildOverlay({
       </button>
 
       <div
+        className="build-card"
         onClick={(e) => e.stopPropagation()}
         style={{
           width: "100%",
           maxWidth: 640,
-          height: "100%",
-          maxHeight: 420,
           background: "#0f0e0c",
           border: "1px solid #2e2c28",
           borderRadius: 10,
@@ -366,105 +366,108 @@ export function BuildOverlay({
               }}
             />
           )}
-          {done && (
-            <div
-              style={{
-                marginTop: 16,
-                paddingTop: 12,
-                borderTop: "1px solid #1e1d1a",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                gap: 16,
-                flexWrap: "wrap",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onComplete();
-                  }}
-                  style={{
-                    background: "#D4A853",
-                    border: "1px solid #B8923F",
-                    color: "#0f0e0c",
-                    fontSize: 12,
-                    fontWeight: 600,
-                    cursor: "pointer",
-                    padding: "6px 12px",
-                    borderRadius: 4,
-                    fontFamily: "inherit",
-                    transition: "background 0.15s, transform 0.15s",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "#E8BC5E";
-                    e.currentTarget.style.transform = "translateY(-1px)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = "#D4A853";
-                    e.currentTarget.style.transform = "translateY(0)";
-                  }}
-                >
-                  Visit rendered page →
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onReset();
-                  }}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    color: "#706c64",
-                    fontSize: 11,
-                    cursor: "pointer",
-                    padding: 0,
-                    fontFamily: "inherit",
-                    transition: "color 0.2s",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.color = "#a8a49b";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.color = "#706c64";
-                  }}
-                >
-                  Rebuild without cache
-                </button>
-              </div>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onClose();
-                }}
-                style={{
-                  background: "transparent",
-                  border: "1px solid #2e2c28",
-                  color: "#a8a49b",
-                  fontSize: 11,
-                  cursor: "pointer",
-                  padding: "4px 10px",
-                  borderRadius: 4,
-                  fontFamily: "inherit",
-                  transition: "background 0.2s, color 0.2s",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "#1e1d1a";
-                  e.currentTarget.style.color = "#d4d0c8";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "transparent";
-                  e.currentTarget.style.color = "#a8a49b";
-                }}
-              >
-                Close
-              </button>
-            </div>
-          )}
         </div>
 
+        {done && (
+          <div className="build-actions">
+            <button
+              className="build-btn build-btn-primary"
+              onClick={(e) => {
+                e.stopPropagation();
+                onComplete();
+              }}
+            >
+              Visit rendered page →
+            </button>
+            <button
+              className="build-btn build-btn-link"
+              onClick={(e) => {
+                e.stopPropagation();
+                onReset();
+              }}
+            >
+              Rebuild without cache
+            </button>
+            <button
+              className="build-btn build-btn-ghost"
+              onClick={(e) => {
+                e.stopPropagation();
+                onClose();
+              }}
+            >
+              Close
+            </button>
+          </div>
+        )}
+
         <style>{`
+          .build-card {
+            height: 100%;
+            max-height: 420px;
+          }
+          .build-actions {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px 16px;
+            border-top: 1px solid #1e1d1a;
+            background: #141311;
+          }
+          .build-btn {
+            font-family: inherit;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s;
+          }
+          .build-btn-primary {
+            background: #D4A853;
+            border: 1px solid #B8923F;
+            color: #0f0e0c;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 4px;
+          }
+          .build-btn-link {
+            background: none;
+            border: none;
+            color: #706c64;
+            font-size: 11px;
+            padding: 0;
+          }
+          .build-btn-ghost {
+            margin-left: auto;
+            background: transparent;
+            border: 1px solid #2e2c28;
+            color: #a8a49b;
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 4px;
+          }
+          @media (hover: hover) {
+            .build-btn-primary:hover { background: #E8BC5E; }
+            .build-btn-link:hover { color: #a8a49b; }
+            .build-btn-ghost:hover { background: #1e1d1a; color: #d4d0c8; }
+          }
+          @media (max-width: 640px) {
+            .build-card {
+              max-height: none;
+              font-size: 13px;
+              padding-bottom: env(safe-area-inset-bottom);
+            }
+            .build-close-floating { display: none !important; }
+            .build-terminal-scroll { padding: 12px !important; }
+            .build-actions {
+              flex-direction: column;
+              align-items: stretch;
+              gap: 8px;
+              padding: 12px;
+            }
+            .build-btn { min-height: 44px; font-size: 14px; }
+            .build-btn-primary { order: 1; }
+            .build-btn-ghost { order: 2; margin-left: 0; }
+            .build-btn-link { order: 3; padding: 0 8px; }
+          }
           @keyframes blink {
             50% { opacity: 0; }
           }

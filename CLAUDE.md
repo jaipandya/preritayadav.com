@@ -48,6 +48,12 @@ Text edited on the WIP canvas is carried to the rendered site (same browser only
 - Run `bun test` after changing layout creators, bindings or `lib/contentOverrides.ts`.
 - New rendered-site copy must come from `lib/` and be shown through the `components/rendered/Content.tsx` components (`Content`, `ContentParagraphs`, `ContentList`, ...), inside the `ContentGate` (see the doc). Case study headings come from `lib/caseStudySections.ts`, which must match the canvas labels per layout format (`bun test` checks it). The rendered design is described in `docs/rendered-design.md`.
 
+### Fake build log stays in sync with /rendered
+
+The "build agent" log shown when switching to the rendered site (`BUILD_LINES` and `CACHED_LINES` in `components/ui/BuildOverlay.tsx`) narrates how `/rendered` was built: content counts, layout and design tokens (column width, fonts, colours), components, pages, routes and page counts. It must not drift from what `/rendered` actually is.
+
+Update it when a change to `/rendered` (or the content it reads) makes a line wrong or adds or changes something major. Examples: a work item, page, route or component is added or removed (counts, `[n/N]` page steps, static generation list), the typeface or colour tokens change, the layout or navigation pattern changes. Skip it for small tweaks (spacing, copy edits, bug fixes) that no log line refers to. When you edit it, follow the copywriting rules (no em dashes) and check the numbers against the code, not memory.
+
 ### Component decomposition
 
 When building or modifying features, keep components small and focused. Extract shared logic into hooks (`lib/`) and shared UI into components (`components/`). If you find yourself copying code between shape utils or layout creators, extract it into a shared module first.

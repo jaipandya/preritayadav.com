@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { createTLStore, getSnapshot, inlineBase64AssetStore, loadSnapshot, type TLAssetStore } from "tldraw";
 import { customShapeUtils, customBindingUtils } from "@/lib/shapes";
 import { debounce } from "@/lib/debounce";
@@ -56,6 +56,9 @@ export function useCanvasPersistence(pageKey: string) {
     status: "loading",
   });
   const [needsInitialLayout, setNeedsInitialLayout] = useState(false);
+  // Set once Reset is clicked: no autosave may write the canvas back, and repeat clicks are ignored.
+  const resettingRef = useRef(false);
+  const cancelSaveRef = useRef<() => void>(() => {});
 
   useEffect(() => {
     const s = store;
@@ -82,11 +85,13 @@ export function useCanvasPersistence(pageKey: string) {
     }
 
     const debouncedSave = debounce(() => {
+      if (resettingRef.current) return;
       const snapshot = getSnapshot(s);
       localStorage.setItem(persistenceKey, JSON.stringify(snapshot));
     }, 500);
 
     const cleanup = s.listen(debouncedSave);
+    cancelSaveRef.current = debouncedSave.cancel;
 
     return () => {
       cleanup();
@@ -95,6 +100,11 @@ export function useCanvasPersistence(pageKey: string) {
   }, [persistenceKey, store]);
 
   const reset = useCallback(() => {
+    if (resettingRef.current) return;
+    resettingRef.current = true;
+    // A pending autosave (or one triggered by the pointer moving over the canvas) would otherwise
+    // write the old canvas back after the clear below, and the reload would restore it.
+    cancelSaveRef.current();
     // Clear all prerita-wip-* keys, not just the current page
     const keysToRemove: string[] = [];
     for (let i = 0; i < localStorage.length; i++) {
