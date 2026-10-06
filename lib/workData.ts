@@ -3,6 +3,7 @@ export interface WorkItem {
   number: string;
   title: string;
   tagline: string;
+  summaryTagline?: string;
   company: string;
   role: string;
   duration: string;
@@ -12,9 +13,11 @@ export interface WorkItem {
   challenge: string;
   challengeTitle?: string;
   process: string[];
+  processIntro?: string;
   approach: string;
   keyContributions: string[];
   outcome: string;
+  showAtAGlance?: boolean;
   learnings?: string;
   layoutVersion?: number;
   featured: boolean;
@@ -29,20 +32,24 @@ const fitpass: WorkItem = {
   number: "01",
   title: "Partner App Redesign",
   tagline:
-    "Rebuilding the operations console for India's largest fitness network",
+    "Turning a fragmented partner experience into a clearer operating system for gym and studio teams",
+  summaryTagline:
+    "Rebuilding the operations console for India’s largest fitness network",
   company: "Fitpass",
   role: "Product Designer",
   duration: "6 months",
-  tools: "Figma, FigJam, Google Analytics",
+  tools: "Figma, FigJam",
   illustrationType: "fitpass",
   overview:
-    "Fitpass is India's largest fitness network, connecting 6 million+ users with thousands of gyms and studios across 75+ cities. The Partner App is the operations backbone used by gym owners and managers to manage bookings, track sessions, and run their daily business. I redesigned this app from the ground up — transforming a fragmented, engineer-built tool into a structured operations console with clear workflows, task-first navigation, and real-time operational visibility.",
+    "FITPASS connects fitness enthusiasts with gyms and studios across India. The Partner App is used by gym owners and managers to manage bookings, sessions, schedules, and day-to-day operations.\nAs the product evolved, more features and workflows were added over time. The opportunity was to bring these experiences together into a clearer, more structured product built around the way partners actually manage their day.",
   challenge:
-    "The existing Partner App had been built incrementally by engineering teams without a unified design vision. Gym owners struggled with disjointed navigation, buried features, and no clear view of their daily operations. Key pain points included: no information hierarchy across screens, features organized by technical modules rather than user tasks, no way to see today's schedule or live workout sessions at a glance, and low adoption of newer features because they were hard to discover.",
+    "Running a fitness centre means keeping track of several things at once. Bookings, upcoming sessions, active workouts, schedules, payments, and partner information all need attention throughout the day. The existing experience had grown around individual features, which made it harder to get a quick overview of what was happening and find the right action when needed.\n\nThe challenge was to create a more cohesive experience that helped gym owners and managers understand their day at a glance and get to important tasks quickly.",
+  processIntro:
+    "The redesign followed a structured, research-driven process from audit to handoff:",
   process: [
     "Interface Audit",
-    "Partner Interviews",
     "Information Architecture",
+    "Workflow Mapping",
     "Module Definition",
     "Navigation Redesign",
     "Design System Extension",
@@ -50,18 +57,23 @@ const fitpass: WorkItem = {
     "Handoff & QA",
   ],
   approach:
-    "I worked independently on this redesign, starting with a thorough audit of every screen in the existing app. Through conversations with gym owners and analysis of usage data, I mapped out their core daily tasks — checking today's bookings, monitoring active workouts, managing schedules, and tracking earnings. This led me to re-architect the entire information structure around these workflows rather than technical modules. I introduced task-first navigation that surfaced daily priorities, and extended the existing design system with partner-specific components.",
+    "Instead of treating each feature as a separate destination, I looked at the product around the tasks partners needed to accomplish every day. This led to a simpler information structure, clearer navigation, and a more visual way to surface the most important information.\n\nThe experience also needed to work for different partner roles, so the product was structured around the needs of both gym owners and managers.",
   keyContributions: [
-    "Re-architected the full information structure around partner workflows and daily tasks",
-    "Defined core modules based on primary user tasks — bookings, sessions, earnings, schedule",
-    "Designed task-first navigation that surfaces what gym owners need each day",
-    "Built a real-time workout monitoring feature for tracking live sessions across the facility",
-    "Created a visual \"Today\" dashboard — the first screen partners see — showing bookings, active sessions, and daily metrics",
-    "Extended the design system with reusable components tailored to partner operations",
-    "Improved feature discoverability, making newer capabilities visible within natural workflows",
+    "Restructured the information architecture around partner workflows",
+    "Defined clearer modules for bookings, sessions, schedules, and other daily operations",
+    "Designed task-focused navigation to make important actions easier to find",
+    "Introduced a real-time view of people currently working out",
+    "Designed a visual Today view to give partners a quick overview of their day",
+    "Created role-specific experiences for gym owners and managers",
+    "Extended the existing design system with additional components for partner workflows",
+    "Worked across both mobile and desktop experiences",
   ],
   outcome:
-    "The redesign transformed a feature-heavy, engineer-led interface into a cohesive operations console built for clarity and scale. Gym owners could now start their day with a clear view of what's happening, monitor sessions in real time, and navigate the app around tasks rather than hunting through menus. The new structure significantly improved feature discoverability and set the foundation for scaling the partner platform across Fitpass's growing network of 75+ cities.",
+    "The redesign brought more structure and visibility to the Partner App. Instead of navigating through individual features to understand what was happening, partners could get a clearer picture of their day and move between important operational tasks more easily.\n\nThe result was a more cohesive foundation for the growing set of tools partners use to run their fitness businesses.",
+  showAtAGlance: true,
+  learnings:
+    "Operational products don't always need more features. They need a better way to bring the right information together.\n\nFor the Partner App, the biggest shift was moving from a collection of features to an experience organised around the partner's day.",
+  layoutVersion: 2,
   featured: true,
   archived: false,
   layoutFormat: "process-heavy",

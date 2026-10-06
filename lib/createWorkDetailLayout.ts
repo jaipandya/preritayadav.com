@@ -52,8 +52,9 @@ function header(editor: Editor, data: WorkItem): number {
   annotation(editor, data.slug, "title", y, data.title, 30, 500, 45);
   y += 50;
 
-  annotation(editor, data.slug, "tagline", y, data.tagline, 15, CW, 30);
-  y += 50;
+  const taglineHeight = data.summaryTagline ? textHeight(data.tagline) : 30;
+  annotation(editor, data.slug, "tagline", y, data.tagline, 15, CW, taglineHeight);
+  y += taglineHeight + 20;
 
   return y;
 }
@@ -75,7 +76,7 @@ function heroCard(editor: Editor, data: WorkItem, y: number): number {
     type: "project-card",
     x: LEFT_PAD,
     y,
-    props: { w: CW, h: 160, number: data.number, title: data.company, description: data.tagline, mediaType: data.illustrationType },
+    props: { w: CW, h: 160, number: data.number, title: data.company, description: data.summaryTagline ?? data.tagline, mediaType: data.illustrationType },
     meta: { componentType: "project-card", variationId: `${data.slug}-hero-card` },
   });
   return y + 190;
@@ -186,20 +187,24 @@ function layoutProcessHeavy(editor: Editor, data: WorkItem) {
   y = section(editor, data.slug, y, "Overview", data.overview);
   y = section(editor, data.slug, y, "The Challenge", data.challenge);
 
-  // Expanded process section with descriptions
-  annotation(editor, data.slug, "process-heading", y, "Design Process", 20, 300, 32);
-  y += 40;
-  annotation(editor, data.slug, "process-intro", y,
-    "The redesign followed a structured, research-driven process from audit to handoff:", 14, CW, 24);
-  y += 36;
+  if (data.processIntro) {
+    y = section(editor, data.slug, y, "Design Process", data.processIntro);
+  }
 
   y = processTimeline(editor, data.slug, y, data.process);
 
   y = imagePlaceholders(editor, data.slug, y);
 
   y = section(editor, data.slug, y, "Approach", data.approach);
-  y = bulletList(editor, data.slug, y, "Key Contributions", data.keyContributions);
+  y = bulletList(editor, data.slug, y, "Key Contributions", data.keyContributions, true);
   y = section(editor, data.slug, y, "Outcome", data.outcome);
+  if (data.showAtAGlance) {
+    annotation(editor, data.slug, "at-a-glance-label", y, "At a glance", 18, 300, 28);
+    y += 52;
+  }
+  if (data.learnings) {
+    y = section(editor, data.slug, y, "What I learned", data.learnings);
+  }
 
   footerCta(editor, data.slug, y);
 }

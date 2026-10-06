@@ -112,6 +112,21 @@ export default function RenderedWorkDetail({
         <TextContent text={work.challenge} />
       </motion.div>
 
+      {work.processIntro && (
+        <motion.div
+          className="r-case-section"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.15 }}
+          variants={fadeUp}
+          custom={0}
+          aria-label="Design Process"
+        >
+          <h2>Design Process</h2>
+          <TextContent text={work.processIntro} />
+        </motion.div>
+      )}
+
       <motion.div
         className="r-case-section"
         initial="hidden"
@@ -167,6 +182,20 @@ export default function RenderedWorkDetail({
         <h2>Outcome</h2>
         <TextContent text={work.outcome} />
       </motion.div>
+
+      {work.showAtAGlance && (
+        <motion.div
+          className="r-case-section"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.15 }}
+          variants={fadeUp}
+          custom={0}
+          aria-label="At a glance"
+        >
+          <h2>At a glance</h2>
+        </motion.div>
+      )}
 
       {work.learnings && (
         <motion.div

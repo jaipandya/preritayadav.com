@@ -203,6 +203,13 @@ function workItemToMarkdown(data: WorkItem): string {
   pushText(data.challenge);
   lines.push("");
 
+  if (data.processIntro) {
+    lines.push("## Design Process");
+    lines.push("");
+    pushText(data.processIntro);
+    lines.push("");
+  }
+
   lines.push("## Process");
   lines.push("");
   data.process.forEach((step, i) => {
@@ -226,6 +233,11 @@ function workItemToMarkdown(data: WorkItem): string {
   lines.push("");
   pushText(data.outcome);
   lines.push("");
+
+  if (data.showAtAGlance) {
+    lines.push("## At a glance");
+    lines.push("");
+  }
 
   if (data.learnings) {
     lines.push("## What I learned");

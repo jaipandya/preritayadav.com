@@ -65,6 +65,13 @@ export default function WorkDetailPage({
             <TextContent text={data.challenge} />
           </section>
 
+          {data.processIntro && (
+            <section aria-label="Design Process">
+              <h2>Design Process</h2>
+              <TextContent text={data.processIntro} />
+            </section>
+          )}
+
           <section aria-label="Process">
             <h2>Process</h2>
             <ol>
@@ -92,6 +99,12 @@ export default function WorkDetailPage({
             <h2>Outcome</h2>
             <TextContent text={data.outcome} />
           </section>
+
+          {data.showAtAGlance && (
+            <section aria-label="At a glance">
+              <h2>At a glance</h2>
+            </section>
+          )}
 
           {data.learnings && (
             <section aria-label="What I learned">
