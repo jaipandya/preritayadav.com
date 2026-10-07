@@ -85,14 +85,16 @@ export default function RenderedHome() {
         <h2 className="r-label" id="outside-heading">
           <Content k="landing.outsideWork.heading" fallback={outsideWork.heading} />
         </h2>
-        <div className="r-rows">
+        <div className="r-items">
           {outsideWork.items.map((item) => (
-            <div key={item.number} className="r-row">
-              <span className="r-row-main">
-                <span className="r-row-title">{item.title}</span>
-                <span className="r-row-desc">{item.subtitle}</span>
-              </span>
-            </div>
+            <article key={item.number} className="r-item">
+              <span className="r-item-num" aria-hidden="true">{item.number}</span>
+              <div>
+                <h3 className="r-row-title">{item.title}</h3>
+                <p className="r-row-desc">{item.subtitle}</p>
+                <p className="r-item-body">{item.description}</p>
+              </div>
+            </article>
           ))}
         </div>
       </section>
@@ -108,11 +110,9 @@ export default function RenderedHome() {
         <p className="r-lede">
           <Content k="landing.footerClosing" fallback={footerClosing} />
         </p>
-        <div className="r-rows">
-          <Link href="/rendered/contact" className="r-row">
-            <span className="r-row-plain">
-              <Content k="landing.footerCta.label" fallback={footerCta.label} />
-            </span>
+        <div className="r-btn-wrap">
+          <Link href="/rendered/contact" className="r-btn">
+            <Content k="landing.footerCta.label" fallback={footerCta.label} />
           </Link>
         </div>
       </footer>

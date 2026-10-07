@@ -74,7 +74,7 @@ html:has(.rendered-root) {
 
 /* ---------- TYPE ---------- */
 .r-display {
-  font-size: 33px;
+  font-size: 36px;
   line-height: 1.05;
   letter-spacing: -0.035em;
   font-weight: 700;
@@ -82,11 +82,11 @@ html:has(.rendered-root) {
   text-wrap: balance;
 }
 @media (min-width: 640px) {
-  .r-display { font-size: 42px; }
+  .r-display { font-size: 48px; }
 }
 
 .r-title {
-  font-size: 28px;
+  font-size: 32px;
   line-height: 1.25;
   letter-spacing: -0.03em;
   font-weight: 700;
@@ -95,20 +95,20 @@ html:has(.rendered-root) {
 }
 
 .r-lede {
-  font-size: 19px;
+  font-size: 21px;
   line-height: 1.55;
   font-weight: 500;
   color: var(--r-text);
   text-wrap: balance;
 }
 
-.r-intro { font-size: 16px; line-height: 1.5; color: var(--r-text); letter-spacing: -0.005em; }
-.r-small { font-size: 13px; line-height: 1.55; color: var(--r-muted); }
-.r-sub { font-size: 14px; line-height: 1.5; color: var(--r-body); }
+.r-intro { font-size: 18px; line-height: 1.5; color: var(--r-text); letter-spacing: -0.005em; }
+.r-small { font-size: 15px; line-height: 1.55; color: var(--r-muted); }
+.r-sub { font-size: 16px; line-height: 1.5; color: var(--r-body); }
 
 .r-label {
   font-family: var(--r-mono);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 400;
   line-height: 1.5;
   letter-spacing: -0.025em;
@@ -116,7 +116,7 @@ html:has(.rendered-root) {
 }
 .r-mono-small {
   font-family: var(--r-mono);
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.5;
   color: var(--r-muted);
   font-variant-numeric: tabular-nums;
@@ -152,19 +152,51 @@ a.r-row:focus-visible { outline-offset: -2px; border-radius: 8px; }
 .r-row-lead { display: flex; align-items: center; gap: 14px; min-width: 0; }
 .r-row-main { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .r-row-title {
-  font-size: 16px;
+  font-size: 17px;
   line-height: 1.5;
   font-weight: 500;
   color: var(--r-text);
 }
-.r-row-title .r-row-title-sub { margin-left: 8px; font-weight: 400; color: var(--r-muted); font-size: 14px; }
+.r-row-title .r-row-title-sub { margin-left: 8px; font-weight: 400; color: var(--r-muted); font-size: 15px; }
 .r-row-desc {
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.5;
   color: var(--r-body);
 }
-.r-row-trail { flex: none; color: var(--r-muted); font-size: 13px; }
-.r-row-plain { font-size: 14px; color: var(--r-muted); }
+.r-row-trail { flex: none; color: var(--r-muted); font-size: 14px; }
+.r-row-plain { font-size: 15px; color: var(--r-muted); }
+
+/* ---------- OUTSIDE WORK ITEMS ---------- */
+.r-items { display: flex; flex-direction: column; gap: 32px; }
+.r-item { display: grid; grid-template-columns: 28px minmax(0, 1fr); column-gap: 8px; }
+.r-item-num { font-family: var(--r-mono); font-size: 14px; line-height: 24px; color: var(--r-muted); font-variant-numeric: tabular-nums; }
+.r-item-body { margin-top: 8px; font-size: 16px; line-height: 1.65; color: var(--r-body); text-wrap: pretty; }
+
+/* ---------- BUTTON ---------- */
+/* The anchor selector beats the reset above (.rendered-root a { color: inherit }), so the label stays white. */
+.rendered-root a.r-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 22px;
+  border-radius: 12px;
+  background: var(--r-text);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  transition: background-color 150ms ease, transform 150ms ease;
+}
+.rendered-root a.r-btn::after { content: "\2192" / ""; transition: transform 150ms ease; }
+.rendered-root a.r-btn:hover { background: var(--r-ink); }
+.rendered-root a.r-btn:hover::after { transform: translateX(3px); }
+.rendered-root a.r-btn:active { transform: scale(0.98); }
+.rendered-root a.r-btn:focus-visible { outline-offset: 3px; border-radius: 12px; }
+@media (prefers-reduced-motion: reduce) {
+  .rendered-root a.r-btn, .rendered-root a.r-btn::after { transition: none; }
+}
+.r-end .r-btn-wrap { margin-top: 24px; }
 
 /* ---------- MARK (logo tile) ---------- */
 .r-mark {
@@ -208,7 +240,7 @@ a.r-row:focus-visible { outline-offset: -2px; border-radius: 8px; }
   display: inline-flex;
   align-items: center;
   min-height: 44px;
-  font-size: 13px;
+  font-size: 14px;
   color: var(--r-muted);
   margin: -14px 0 26px;
   transition: color 150ms ease;
@@ -244,7 +276,7 @@ a.r-row:focus-visible { outline-offset: -2px; border-radius: 8px; }
 /* ---------- PROSE ---------- */
 .r-prose { display: flex; flex-direction: column; gap: 16px; }
 .r-prose p {
-  font-size: 15px;
+  font-size: 17px;
   line-height: 1.7;
   color: var(--r-body);
   text-wrap: pretty;
@@ -255,7 +287,7 @@ a.r-row:focus-visible { outline-offset: -2px; border-radius: 8px; }
 .r-list li {
   position: relative;
   padding-left: 16px;
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.5;
   color: var(--r-body-dark);
 }
@@ -275,14 +307,14 @@ a.r-row:focus-visible { outline-offset: -2px; border-radius: 8px; }
   counter-increment: step;
   display: flex;
   gap: 12px;
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.5;
   color: var(--r-body-dark);
 }
 .r-steps li::before {
   content: counter(step, decimal-leading-zero);
   font-family: var(--r-mono);
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.9;
   color: var(--r-muted);
   font-variant-numeric: tabular-nums;
@@ -301,7 +333,7 @@ a.r-row:focus-visible { outline-offset: -2px; border-radius: 8px; }
 }
 .r-meta-item { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .r-meta-item .r-mono-small { letter-spacing: -0.01em; }
-.r-meta-item span:last-child { font-size: 14px; line-height: 1.45; color: var(--r-text); }
+.r-meta-item span:last-child { font-size: 15px; line-height: 1.45; color: var(--r-text); }
 @media (max-width: 479px) {
   .r-meta { grid-template-columns: 1fr; gap: 12px; }
 }
@@ -396,7 +428,7 @@ a.r-row:hover .r-ext { color: var(--r-muted); }
   align-items: center;
   min-height: 44px;
   padding: 0 8px;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--r-body);
   transition: color 150ms ease;
@@ -429,7 +461,7 @@ a.r-row:hover .r-ext { color: var(--r-muted); }
   border-radius: 8px;
   background: var(--r-text);
   color: #fff;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
   transform: translateY(-200%);
   transition: transform 150ms ease;

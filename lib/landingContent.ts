@@ -68,14 +68,6 @@ export const outsideWork = {
   items: [
     {
       number: "1",
-      title: "Mentoring at 10kdesigners",
-      subtitle: "Giving back to the place that shaped me",
-      description:
-        "I was part of Cohort 4 at 10kdesigners, where I deep-dived into the world of product design. Since graduating from 10K, I\u2019ve been mentoring new designers\u2014sharing what I\u2019ve learned, jamming on projects, and helping them find their footing.",
-      illustration: "mentoring" as OutsideWorkIllustration,
-    },
-    {
-      number: "2",
       title: "Travelling to new places and meeting people",
       subtitle: "Design takes a seat, curiosity takes the wheel",
       description:
@@ -83,11 +75,19 @@ export const outsideWork = {
       illustration: "travel" as OutsideWorkIllustration,
     },
     {
+      number: "2",
+      title: "Mentoring at 10kdesigners",
+      subtitle: "Giving back to the place that shaped me",
+      description:
+        "I was part of Cohort 4 at 10kdesigners, where I deep-dived into the world of product design. Since graduating from 10K, I\u2019ve been mentoring new designers: sharing what I\u2019ve learned, jamming on projects, and helping them find their footing.",
+      illustration: "mentoring" as OutsideWorkIllustration,
+    },
+    {
       number: "3",
       title: "Tinkering with tiny projects",
       subtitle: "I try and I sometimes glue my fingers together",
       description:
-        "From a travel calendar that doubles as postcard, to crocheting fingerless gloves (because ten fingers is too many)\u2014I love picking up random skills and turning them into little side projects. Nothing is too small to make or too weird to try.",
+        "From a travel calendar that doubles as postcard, to crocheting fingerless gloves (because ten fingers is too many). I love picking up random skills and turning them into little side projects. Nothing is too small to make or too weird to try.",
       illustration: "tinkering" as OutsideWorkIllustration,
     },
   ],

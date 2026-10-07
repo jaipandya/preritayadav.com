@@ -141,19 +141,20 @@ One sans family plus one mono, both self-hosted through `next/font` (removes the
 - Mono: **Geist Mono** (400) for section labels, years, metadata.
 - Drop Libre Baskerville and Manrope from the rendered site.
 
-Scale (same numbers as the reference, they are good):
+Scale (the reference numbers raised by 1 to 2px after a readability review: 15px body and 13px labels were too small on a laptop and a phone):
 
 | Token | Size / lh / tracking / weight |
 | --- | --- |
-| `display` (home name) | 42px (33 mobile) / 1.05 / -0.035em / 700 |
-| `title` (case study h1) | 28px / 1.25 / -0.03em / 700 |
-| `lede` | 19px / 1.55 / 0 / 500 |
-| `body` | 15px / 1.7 / 0 / 400 |
-| `row-title` | 16px / 1.5 / 0 / 500 |
-| `row-sub` | 14px / 1.5 / 0 / 400 |
-| `small` | 13px / 1.5 / 0 / 400 |
-| `label` (mono) | 13px / 1.5 / -0.025em / 400 |
-| `micro` (mono, years) | 12px / 1.5 / 0 / 400 |
+| `display` (home name) | 48px (36 mobile) / 1.05 / -0.035em / 700 |
+| `title` (case study h1) | 32px / 1.25 / -0.03em / 700 |
+| `lede` | 21px / 1.55 / 0 / 500 |
+| `intro` (home subtitle) | 18px / 1.5 / 0 / 400 |
+| `body` | 17px / 1.7 / 0 / 400 (list items 16px) |
+| `row-title` | 17px / 1.5 / 0 / 500 |
+| `row-sub` | 15px / 1.5 / 0 / 400 |
+| `small` | 15px / 1.5 / 0 / 400 |
+| `label` (mono) | 14px / 1.5 / -0.025em / 400 |
+| `micro` (mono, years) | 13px / 1.5 / 0 / 400 |
 | `badge` | 11px / 1 / 0 / 500 |
 
 Rules: no uppercase transforms, no letter-spacing on body, no italics (the About outro is `lede`). `text-wrap: balance` on h1 and lede, `text-wrap: pretty` on body. `font-variant-numeric: tabular-nums` on years.
@@ -205,7 +206,7 @@ Featured work                  section label               landing.featuredWorkH
 [mark] Fitpass  Partner App..                              work.<slug>.company, work.<slug>.title
        Turning a fragmented...                             work.<slug>.tagline
 ...
-View all work →                row, 14px #737373           landing.viewAllWorkLabel
+View all work →                row, 15px #737373           landing.viewAllWorkLabel
 
 Writing & ideas                section label               landing.blogHeading
 Hatch Conference 2023   ↗      row, title + description    landing.blogPosts.<i>.title / .description
@@ -217,19 +218,19 @@ Teams I have worked with       section label               landing.teamsWorkedWi
 [logo] [logo] [logo] ...       8 logos, 24px, grayscale    (plain lib import)
 
 Let's build something great.   lede                        landing.footerClosing
-Say hello                      row, 14px                   landing.footerCta.label
+[ Say hello → ]                dark button, 16/500         landing.footerCta.label
 ```
 
 - Hero: `Hello!` and `I'm Prerita.` are two fields today. The greeting renders as a small mono line above the name, so both stay editable. The name is the page `h1`. `<title>` and metadata stay as they are.
 - Home loses: hero illustration, testimonial ("Kind words", decision 1), design principles, skills strip. None of these is editable on the WIP canvas (no keys), so no override is lost; they stay in `lib/landingContent.ts` for the canvas and the sr-only HTML.
-- Outside work: three text rows (title 16/500, subtitle 14/`#666`). Their text has no content keys (not editable on canvas), so they import straight from `lib/landingContent.ts`. The long `description` is not shown.
+- Outside work: three items, each with its number (mono, `#737373`), title (17/500), subtitle (15/`#666`) and the full `description` (16/1.65, `#666`), the same text as the WIP card. The order follows `lib/landingContent.ts` (travel, mentoring, tinkering). Their text has no content keys (not editable on canvas), so they import straight from that module. The wobbly illustrations belong to the sketch and are not shown.
 - Teams (`components/rendered/TeamLogos.tsx`): a fixed 4 by 2 grid, left aligned, so eight logos fill it exactly with no orphan row. Logos are sized by visual weight, not by one height: height shrinks with the square root of the aspect ratio (clamped 12 to 22px), so a wide wordmark and a square icon take up about the same area. One ink: `grayscale(1) brightness(.7) contrast(1.2)`, 60% opacity and `mix-blend-mode: multiply` (drops any white background). No hover state, because they are not links. Each logo has its intrinsic size in a map so nothing shifts while loading, and the company name is the `alt`. Source files are cropped marks in `public/logos/mark/`: taglines removed from Byju's and EMA, Fitpass as a wordmark, 10kdesigners as its lilac "10K" only (the rest of the wordmark is white, made for dark backgrounds), and zkAGI uses the dark mark in `logos/square/zkagi.png` because `logos/zkagi.svg` is all white. Crop boxes were measured from the real element bounds in a browser; the Next image cache keys on URL, so a changed file needs a new name.
 
 #### Work `/rendered/work`
 
 ```
 ← Back home                    13px #737373                workListing.backLabel
-Work                           h1 28/700                   workListing.title
+Work                           h1 32/700                   workListing.title
 Product design, UX...          16px #666                   workListing.subtitle
 
 [mark] Fitpass  Partner App Redesign                       workListing.cards.<slug> (else company + title)
@@ -251,7 +252,7 @@ Header (one block, mirrors the canvas order: back, company, title, tagline, Role
 ```
 ← Back to work                      13px #737373            work.<slug>.labels.back
 [44px mark]  Fitpass                13px #737373            work.<slug>.company
-             Partner App Redesign   h1 28/700               work.<slug>.title
+             Partner App Redesign   h1 32/700               work.<slug>.title
 Turning a fragmented...             lede 19/500             work.<slug>.tagline
 Role   Duration   Tools             mono label 12px         work.<slug>.labels.role / .duration / .tools
 Product Designer  6 months  Figma   14px #1a1a1a            work.<slug>.role / .duration / .tools
@@ -290,9 +291,9 @@ Other case study rules:
 
 #### About `/rendered/about`
 
-- h1 = `about.title` (28/700). Five paragraphs as `Prose` (15px, `#444`, 16px apart). Outro as `lede`. Footer text as body, then a row with `about.cta.label` ("Say hello", no arrow).
+- h1 = `about.title` (32/700). Five paragraphs as `Prose` (17px, `#444`, 16px apart). Outro as `lede`. Footer text as body, then a dark button (`.r-btn`, same as the home footer) with `about.cta.label` ("Say hello", arrow added by CSS).
 - The three scene illustrations are not shown (`illustrations` in `lib/aboutContent.ts` stays for the WIP canvas).
-- **Portrait** (decision 2): between the h1 and the first paragraph, one image inside the media tray at the top of the page, 16:12, `alt` describing it. It uses the existing illustrated portrait `public/rendered/generated/hero-notion-avatar.png` until a photo is supplied. The source path is a single constant in the About page so swapping to a real photo is a one-line change. The image is loaded with `priority` and explicit dimensions so there is no layout shift.
+- **Portrait** (decision 2): between the h1 and the first paragraph, one image inside the media tray at the top of the page, 16:12, `alt` describing it. It uses the existing illustrated portrait `public/rendered/generated/about-portrait.webp` (1000 by 750, about 44 KB, down from a 1.6 MB PNG that made the page wait) until a photo is supplied. The source path is a single constant in the About page so swapping to a real photo is a one-line change. The image is loaded with `priority` and explicit dimensions so there is no layout shift.
 
 #### Contact `/rendered/contact`
 
@@ -407,7 +408,7 @@ Answered after the first review of this doc.
 1. **Testimonial: dropped** from the rendered home page.
 2. **About gets a portrait** (see 3.7).
 3. **Nav and bar labels are not editable** (see 4.5).
-4. **Outside work stays on home** as three short text rows, because it is on the WIP home page too.
+4. **Outside work stays on home** as three items with their full text, because it is on the WIP home page too.
 5. **No serif.** Typography follows alexkehr.com and its project pages: one sans plus mono, no italics. The About outro is `lede`.
 6. **This file lives in `docs/`.**
 7. Dark mode is out of scope for this pass; the tokens make it a later addition.

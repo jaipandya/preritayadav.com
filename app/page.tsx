@@ -31,7 +31,7 @@ const featured = getFeaturedWork();
 
 export default function Home() {
   return (
-    <PageShell navLinks={navLinks} pageKey="landing-v3" onCreateLayout={createLandingLayout}>
+    <PageShell navLinks={navLinks} pageKey="landing-v4" onCreateLayout={createLandingLayout}>
       <header>
         <p>{hero.greeting}</p>
         <h1>{hero.name}</h1>

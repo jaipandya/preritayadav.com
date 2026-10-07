@@ -28,7 +28,7 @@ const BUILD_LINES: Array<{ text: string; delay: number }> = [
   { text: "  ✓ Hero: greeting, name, two-line subtitle", delay: 280 },
   { text: "  ✓ Featured work: 3 projects, each linked to its case study", delay: 320 },
   { text: "  ✓ Writing: 5 posts with external links", delay: 300 },
-  { text: "  ✓ Outside work: mentoring, travel, tinkering", delay: 280 },
+  { text: "  ✓ Outside work: travel, mentoring, tinkering", delay: 280 },
   { text: "  ✓ Teams: 8 companies, shown as a quiet grid of logos", delay: 240 },
   { text: "  ✓ Closing line and a way to get in touch", delay: 260 },
   { text: "", delay: 600 },
@@ -392,6 +392,7 @@ export function BuildOverlay({
           .build-card {
             height: 100%;
             max-height: 420px;
+            color-scheme: dark;
           }
           .build-actions {
             flex-shrink: 0;
@@ -446,7 +447,8 @@ export function BuildOverlay({
             .build-btn { min-height: 44px; font-size: 14px; }
             .build-btn-primary { order: 1; }
             .build-btn-ghost { order: 2; margin-left: 0; }
-            @keyframes blink {
+          }
+          @keyframes blink {
             50% { opacity: 0; }
           }
           .build-terminal-scroll::-webkit-scrollbar {

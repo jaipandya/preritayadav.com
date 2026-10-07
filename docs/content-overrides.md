@@ -209,7 +209,7 @@ Verified in a browser by sampling every frame, on a hard load (rendered page in 
 Saved canvases only get bindings (and new shapes) when they are created, so every page that has bindings carries a layout version in its page key:
 
 - Work items: `layoutVersion` in `lib/workData.ts` (page key `work-<slug>-v<n>`).
-- Static pages: `landing-v3`, `about-v3`, `contact-v3`, `work-listing-v3` (set in each `app/**/page.tsx`).
+- Static pages: `landing-v4`, `about-v3`, `contact-v3`, `work-listing-v3` (set in each `app/**/page.tsx`).
 
 **When a layout creator changes shape structure, bump that page's version** (and bind any new text). Otherwise users keep their old canvas and the new shapes never appear. `useCanvasPersistence` deletes saved canvases of older versions of the same page on load, so Build never merges text from two different layouts.
 

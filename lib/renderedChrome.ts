@@ -20,8 +20,8 @@ export const skipToContentLabel = "Skip to content";
 export const renderedCaseStudyNavLabel = "More case studies";
 
 export const aboutPortrait = {
-  src: "/rendered/generated/hero-notion-avatar.png",
-  width: 1448,
-  height: 1086,
+  src: "/rendered/generated/about-portrait.webp",
+  width: 1000,
+  height: 750,
   alt: "Illustration of Prerita sketching wireframes at her desk",
 };

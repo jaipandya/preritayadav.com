@@ -51,11 +51,9 @@ export default function RenderedAboutPage() {
         <p className="r-sub">
           <Content k="about.footerText" fallback={aboutFooterText} />
         </p>
-        <div className="r-rows" style={{ marginTop: 8 }}>
-          <Link href="/rendered/contact" className="r-row">
-            <span className="r-row-plain">
-              <Content k="about.cta.label" fallback={aboutCta.label} />
-            </span>
+        <div className="r-btn-wrap">
+          <Link href="/rendered/contact" className="r-btn">
+            <Content k="about.cta.label" fallback={aboutCta.label} />
           </Link>
         </div>
       </footer>
