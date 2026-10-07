@@ -2,6 +2,7 @@
 
 import { useContent, useContentList, useContentOverrides } from "@/lib/useContentOverrides";
 import { contentKey } from "@/lib/contentOverrides";
+import { CopyButton } from "./CopyButton";
 
 /**
  * Client leaves for every piece of content text on the rendered site. The page itself stays a server
@@ -70,16 +71,20 @@ export function ContentLines({
   );
 }
 
-/** Email as a contact row: a leading tile (passed as children), the address, and a mailto link, all from the same (possibly overridden) value. */
+/** Email as a contact row: a leading tile (passed as children), the address, a mailto link and a copy button, all from the same (possibly overridden) value. */
 export function ContentEmailRow({ k, fallback, children }: { k: string; fallback: string; children?: React.ReactNode }) {
   const email = useContent(k, fallback);
   return (
-    <a href={`mailto:${email}`} className="r-row">
-      <span className="r-row-lead">
-        {children}
-        <span className="r-row-title">{email}</span>
-      </span>
-    </a>
+    <div className="r-row-wrap">
+      <a href={`mailto:${email}`} className="r-row">
+        <span className="r-row-lead">
+          {children}
+          <span className="r-row-title">{email}</span>
+        </span>
+      </a>
+      {/* A sibling of the link, not inside it: a button cannot live in an anchor. */}
+      <CopyButton text={email} />
+    </div>
   );
 }
 

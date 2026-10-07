@@ -476,6 +476,156 @@ a.r-row:hover .r-ext { color: var(--r-muted); }
 .r-skip:focus { transform: none; outline: 2px solid var(--r-text); outline-offset: 2px; }
 .rendered-root a.r-skip { color: #fff; }
 
+/* ---------- MOTION ----------
+ * Each rule says what the motion tells the visitor. Only transform and opacity move (the nav dot is the one
+ * exception: it slides with a transform too). Hover effects are gated on (hover: hover) so touch screens never
+ * get a stuck hover state. Everything that moves sits under prefers-reduced-motion: no-preference.
+ */
+.rendered-root { --r-ease: cubic-bezier(0.23, 1, 0.32, 1); }
+
+/* Press feedback: the surface answers the finger before the page changes. Not gated on hover so touch gets it. */
+a.r-row { transition: background-color 150ms ease, transform 120ms var(--r-ease); }
+a.r-row:active { background: #f3f3f3; }
+.r-bar-link, .r-bar-icon { transition: color 150ms ease, transform 120ms var(--r-ease); }
+.r-bar-link:active, .r-bar-icon:active { transform: scale(0.96); }
+@media (prefers-reduced-motion: no-preference) {
+  a.r-row:active { transform: scale(0.99); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* A new page arrives: its blocks settle in from just below, top to bottom. Tells you the route changed and
+     which way to read. 360ms in total, played once per navigation (app/rendered/template.tsx remounts the page).
+     "backwards" fill, never "both": a transform left on .r-col would turn position: fixed children into relative ones. */
+  .r-col > :not(.r-float-back) { animation: r-enter 360ms var(--r-ease) backwards; }
+  .r-col > :nth-child(3) { animation-delay: 40ms; }
+  .r-col > :nth-child(4) { animation-delay: 80ms; }
+  .r-col > :nth-child(5) { animation-delay: 120ms; }
+  .r-col > :nth-child(n + 6) { animation-delay: 150ms; }
+}
+@keyframes r-enter {
+  from { opacity: 0; transform: translateY(8px); }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  /* Internal links grow an arrow on hover, so the pair "arrow in a row" means "opens another page here"
+     and the corner arrow (below) means "leaves the site". Links to /rendered pages only (not mailto, not external). */
+  a.r-row[href^="/rendered"]::after {
+    content: "\2192" / "";
+    flex: none;
+    font-size: 15px;
+    color: var(--r-muted);
+    opacity: 0;
+  }
+  a.r-row[href^="/rendered"]:hover::after,
+  a.r-row[href^="/rendered"]:focus-visible::after { opacity: 1; }
+
+  .r-ext-icon { transition: transform 150ms var(--r-ease); }
+  a.r-row:hover .r-ext-icon,
+  .r-bar-cta:hover .r-ext-icon { transform: translate(1px, -1px); }
+
+  .r-back:hover { transform: translateX(-2px); }
+  .r-float-back:hover svg { transform: translateX(-2px); }
+
+  /* The sketch switch is a pencil: it tilts like it is about to draw. */
+  .r-bar-pencil:hover svg { transform: rotate(-14deg); }
+
+  /* Screenshots open full size in a new tab: lift a little so they read as clickable. */
+  .r-tray a { cursor: zoom-in; }
+  .r-tray a:hover img { transform: translateY(-2px); box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1), 0 6px 18px rgba(0, 0, 0, 0.07); }
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  a.r-row[href^="/rendered"]::after { transform: translateX(-6px); transition: opacity 150ms ease, transform 200ms var(--r-ease); }
+  a.r-row[href^="/rendered"]:hover::after,
+  a.r-row[href^="/rendered"]:focus-visible::after { transform: none; }
+}
+.r-back { transition: color 150ms ease, transform 200ms var(--r-ease); }
+.r-bar-pencil svg { transform-origin: 20% 85%; transition: transform 200ms var(--r-ease); }
+.r-float-back svg { transition: transform 200ms var(--r-ease); }
+.r-tray a img { transition: transform 200ms var(--r-ease), box-shadow 200ms ease; }
+
+/* The back button slides in from the edge it points to, in step with its fade. */
+@media (prefers-reduced-motion: no-preference) {
+  .r-float-back { transform: translateX(-8px); transition: opacity 200ms ease, transform 200ms var(--r-ease), visibility 0s linear 200ms, color 150ms ease; }
+  .r-float-back[data-visible="true"] { transform: none; }
+}
+
+/* The dot under the current page link glides to the next one when you navigate, so you see where you went. */
+.r-bar-group { position: relative; }
+.r-bar-dot {
+  position: absolute;
+  left: 0;
+  bottom: 5px;
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--r-text);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(var(--dot-x, 0px));
+}
+.r-bar-dot[data-on="true"] { opacity: 1; }
+@media (prefers-reduced-motion: no-preference) {
+  .r-bar-dot[data-ready="true"] { transition: transform 280ms var(--r-ease), opacity 150ms ease; }
+}
+
+/* Painted thumbnails bleed in as they scroll into view, like a wash drying. Browsers without scroll timelines
+   show them as they are. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .r-item-thumb {
+      animation: r-bleed linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 100%;
+    }
+  }
+}
+@keyframes r-bleed {
+  from { opacity: 0; filter: blur(6px); transform: scale(0.96); }
+}
+
+/* ---------- COPY EMAIL ---------- */
+.r-row-wrap { position: relative; }
+.r-row-wrap > .r-row { padding-right: 44px; }
+.r-copy {
+  position: absolute;
+  top: 50%;
+  right: -17px;
+  width: 44px;
+  height: 44px;
+  margin-top: -22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: var(--r-muted);
+  cursor: pointer;
+  transition: color 150ms ease, transform 120ms var(--r-ease);
+}
+.r-copy:active { transform: scale(0.94); }
+.r-copy[data-copied="true"] { color: var(--r-text); }
+.r-copy-icons { position: relative; width: 16px; height: 16px; }
+.r-copy-icons svg { position: absolute; inset: 0; }
+.r-copy-check { opacity: 0; }
+.r-copy[data-copied="true"] .r-copy-check { opacity: 1; }
+.r-copy[data-copied="true"] .r-copy-clip { opacity: 0; }
+@media (hover: hover) and (pointer: fine) {
+  .r-copy:hover { color: var(--r-text); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .r-copy-icons svg { transition: opacity 150ms ease, transform 200ms var(--r-ease); }
+  .r-copy-check { transform: scale(0.6); }
+  .r-copy-clip { transform: none; }
+  .r-copy[data-copied="true"] .r-copy-check { transform: none; }
+  .r-copy[data-copied="true"] .r-copy-clip { transform: scale(0.6); }
+}
+
+/* ---------- PORTRAIT ---------- */
+/* A watercolor that fades into the page, like the outside work thumbnails: no box. */
+.r-portrait { margin: 24px -12px 0; }
+.r-portrait img { width: 100%; height: auto; }
+
 /* A field erased on the WIP canvas renders as empty text: hide the element instead of leaving a gap. */
 .rendered-root :is(h1, h2, h3, h4, p, a):empty {
   display: none;

@@ -186,7 +186,7 @@ const abhiloans: WorkItem = {
 const ema: WorkItem = {
   slug: "ema-persona-chatbot",
   number: "03",
-  title: "Ema Personas & Chatbot Builder",
+  title: "Personas & Chatbot Builder",
   tagline:
     "Designing a system for configuring, managing and using reusable AI-powered workflows across an organisation",
   company: "Ema",

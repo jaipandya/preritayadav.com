@@ -293,7 +293,7 @@ Other case study rules:
 
 - h1 = `about.title` (32/700). Five paragraphs as `Prose` (17px, `#444`, 16px apart). Outro as `lede`. Footer text as body, then a dark button (`.r-btn`, same as the home footer and the contact link ending the work list and each case study) with `about.cta.label` ("Say hello", arrow added by CSS).
 - The three scene illustrations are not shown (`illustrations` in `lib/aboutContent.ts` stays for the WIP canvas).
-- **Portrait** (decision 2): between the h1 and the first paragraph, one image inside the media tray at the top of the page, 16:12, `alt` describing it. It uses the existing illustrated portrait `public/rendered/generated/about-portrait.webp` (1000 by 750, about 44 KB, down from a 1.6 MB PNG that made the page wait) until a photo is supplied. The source path is a single constant in the About page so swapping to a real photo is a one-line change. The image is loaded with `priority`, explicit dimensions (no layout shift) and a 20 by 15 blur placeholder (`aboutPortrait.blurDataURL`).
+- **Portrait** (decision 2): between the h1 and the first paragraph, one image at the top of the page, 4:3, `alt` describing it, no tray and no box. It is a watercolor version of the illustrated portrait (`public/rendered/generated/about-portrait-watercolor.webp`, 1000 by 750), painted by `scripts/watercolor-portrait.py` from `scripts/source/about-portrait-original.webp` in the same style as the outside work thumbnails: it fades into the white page. Rerunning the script is deterministic. The file name changes when the art changes, because optimized images are cached by URL. The source path is the `aboutPortrait` constant in `lib/renderedChrome.ts`, so swapping to a real photo is a one-line change. The image is loaded with `priority`, explicit dimensions (no layout shift) and a 20 by 15 blur placeholder (`aboutPortrait.blurDataURL`).
 
 #### Contact `/rendered/contact`
 
@@ -301,10 +301,21 @@ Other case study rules:
 
 ### 3.8 Motion and interaction
 
-- Row hover: background to `#fafafa`, 150ms ease. Link text color change 150ms.
-- Page load: no stagger. One optional 200ms opacity fade of the whole `data-content-gate` wrapper, `@media (prefers-reduced-motion: no-preference)` only, and it must not conflict with the ContentGate (the gate only toggles `visibility`).
-- Floating back button: fade in at 200ms after 200px scroll.
-- No scroll-triggered entrances. Remove `motion/react` from the rendered tree. Pages become server components (smaller bundle, content in HTML at first byte).
+Motion is CSS only (no animation library), uses only `transform` and `opacity`, sits under `prefers-reduced-motion: no-preference`, and hover effects are gated on `(hover: hover) and (pointer: fine)`. Every effect says something; if it does not, it is not here. All rules live in the MOTION section of `rendered.css`. Easing is `--r-ease` (ease-out quint), durations 120 to 360ms.
+
+| Where | What moves | What it tells you |
+| --- | --- | --- |
+| Page change | Blocks settle in from 8px below, 360ms, small stagger. `app/rendered/template.tsx` remounts the page on every navigation | The route changed, and which way to read |
+| Rows | Background to `#fafafa` on hover, `#f3f3f3` and `scale(0.99)` on press. Internal links slide in a `→` on hover | The row is a link to another page here |
+| External links | The corner arrow nudges up and right on hover | This leaves the site |
+| Floating bar | A dot under the current page link glides between links. Press scales to 0.96. The pencil tilts on hover | Where you are, and that the pencil draws |
+| Back links | Inline back link nudges left, the floating back button slides in from the left | The direction of "back" |
+| Screenshots | Lift 2px on hover, `zoom-in` cursor | Opens full size |
+| Copy email | Clipboard icon turns into a check for 1.8s, announced through a live region. Nothing shows as copied if the browser refuses the write | The address is on your clipboard |
+| Outside work thumbnails | Bleed in (opacity, blur 6px to 0, scale 0.96 to 1) as they scroll into view, via `animation-timeline: view()`; browsers without it show them as they are | Watercolor drying; the one decorative element gets the one scroll effect |
+| Content gate | Spinner after 200ms, static under reduced motion (unchanged) | Overrides are loading |
+
+Not animated on purpose: keyboard focus, text, logos, the About portrait (it is above the fold and already has a blur placeholder).
 
 ### 3.9 Accessibility
 

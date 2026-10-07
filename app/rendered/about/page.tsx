@@ -23,17 +23,16 @@ export default function RenderedAboutPage() {
         </h1>
       </header>
 
-      <figure className="r-tray" style={{ marginTop: 32 }}>
+      <figure className="r-portrait">
         <Image
           src={aboutPortrait.src}
           alt={aboutPortrait.alt}
           width={aboutPortrait.width}
           height={aboutPortrait.height}
-          sizes="(max-width: 540px) calc(100vw - 80px), 460px"
+          sizes="(max-width: 540px) calc(100vw - 48px), 516px"
           priority
           placeholder="blur"
           blurDataURL={aboutPortrait.blurDataURL}
-          style={{ width: "100%", height: "auto" }}
         />
       </figure>
 
