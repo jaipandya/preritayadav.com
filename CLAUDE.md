@@ -62,7 +62,7 @@ The canvas site is the one search engines index; `/rendered/*`, `/md/*`, `/blog/
 - A page or route is added, removed, renamed or moved (including route groups like `app/(home)` and `app/work/(listing)`): its `pageMetadata` and canonical path, `opengraph-image.tsx`, `app/sitemap.ts` entry and the JSON-LD for it (`Person` in the root layout, `ProfilePage` on `/about`, `ItemList` on `/work`, `CreativeWork` and `BreadcrumbList` on case studies).
 - Work data changes: a case study is added, archived or has its slug, title, tagline or `atAGlanceImages` changed. The sitemap, the case study JSON-LD (`workImageUrls` in `lib/seo.ts`) and the `/work` `ItemList` read from `workData.ts`. `dynamicParams = false` means a new slug only exists through `generateStaticParams`.
 - The page shell or the sr-only article changes: crawlers read that HTML, so it must still hold the page's `h1`, headings and text from the content modules.
-- Robots, hosts or the rendered site change: `/rendered/*` stays `noindex, follow` with no canonical, and `proxy.ts` keeps non-main hosts out.
+- Robots, hosts or the rendered site change: `/rendered/*` stays `noindex, follow` with no canonical, and the `headers()` rule in `next.config.ts` keeps non-main hosts out (a domain change means editing `INDEXABLE_HOSTS` there). There is no `proxy.ts`: it ran a function on every request. `.md` URLs are a `rewrites()` rule in the same file. Do not add per-request code (proxy, dynamic route handlers) when a config rule or a `force-static` route will do.
 - After such a change, run `bun run build && bun run start` and check the canonical, JSON-LD, `/sitemap.xml` and a bad URL (it must return 404).
 
 ### Component decomposition

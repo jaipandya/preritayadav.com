@@ -2,7 +2,7 @@
 
 ## Which version is indexed
 
-The canvas site (`/`, `/work`, `/work/<slug>`, `/about`, `/contact`) is the primary version and the only one search engines index. The rendered site (`/rendered/*`) is `noindex, follow` so the two never compete as duplicates. `/md/*` (plain text copies) send `X-Robots-Tag: noindex`. `/blog/*` (placeholders) and `/meta/*` (internal reference pages) are `noindex`.
+The canvas site (`/`, `/work`, `/work/<slug>`, `/about`, `/contact`) is the primary version and the only one search engines index. The rendered site (`/rendered/*`) is `noindex, follow` so the two never compete as duplicates. `/md/*` (plain text copies) send `X-Robots-Tag: noindex`. Any host other than `preritayadav.com`, `www.preritayadav.com` and localhost (a `*.vercel.app` preview, a draft subdomain) gets `X-Robots-Tag: noindex, nofollow` on every response, from the `headers()` rule in `next.config.ts` (`INDEXABLE_HOSTS`). Update that list if the domain changes. `/blog/*` (placeholders) and `/meta/*` (internal reference pages) are `noindex`.
 
 ## What each page has
 
