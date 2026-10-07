@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { pageMetadata, SITE_URL, SITE_NAME } from "@/lib/seo";
+import { JsonLd } from "@/components/JsonLd";
+import { pageMetadata, SITE_URL, SITE_NAME, workImageUrls } from "@/lib/seo";
 import { getWorkBySlug, workItems } from "@/lib/workData";
 
 export async function generateMetadata({
@@ -20,6 +21,9 @@ export async function generateMetadata({
     path: `/work/${item.slug}`,
   });
 }
+
+// Only the slugs from generateStaticParams exist. Anything else is a real 404, not a 200 "Project Not Found" page.
+export const dynamicParams = false;
 
 export async function generateStaticParams() {
   return workItems.map((item) => ({ slug: item.slug }));
@@ -46,7 +50,7 @@ export default async function WorkDetailLayout({
         name: `${item.title}, ${item.company}`,
         description: item.tagline,
         url,
-        image: `${url}/opengraph-image`,
+        image: [`${url}/opengraph-image`, ...workImageUrls(item)],
         creator: { "@type": "Person", name: SITE_NAME, url: SITE_URL },
         about: item.company,
       },
@@ -63,7 +67,7 @@ export default async function WorkDetailLayout({
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <JsonLd data={jsonLd} />
       {children}
     </>
   );

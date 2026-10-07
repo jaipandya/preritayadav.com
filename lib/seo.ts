@@ -36,3 +36,11 @@ export function pageMetadata({
     twitter: { card: "summary_large_image", title: shareTitle, description },
   };
 }
+
+/** Absolute URLs of the screenshots a case study shows on the canvas. They are shapes, not `<img>` tags, so the sitemap and JSON-LD are how search engines learn about them. */
+export function workImageUrls(item: { atAGlanceImages?: { src: string }[] }): string[] {
+  return (item.atAGlanceImages ?? []).map((image) => `${SITE_URL}${image.src}`);
+}
+
+/** A person's portrait for structured data. */
+export const PERSON_IMAGE = `${SITE_URL}/rendered/generated/about-portrait-watercolor.webp`;

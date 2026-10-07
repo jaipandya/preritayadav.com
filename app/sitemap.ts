@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { workItems } from "@/lib/workData";
+import { workImageUrls } from "@/lib/seo";
 
 const BASE = "https://preritayadav.com";
 
@@ -17,6 +18,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${BASE}/work/${item.slug}`,
       changeFrequency: "monthly" as const,
       priority: 0.8,
+      images: workImageUrls(item),
     }));
 
   return [...staticRoutes, ...workRoutes];

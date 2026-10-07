@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { Viewport } from "next";
+import { PERSON_IMAGE } from "@/lib/seo";
 import { ContentGateHead } from "@/components/content/ContentGateHead";
 import "./globals.css";
 
@@ -47,6 +48,7 @@ const jsonLd = {
   "@type": "Person",
   name: "Prerita Yadav",
   url: siteUrl,
+  image: PERSON_IMAGE,
   jobTitle: "Product Designer",
   description:
     "Product designer crafting intuitive, human-centered experiences for startups and enterprises.",

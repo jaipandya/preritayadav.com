@@ -9,7 +9,10 @@ The canvas site (`/`, `/work`, `/work/<slug>`, `/about`, `/contact`) is the prim
 - `lib/seo.ts` `pageMetadata({ title, description, path })` gives a page its canonical URL, Open Graph and Twitter text. Use it in every new page layout. A page that sets `openGraph` replaces the root layout's object (Next merges one level deep), which is why the helper repeats `url`, `siteName`, `type` and `locale`.
 - A share image from an `opengraph-image.tsx` next to the page, drawn with `OgTemplate` in `lib/ogTemplate.tsx` (1200x630). Next adds it to Open Graph and Twitter. Do not set `runtime = "edge"`: without it these are rendered once at build time and served as static files.
 - `app/sitemap.ts` lists the public pages (archived case studies are left out but stay reachable). `app/robots.ts` allows everything and points to the sitemap.
-- JSON-LD: `Person` on every page (root layout), `CreativeWork` and `BreadcrumbList` on case studies (`app/work/[slug]/layout.tsx`).
+- JSON-LD (render with `components/JsonLd.tsx`): `Person` with a portrait on every page (root layout), `ProfilePage` on `/about`, `ItemList` on `/work` (`app/work/(listing)/layout.tsx`, so it stays off case studies), `CreativeWork` and `BreadcrumbList` on case studies (`app/work/[slug]/layout.tsx`).
+- Case study screenshots are tldraw shapes, not `<img>` tags. They reach search engines through `images` in `app/sitemap.ts` and the `image` array of the `CreativeWork`, both from `workImageUrls` in `lib/seo.ts` (the `atAGlanceImages` of the case study).
+- The home page is a client component, so its canonical lives in `app/(home)/layout.tsx`. It is not in the root layout, or every page without its own metadata (rendered, blog) would inherit `/`.
+- `app/work/[slug]/layout.tsx` sets `dynamicParams = false`: an unknown slug is a real 404, not a 200 page.
 
 When adding a page: layout with `pageMetadata`, an `opengraph-image.tsx`, a sitemap entry, and check long titles in the image (the template shrinks the title above 22 and 40 characters, and the dashed rail sits under the URL).
 

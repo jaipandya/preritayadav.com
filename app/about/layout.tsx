@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { pageMetadata } from "@/lib/seo";
+import { JsonLd } from "@/components/JsonLd";
+import { PERSON_IMAGE, SITE_NAME, SITE_URL, pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
   title: "About",
@@ -13,5 +14,26 @@ export default function AboutLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  const url = `${SITE_URL}/about`;
+  return (
+    <>
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "ProfilePage",
+          "@id": `${url}#profile`,
+          url,
+          name: `About ${SITE_NAME}`,
+          mainEntity: {
+            "@type": "Person",
+            name: SITE_NAME,
+            url: SITE_URL,
+            image: PERSON_IMAGE,
+            jobTitle: "Product Designer",
+          },
+        }}
+      />
+      {children}
+    </>
+  );
 }
