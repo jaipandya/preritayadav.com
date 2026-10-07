@@ -630,3 +630,61 @@ a.r-row:active { background: #f3f3f3; }
 .rendered-root :is(h1, h2, h3, h4, p, a):empty {
   display: none;
 }
+
+/* ---------- BUILD GATE ----------
+ * Shown instead of the page until the fake build has run in this browser (components/rendered/BuildGate.tsx).
+ * The head script adds `build-pending` before paint. The page is display: none, not removed, so crawlers and
+ * the server HTML still get all of it. */
+.r-gate { display: none; }
+.build-pending .r-gate {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 48px 24px;
+}
+.build-pending .rendered-root > :not(.r-gate) { display: none; }
+
+.r-gate-card { width: 100%; max-width: var(--r-col); }
+.r-gate-title {
+  margin-top: 12px;
+  font-size: 28px;
+  line-height: 1.25;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--r-ink);
+  text-wrap: balance;
+}
+.r-gate-body { margin-top: 12px; font-size: 16px; line-height: 1.6; color: var(--r-body); text-wrap: pretty; }
+.r-gate-actions { margin-top: 28px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; }
+.rendered-root button.r-gate-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--r-text);
+  color: #fff;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  cursor: pointer;
+  transition: background-color 150ms ease, transform 150ms ease;
+}
+.rendered-root button.r-gate-btn:hover { background: var(--r-ink); }
+.rendered-root button.r-gate-btn:active { transform: scale(0.98); }
+.rendered-root button.r-gate-btn:focus-visible { outline-offset: 3px; border-radius: 12px; }
+.r-gate-link { font-size: 15px; color: var(--r-body); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--r-hair); }
+.r-gate-link:hover { color: var(--r-text); }
+.r-gate-progress { margin-top: 24px; height: 2px; background: var(--r-tile); border-radius: 1px; overflow: hidden; }
+.r-gate-progress > div { height: 100%; background: var(--r-text); transition: width 300ms ease-out; }
+@media (prefers-reduced-motion: no-preference) {
+  .build-pending .r-gate-card { animation: r-enter 360ms var(--r-ease) backwards; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rendered-root button.r-gate-btn, .r-gate-progress > div { transition: none; }
+}

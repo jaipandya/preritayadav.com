@@ -1,3 +1,4 @@
+import { BUILD_DONE_KEY } from "@/lib/buildFlag";
 import { CONTENT_OVERRIDES_KEY } from "@/lib/contentOverrides";
 
 // Server component on purpose: the style and script must be in the initial HTML, before React hydrates.
@@ -16,6 +17,11 @@ animation:content-gate-in .2s linear .2s forwards,content-gate-spin .7s linear i
 // Only on rendered pages, and only for browsers that have overrides. A hard load of any other page is untouched.
 const GATE_SCRIPT = `try{var p=location.pathname;if((p==="/rendered"||p.indexOf("/rendered/")===0)&&localStorage.getItem(${JSON.stringify(CONTENT_OVERRIDES_KEY)}))document.documentElement.classList.add("content-pending")}catch(e){}`;
 
+// The build gate (components/rendered/BuildGate.tsx): on rendered pages, add `build-pending` before paint unless the fake build has
+// run in this browser (localStorage). rendered.css does the hiding.
+// Its own try, so blocked storage cannot take the content gate down with it (and fails open: the page shows).
+const BUILD_GATE_SCRIPT = `try{var p=location.pathname;if((p==="/rendered"||p.indexOf("/rendered/")===0)&&localStorage.getItem(${JSON.stringify(BUILD_DONE_KEY)})!=="1")document.documentElement.classList.add("build-pending")}catch(e){}`;
+
 /**
  * Render once in the <head> of the root layout. It must not live in the rendered layout: that layout is created on the client
  * when you navigate from the WIP site, and React does not run (and warns about) scripts rendered on the client. See ContentGate.
@@ -24,7 +30,7 @@ export function ContentGateHead() {
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: GATE_CSS }} />
-      <script dangerouslySetInnerHTML={{ __html: GATE_SCRIPT }} />
+      <script dangerouslySetInnerHTML={{ __html: GATE_SCRIPT + BUILD_GATE_SCRIPT }} />
     </>
   );
 }

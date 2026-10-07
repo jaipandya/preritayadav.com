@@ -13,6 +13,17 @@ export const renderedNav = {
   sketchLabel: "Switch to sketch version",
 };
 
+/** The "not built yet" gate shown on /rendered until the fake build has run (components/rendered/BuildGate.tsx). */
+export const buildGate = {
+  label: "Not built yet",
+  title: "This page hasn’t been built yet.",
+  body: "The rendered site is generated from the sketch. Run the build to see this page.",
+  build: "Build it",
+  sketch: "Back to the sketch",
+  building: { title: "Building the rendered site.", show: "Show build output", progressLabel: "Build progress" },
+  ready: { title: "Your build is ready.", body: "The rendered site is waiting.", open: "Open the page" },
+};
+
 /** Accessible text added to links that open another site or a new tab. */
 export const newTabLabel = "opens in a new tab";
 export const skipToContentLabel = "Skip to content";

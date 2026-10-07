@@ -372,6 +372,19 @@ The floating bar sits outside `ContentGate` (it holds no content text).
 
 Spinner (names `content-pending` and `data-content-gate` kept): 20px ring, 1.5px border `#1a1a1a` at 20% with the leading edge `#1a1a1a`, centered, fades in after 200ms, 700ms linear spin, static under `prefers-reduced-motion`.
 
+### 4.6 Build gate ("not built yet")
+
+The rendered site is the result of the fake build, so `/rendered/*` shows a gate instead of the page until the build has run in this browser. Code: `components/rendered/BuildGate.tsx` (mounted in `app/rendered/layout.tsx`), `lib/buildFlag.ts`, the head script in `components/content/ContentGateHead.tsx`, `.r-gate*` and `.build-pending` in `rendered.css`, copy in `buildGate` in `lib/renderedChrome.ts`.
+
+- **Flag:** `prerita-build-done` in **localStorage** (not sessionStorage), so a new tab, a cmd-click on "Visit rendered page", a shared link opened in the same browser and later visits all count as built. It also makes repeat builds use the "cached" log across visits. A `storage` event keeps open tabs in sync. If storage throws, a memory fallback lets the build open the page on that page view. To see the gate again, delete the key in devtools.
+- **No skip:** there is deliberately no way to skip the build. The site "does not exist" until it has run. The gate offers "Build it" and "Back to the sketch" (the same page on the canvas).
+- **No redirect:** the gate stands in on the requested URL, so deep links such as `/rendered/work/<slug>` keep working once built.
+- **No flash:** the head script adds `build-pending` to `<html>` before paint on `/rendered*` when the flag is missing. CSS then hides everything in `.rendered-root` except `.r-gate` (`display: none`, so it is out of the accessibility tree and adds no scroll height). `BuildGate` keeps the class in step afterwards by reading browser state directly, because during hydration a hook would return the server answer and drop the class for a frame.
+- **Server HTML stays the full page.** The gate markup is always in the HTML and hidden by CSS unless `build-pending` is set. No hydration mismatch, and the page is `noindex` anyway.
+- **Building in place:** "Build it" runs `runBuild` (shared with the canvas Build button) with `BuildOverlayHost` mounted inside the gate. On a `/rendered` path "Visit rendered page" does not navigate (it would give `/rendered/rendered/...`): it ends the session, and since the flag is set the page is revealed in place and focus moves to `#main`. The gate stays up until the modal is dismissed, so the page does not appear behind the "Ready" modal.
+- **Background builds:** with the modal hidden the gate shows progress and "Show build output", then "Your build is ready" with "Open the page".
+- The fake build log needs no change: it names no gate component.
+
 ### 4.4 New copy
 
 Target: none. The design reuses existing fields. If a later decision adds copy (for example a kept testimonial, or editable nav labels), it goes in the matching `lib/*Content.ts`, gets a key in `docs/content-overrides.md` and a binding in the layout creator, and bumps that page's layout version (brief item 8).

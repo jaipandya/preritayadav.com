@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from "react";
+import { isBuilt, markBuilt } from "@/lib/buildFlag";
 
 /**
  * The fake build, kept outside React so it keeps running while the modal is hidden and while the visitor
@@ -19,7 +20,6 @@ export type BuildSnapshot = {
 };
 
 const IDLE: BuildSnapshot = { phase: "idle", open: false, lines: [], progress: 0, cached: false };
-const BUILD_DONE_KEY = "prerita-build-done";
 
 let snapshot: BuildSnapshot = IDLE;
 let timers: ReturnType<typeof setTimeout>[] = [];
@@ -76,21 +76,14 @@ export function startBuild(source: BuildLine[], cached: boolean, from: HTMLEleme
       progress: Math.min(((i + 1) / source.length) * 100, 100),
     });
     if (i === source.length - 1) {
-      if (!cached) {
-        try { sessionStorage.setItem(BUILD_DONE_KEY, "1"); } catch {}
-      }
+      if (!cached) markBuilt();
       update({ phase: "done" });
     }
   });
 }
 
-export function wasBuiltBefore(): boolean {
-  try {
-    return sessionStorage.getItem(BUILD_DONE_KEY) === "1";
-  } catch {
-    return false;
-  }
-}
+/** A build has finished in this browser before (kept in localStorage, see `lib/buildFlag.ts`). */
+export const wasBuiltBefore = isBuilt;
 
 /** Cancels the queued build lines and plays `stopLines`, then ends in "stopped". */
 export function stopBuild(stopLines: BuildLine[]) {

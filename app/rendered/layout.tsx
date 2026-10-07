@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { BuildGate } from "@/components/rendered/BuildGate";
 import { ContentGate } from "@/components/content/ContentGate";
 import { FloatingBar } from "@/components/rendered/FloatingBar";
 import { skipToContentLabel } from "@/lib/renderedChrome";
@@ -29,6 +30,8 @@ export default function RenderedLayout({
       <a href="#main" className="r-skip">
         {skipToContentLabel}
       </a>
+      {/* Hidden by CSS unless the fake build has not run yet. It hides everything else while it is up. */}
+      <BuildGate />
       {/* Before the content in the DOM, so keyboard and screen reader order matches the visual order on desktop. */}
       <FloatingBar />
       <ContentGate>

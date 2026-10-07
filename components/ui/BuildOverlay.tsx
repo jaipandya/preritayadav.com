@@ -3,6 +3,7 @@
 import { useEffect, useRef, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { commitOverridesFromCanvases } from "@/lib/contentOverrides";
+import { buildGate } from "@/lib/renderedChrome";
 import {
   dismissBuild,
   getSnapshot,
@@ -539,8 +540,19 @@ function BuildOverlay({
   );
 }
 
+/** Starts a build, or brings the running one back. Used by the Build button and by the gate on /rendered. */
+export function runBuild(from: HTMLElement | null) {
+  if (getSnapshot().phase !== "idle") {
+    openBuild(from);
+    return;
+  }
+  commitOverridesFromCanvases();
+  const cached = wasBuiltBefore();
+  startBuild(cached ? CACHED_LINES : BUILD_LINES, cached, from);
+}
+
 /**
- * Mounted once per page (in BrowserChrome), because the desktop and phone Build buttons both exist in the DOM.
+ * Mounted once per page (in BrowserChrome, and in the gate on /rendered), because the desktop and phone Build buttons both exist in the DOM.
  * Shows the modal while the session is open and keeps the page's side effects (body class, focus, announcements).
  */
 export function BuildOverlayHost() {
@@ -548,6 +560,7 @@ export function BuildOverlayHost() {
   const pathname = usePathname();
   const snap = useBuildSession();
   const wasOpen = useRef(false);
+  const onRendered = pathname === "/rendered" || pathname.startsWith("/rendered/");
 
   // Hides toolbars and the Build button while the modal is up, and gives them back when it is hidden.
   useEffect(() => {
@@ -570,14 +583,18 @@ export function BuildOverlayHost() {
     commitOverridesFromCanvases();
     // End the session first, or the modal would be waiting open when the visitor comes back to the sketch.
     dismissBuild();
+    // Already on /rendered (the gate): the flag is set, so ending the session reveals the page in place.
+    if (onRendered) return;
     router.push(`/rendered${pathname === "/" ? "" : pathname}`);
-  }, [router, pathname]);
+  }, [router, pathname, onRendered]);
 
   // A build that ends while the modal is hidden is announced, since nothing else on screen is read out.
   const announcement = snap.open
     ? ""
     : snap.phase === "done"
-    ? "Build ready. Use the Build button to view it."
+    ? onRendered
+      ? `Build ready. Use the ${buildGate.ready.open} button to view it.`
+      : "Build ready. Use the Build button to view it."
     : snap.phase === "stopped"
     ? "Build stopped."
     : "";
@@ -656,19 +673,7 @@ export function BuildButton({
   const idle = phase === "idle";
   const busy = phase === "running" || phase === "stopping";
 
-  const handleClick = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement>) => {
-      const from = e.currentTarget;
-      if (getSnapshot().phase !== "idle") {
-        openBuild(from);
-        return;
-      }
-      commitOverridesFromCanvases();
-      const cached = wasBuiltBefore();
-      startBuild(cached ? CACHED_LINES : BUILD_LINES, cached, from);
-    },
-    [],
-  );
+  const handleClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => runBuild(e.currentTarget), []);
 
   const iconSize = variant === "floating" ? 14 : 12;
 
