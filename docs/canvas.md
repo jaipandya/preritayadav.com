@@ -18,7 +18,7 @@ Layers 1 and 3 do not take pointer events (except the edited shape), so every pr
 
 | File | What it does |
 |---|---|
-| `lib/canvas/engine.ts` | `SiteEngine`, a subclass of Quickdraw's `Editor`. Teaches it the custom shapes (hit testing, resizing, stacking under the canvas), double click and Enter to edit, the browse tool, blocked tool shortcuts, a transparent background and a gentler Ctrl+wheel zoom. Its `_` methods override Quickdraw internals: check them when upgrading Quickdraw. |
+| `lib/canvas/engine.ts` | `SiteEngine`, a subclass of Quickdraw's `Editor`. Teaches it the custom shapes (hit testing, resizing, stacking under the canvas), double click, Enter or a text tool click to edit, the browse tool, blocked tool shortcuts, a transparent background and a gentler Ctrl+wheel zoom. Its `_` methods override Quickdraw internals: check them when upgrading Quickdraw. |
 | `lib/canvas/editor.ts` | `Editor`, the API the rest of the site uses (`createShape`, `updateShape`, `getShapesAtPoint`, `setCurrentTool`, `setEditingShape`, `setCamera`, `on("event")`, ...). Method names follow the old tldraw API, so layout creators did not change. |
 | `lib/canvas/ShapeUtil.ts` | `ShapeUtil` base class, `Rectangle2d`, `resizeBox` and the `T` prop validators for custom shapes. |
 | `lib/canvas/react.tsx` | `useEditor`, `useEditorValue`, `useIsEditing`, `track` and `HTMLContainer`. |
