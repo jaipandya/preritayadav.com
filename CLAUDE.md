@@ -58,6 +58,13 @@ Update it when a change to `/rendered` (or the content it reads) makes a line wr
 
 The canvas site is the one search engines index; `/rendered/*`, `/md/*`, `/blog/*` and `/meta/*` are `noindex`. Every new public page needs a layout using `pageMetadata` from `lib/seo.ts`, an `opengraph-image.tsx` (no `runtime = "edge"`), and a `app/sitemap.ts` entry. Details and the Search Console steps are in `docs/seo.md`.
 
+**Keep SEO in sync with structure.** SEO depends on routes, layouts and content shapes, so when you change any of them, update the SEO pieces in the same change and `docs/seo.md` if the description is now wrong. Check these:
+- A page or route is added, removed, renamed or moved (including route groups like `app/(home)` and `app/work/(listing)`): its `pageMetadata` and canonical path, `opengraph-image.tsx`, `app/sitemap.ts` entry and the JSON-LD for it (`Person` in the root layout, `ProfilePage` on `/about`, `ItemList` on `/work`, `CreativeWork` and `BreadcrumbList` on case studies).
+- Work data changes: a case study is added, archived or has its slug, title, tagline or `atAGlanceImages` changed. The sitemap, the case study JSON-LD (`workImageUrls` in `lib/seo.ts`) and the `/work` `ItemList` read from `workData.ts`. `dynamicParams = false` means a new slug only exists through `generateStaticParams`.
+- The page shell or the sr-only article changes: crawlers read that HTML, so it must still hold the page's `h1`, headings and text from the content modules.
+- Robots, hosts or the rendered site change: `/rendered/*` stays `noindex, follow` with no canonical, and `proxy.ts` keeps non-main hosts out.
+- After such a change, run `bun run build && bun run start` and check the canonical, JSON-LD, `/sitemap.xml` and a bad URL (it must return 404).
+
 ### Component decomposition
 
 When building or modifying features, keep components small and focused. Extract shared logic into hooks (`lib/`) and shared UI into components (`components/`). If you find yourself copying code between shape utils or layout creators, extract it into a shared module first.
