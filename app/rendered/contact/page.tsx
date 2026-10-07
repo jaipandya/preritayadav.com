@@ -9,6 +9,7 @@ import {
 import { Content, ContentEmailRow } from "@/components/rendered/Content";
 import { SocialIcon } from "@/components/rendered/SocialIcon";
 import { newTabLabel } from "@/lib/renderedChrome";
+import { ExtArrow } from "@/components/rendered/ExtArrow";
 import { BackLink } from "@/components/rendered/BackLink";
 
 /** "https://www.linkedin.com/in/preritayadav/" becomes "linkedin.com/in/preritayadav". */
@@ -56,7 +57,7 @@ export default function RenderedContactPage() {
                   <span className="r-row-desc">{displayUrl(s.url)}</span>
                 </span>
               </span>
-              <span className="r-row-trail" aria-hidden="true">&#8599;</span>
+              <span className="r-row-trail"><ExtArrow /></span>
             </a>
           ))}
         </div>

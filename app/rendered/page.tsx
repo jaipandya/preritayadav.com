@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import {
   hero,
@@ -13,6 +14,7 @@ import {
 import { newTabLabel } from "@/lib/renderedChrome";
 import { getFeaturedWork } from "@/lib/workData";
 import { Content, ContentLines } from "@/components/rendered/Content";
+import { ExtArrow } from "@/components/rendered/ExtArrow";
 import { Mark } from "@/components/rendered/Mark";
 import { TeamLogos } from "@/components/rendered/TeamLogos";
 
@@ -69,7 +71,7 @@ export default function RenderedHome() {
               <span className="r-row-main">
                 <span className="r-row-title">
                   <Content k={`landing.blogPosts.${i}.title`} fallback={post.title} />
-                  <span className="r-ext" aria-hidden="true">&#8599;</span>
+                  <span className="r-ext"><ExtArrow /></span>
                   <span className="sr-only"> ({newTabLabel})</span>
                 </span>
                 <span className="r-row-desc">
@@ -94,6 +96,14 @@ export default function RenderedHome() {
                 <p className="r-row-desc">{item.subtitle}</p>
                 <p className="r-item-body">{item.description}</p>
               </div>
+              <Image
+                className="r-item-thumb"
+                src={`/rendered/generated/outside-${item.illustration}.webp`}
+                alt=""
+                width={384}
+                height={384}
+                sizes="(max-width: 479px) 80px, 112px"
+              />
             </article>
           ))}
         </div>

@@ -58,6 +58,7 @@ const BUILD_LINES: Array<{ text: string; delay: number }> = [
   { text: "  FloatingBar.tsx: Home, Work, About, socials, Let's talk", delay: 320 },
   { text: "  Rows: logo tile, title, one-line description, soft hover", delay: 300 },
   { text: "  Mark.tsx: logo tile with initial fallback", delay: 260 },
+  { text: "  Watercolor thumbnails for outside work, painted with OpenCV", delay: 300 },
   { text: "", delay: 400 },
 
   { text: "▸ Building pages from content modules...", delay: 800 },

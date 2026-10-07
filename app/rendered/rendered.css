@@ -168,7 +168,13 @@ a.r-row:focus-visible { outline-offset: -2px; border-radius: 8px; }
 
 /* ---------- OUTSIDE WORK ITEMS ---------- */
 .r-items { display: flex; flex-direction: column; gap: 32px; }
-.r-item { display: grid; grid-template-columns: 28px minmax(0, 1fr); column-gap: 8px; }
+.r-item { display: grid; grid-template-columns: 28px minmax(0, 1fr) 112px; column-gap: 8px; align-items: start; }
+/* A watercolor that fades into the page, so it has no box. Decorative: the text beside it says the same thing. */
+.r-item-thumb { width: 112px; height: 112px; margin: -8px -8px 0 8px; }
+@media (max-width: 479px) {
+  .r-item { grid-template-columns: 24px minmax(0, 1fr) 80px; }
+  .r-item-thumb { width: 80px; height: 80px; margin: -4px -4px 0 4px; }
+}
 .r-item-num { font-family: var(--r-mono); font-size: 14px; line-height: 24px; color: var(--r-muted); font-variant-numeric: tabular-nums; }
 .r-item-body { margin-top: 8px; font-size: 16px; line-height: 1.65; color: var(--r-body); text-wrap: pretty; }
 
@@ -365,7 +371,8 @@ a.r-row:focus-visible { outline-offset: -2px; border-radius: 8px; }
 .r-rows-pair { margin-top: 56px; }
 
 /* ---------- LINK ROWS WITH EXTERNAL ARROW ---------- */
-.r-ext { display: inline-block; margin-left: 4px; color: var(--r-hair); transition: color 150ms ease; }
+.r-ext-icon { display: inline-block; flex: none; vertical-align: 0.02em; }
+.r-ext { display: inline-block; margin-left: 6px; color: var(--r-hair); transition: color 150ms ease; }
 a.r-row:hover .r-ext { color: var(--r-muted); }
 
 /* Teams: 8 logos fill a 4 by 2 grid exactly, left aligned. Grayscale plus multiply drops any white
@@ -373,10 +380,10 @@ a.r-row:hover .r-ext { color: var(--r-muted); }
 .r-logos {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 28px 16px;
+  gap: 32px 16px;
   align-items: center;
 }
-.r-logos li { display: flex; align-items: center; min-height: 24px; }
+.r-logos li { display: flex; align-items: center; min-height: 36px; }
 .r-logos img {
   max-width: 100%;
   height: auto;
@@ -449,7 +456,7 @@ a.r-row:hover .r-ext { color: var(--r-muted); }
 @media (min-width: 640px) {
   .r-bar-socials { display: flex; align-items: center; margin-left: 8px; padding-left: 8px; border-left: 1px solid var(--r-ring); }
 }
-.r-bar-cta { padding: 0 8px; white-space: nowrap; }
+.r-bar-cta { padding: 0 8px; white-space: nowrap; gap: 6px; }
 
 /* ---------- SKIP LINK ---------- */
 .r-skip {

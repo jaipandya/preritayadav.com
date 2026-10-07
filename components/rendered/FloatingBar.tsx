@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { socials } from "@/lib/contactContent";
 import { newTabLabel, renderedNav } from "@/lib/renderedChrome";
+import { ExtArrow } from "./ExtArrow";
 import { SocialIcon } from "./SocialIcon";
 
 
@@ -49,7 +50,7 @@ export function FloatingBar() {
         </div>
         <Link href={renderedNav.cta.href} className="r-bar-link r-bar-cta">
           {renderedNav.cta.label}
-          <span aria-hidden="true">&nbsp;&#8599;</span>
+          <ExtArrow />
         </Link>
       </nav>
     </div>

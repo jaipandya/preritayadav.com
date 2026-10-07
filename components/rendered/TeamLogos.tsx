@@ -19,8 +19,8 @@ const LOGOS: Record<string, { src: string; width: number; height: number }> = {
   epic: { src: "/logos/epic.svg", width: 155, height: 78 },
 };
 
-const BASE_HEIGHT = 22;
-const MIN_HEIGHT = 12;
+const BASE_HEIGHT = 34;
+const MIN_HEIGHT = 18;
 
 /**
  * Optical size: a wide wordmark and a square icon of the same height look very different in weight.
