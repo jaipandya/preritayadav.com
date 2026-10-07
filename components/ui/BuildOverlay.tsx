@@ -131,6 +131,28 @@ const CACHED_LINES: Array<{ text: string; delay: number }> = [
   { text: "✓ Cached build restored. Ready to view.", delay: 400 },
 ];
 
+/** Lines that appear when the user stops a build. Fake, like the build itself. */
+const STOP_LINES: Array<{ text: string; delay: number }> = [
+  { text: "^C", delay: 0 },
+  { text: "", delay: 200 },
+  { text: "▸ Stop requested...", delay: 300 },
+  { text: "  Cancelling queued steps", delay: 380 },
+  { text: "  Releasing file handles", delay: 340 },
+  { text: "  Discarding partial output, nothing was written", delay: 420 },
+  { text: "  Your sketch and edits are untouched", delay: 320 },
+  { text: "", delay: 250 },
+  { text: "■ Build stopped.", delay: 350 },
+];
+
+type BuildStatus = "running" | "stopping" | "stopped" | "done";
+
+const STATUS_TEXT: Record<BuildStatus, string> = {
+  running: "Building...",
+  stopping: "Stopping...",
+  stopped: "Stopped. Nothing was written.",
+  done: "Ready",
+};
+
 export function BuildOverlay({
   onComplete,
   onClose,
@@ -140,18 +162,26 @@ export function BuildOverlay({
   onClose: () => void;
   cached?: boolean;
 }) {
-  const [done, setDone] = useState(false);
+  const [status, setStatus] = useState<BuildStatus>("running");
   const [lines, setLines] = useState<string[]>([]);
   const [progress, setProgress] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const actionRef = useRef<HTMLButtonElement>(null);
   const mountedRef = useRef(true);
+  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const statusRef = useRef<BuildStatus>("running");
+
+  const updateStatus = useCallback((next: BuildStatus) => {
+    statusRef.current = next;
+    setStatus(next);
+  }, []);
 
   useEffect(() => {
     mountedRef.current = true;
     const source = cached ? CACHED_LINES : BUILD_LINES;
     let totalDelay = 0;
     const totalLines = source.length;
-    const timers: ReturnType<typeof setTimeout>[] = [];
+    const timers = timersRef.current;
 
     source.forEach((line, i) => {
       totalDelay += line.delay;
@@ -164,7 +194,7 @@ export function BuildOverlay({
           if (!cached) {
             try { sessionStorage.setItem("prerita-build-done", "1"); } catch {}
           }
-          setDone(true);
+          updateStatus("done");
         }
       }, totalDelay);
       timers.push(timer);
@@ -173,8 +203,9 @@ export function BuildOverlay({
     return () => {
       mountedRef.current = false;
       timers.forEach(clearTimeout);
+      timers.length = 0;
     };
-  }, [cached]);
+  }, [cached, updateStatus]);
 
   useEffect(() => {
     document.body.classList.add("is-building");
@@ -186,6 +217,48 @@ export function BuildOverlay({
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [lines]);
+
+  // The footer button changes meaning (Stop, Stopping, Close, Visit), so keep keyboard focus on it.
+  useEffect(() => {
+    actionRef.current?.focus({ preventScroll: true });
+  }, [status]);
+
+  const stopBuild = useCallback(() => {
+    if (statusRef.current !== "running") return;
+    updateStatus("stopping");
+    timersRef.current.forEach(clearTimeout);
+    timersRef.current.length = 0;
+
+    let delay = 0;
+    STOP_LINES.forEach((line, i) => {
+      delay += line.delay;
+      timersRef.current.push(
+        setTimeout(() => {
+          if (!mountedRef.current) return;
+          setLines((prev) => [...prev, line.text]);
+          if (i === STOP_LINES.length - 1) updateStatus("stopped");
+        }, delay),
+      );
+    });
+  }, [updateStatus]);
+
+  // Backdrop, the red dot and Escape do what the footer button does: stop a running build,
+  // ignore the click while it is stopping, otherwise close.
+  const dismiss = useCallback(() => {
+    const current = statusRef.current;
+    if (current === "running") stopBuild();
+    else if (current !== "stopping") onClose();
+  }, [stopBuild, onClose]);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") dismiss();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [dismiss]);
+
+  const halted = status === "stopping" || status === "stopped";
 
   return (
     <div
@@ -201,46 +274,13 @@ export function BuildOverlay({
         alignItems: "center",
         justifyContent: "center",
       }}
-      onClick={onClose}
+      onClick={dismiss}
     >
-      <button
-        className="build-close-floating"
-        onClick={onClose}
-        aria-label="Close modal"
-        style={{
-          position: "absolute",
-          top: 24,
-          right: 24,
-          width: 40,
-          height: 40,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          background: "rgba(0, 0, 0, 0.4)",
-          border: "1px solid rgba(255, 255, 255, 0.1)",
-          borderRadius: "50%",
-          color: "#fff",
-          cursor: "pointer",
-          zIndex: 10,
-          transition: "background 0.2s, transform 0.2s",
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.background = "rgba(0, 0, 0, 0.6)";
-          e.currentTarget.style.transform = "scale(1.05)";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.background = "rgba(0, 0, 0, 0.4)";
-          e.currentTarget.style.transform = "scale(1)";
-        }}
-      >
-        <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18" />
-          <line x1="6" y1="6" x2="18" y2="18" />
-        </svg>
-      </button>
-
       <div
         className="build-card"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Build output"
         onClick={(e) => e.stopPropagation()}
         style={{
           width: "100%",
@@ -272,18 +312,18 @@ export function BuildOverlay({
         >
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <div style={{ display: "flex", gap: 6, paddingLeft: 4 }}>
-              <button 
-                onClick={onClose}
-                aria-label="Close build output"
-                style={{ 
-                  width: 12, 
-                  height: 12, 
-                  borderRadius: "50%", 
+              <button
+                onClick={dismiss}
+                aria-label={status === "running" ? "Stop build" : "Close build output"}
+                style={{
+                  width: 12,
+                  height: 12,
+                  borderRadius: "50%",
                   background: "#ff5f56",
                   border: "none",
                   padding: 0,
                   cursor: "pointer",
-                }} 
+                }}
               />
               <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#ffbd2e" }} />
               <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#27c93f" }} />
@@ -292,7 +332,7 @@ export function BuildOverlay({
               build: preritayadav.com
             </span>
           </div>
-          <span style={{ color: "#D4A853", fontSize: 11, fontWeight: 600 }}>
+          <span style={{ color: halted ? "#8a4a42" : "#D4A853", fontSize: 11, fontWeight: 600 }}>
             {Math.round(progress)}%
           </span>
         </div>
@@ -303,8 +343,8 @@ export function BuildOverlay({
             style={{
               height: "100%",
               width: `${progress}%`,
-              background: "linear-gradient(90deg, #D4A853, #B8923F)",
-              transition: "width 0.3s ease-out",
+              background: halted ? "#8a4a42" : "linear-gradient(90deg, #D4A853, #B8923F)",
+              transition: "width 0.3s ease-out, background 0.3s",
             }}
           />
         </div>
@@ -328,7 +368,11 @@ export function BuildOverlay({
                 height: line === "" ? 6 : "auto",
                 whiteSpace: "pre-wrap",
                 wordBreak: "break-word",
-                color: line.startsWith("✓ Build") || line.startsWith("✓ 13 pages")
+                color: line.startsWith("■")
+                  ? "#d7857a"
+                  : line === "^C"
+                  ? "#e8e4dc"
+                  : line.startsWith("✓ Build") || line.startsWith("✓ 13 pages")
                   ? "#D4A853"
                   : line.startsWith("  ✓")
                   ? "#7a9e6a"
@@ -345,13 +389,13 @@ export function BuildOverlay({
                   : line.startsWith("  ƒ") || line.startsWith("  ●")
                   ? "#8a9eb5"
                   : undefined,
-                fontWeight: line.startsWith("▸") || line.startsWith("✓") ? 600 : 400,
+                fontWeight: line.startsWith("▸") || line.startsWith("✓") || line.startsWith("■") || line === "^C" ? 600 : 400,
               }}
             >
               {line}
             </div>
           ))}
-          {lines.length > 0 && !lines[lines.length - 1]?.startsWith("✓") && (
+          {(status === "running" || status === "stopping") && lines.length > 0 && (
             <span
               style={{
                 display: "inline-block",
@@ -366,18 +410,32 @@ export function BuildOverlay({
           )}
         </div>
 
-        {done && (
-          <div className="build-actions">
+        {/* Footer: always there. Stop while building, a disabled spinner while stopping, Close once stopped. */}
+        <div className="build-actions">
+          <span className="build-status" role="status" data-status={status}>
+            {STATUS_TEXT[status]}
+          </span>
+          {status === "running" && (
             <button
-              className="build-btn build-btn-primary"
+              ref={actionRef}
+              className="build-btn build-btn-stop"
               onClick={(e) => {
                 e.stopPropagation();
-                onComplete();
+                stopBuild();
               }}
             >
-              Visit rendered page →
+              Stop build
             </button>
+          )}
+          {status === "stopping" && (
+            <button className="build-btn build-btn-stop" disabled aria-busy="true">
+              <span className="build-spinner" aria-hidden="true" />
+              Stopping...
+            </button>
+          )}
+          {status === "stopped" && (
             <button
+              ref={actionRef}
               className="build-btn build-btn-ghost"
               onClick={(e) => {
                 e.stopPropagation();
@@ -386,8 +444,31 @@ export function BuildOverlay({
             >
               Close
             </button>
-          </div>
-        )}
+          )}
+          {status === "done" && (
+            <>
+              <button
+                ref={actionRef}
+                className="build-btn build-btn-primary"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onComplete();
+                }}
+              >
+                Visit rendered page →
+              </button>
+              <button
+                className="build-btn build-btn-ghost"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onClose();
+                }}
+              >
+                Close
+              </button>
+            </>
+          )}
+        </div>
 
         <style>{`
           .build-card {
@@ -404,11 +485,25 @@ export function BuildOverlay({
             border-top: 1px solid #1e1d1a;
             background: #141311;
           }
+          .build-status {
+            margin-right: auto;
+            font-size: 11px;
+            color: #706c64;
+          }
+          .build-status[data-status="done"] { color: #7a9e6a; }
+          .build-status[data-status="stopped"],
+          .build-status[data-status="stopping"] { color: #b2776d; }
           .build-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
             font-family: inherit;
             cursor: pointer;
-            transition: background 0.15s, color 0.15s;
+            transition: background 0.15s, color 0.15s, border-color 0.15s, opacity 0.15s;
           }
+          .build-btn:focus-visible { outline: 2px solid #D4A853; outline-offset: 2px; }
+          .build-btn:disabled { cursor: default; opacity: 0.75; }
           .build-btn-primary {
             background: #D4A853;
             border: 1px solid #B8923F;
@@ -419,17 +514,37 @@ export function BuildOverlay({
             border-radius: 4px;
           }
           .build-btn-ghost {
-            margin-left: auto;
             background: transparent;
             border: 1px solid #2e2c28;
             color: #a8a49b;
-            font-size: 11px;
-            padding: 4px 10px;
+            font-size: 12px;
+            padding: 6px 12px;
             border-radius: 4px;
+          }
+          .build-btn-stop {
+            background: transparent;
+            border: 1px solid #5a342f;
+            color: #e0968b;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 4px;
+          }
+          .build-spinner {
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+            border: 2px solid #4a2f2b;
+            border-top-color: #e0968b;
+            animation: build-spin 0.8s linear infinite;
           }
           @media (hover: hover) {
             .build-btn-primary:hover { background: #E8BC5E; }
             .build-btn-ghost:hover { background: #1e1d1a; color: #d4d0c8; }
+            .build-btn-stop:not(:disabled):hover { background: #2a1a18; border-color: #7a443d; }
+          }
+          @media (prefers-reduced-motion: reduce) {
+            .build-spinner { animation-duration: 2.4s; }
           }
           @media (max-width: 640px) {
             .build-card {
@@ -437,7 +552,6 @@ export function BuildOverlay({
               font-size: 13px;
               padding-bottom: env(safe-area-inset-bottom);
             }
-            .build-close-floating { display: none !important; }
             .build-terminal-scroll { padding: 12px !important; }
             .build-actions {
               flex-direction: column;
@@ -445,12 +559,16 @@ export function BuildOverlay({
               gap: 8px;
               padding: 12px;
             }
+            .build-status { margin-right: 0; text-align: center; font-size: 12px; }
             .build-btn { min-height: 44px; font-size: 14px; }
             .build-btn-primary { order: 1; }
             .build-btn-ghost { order: 2; margin-left: 0; }
           }
           @keyframes blink {
             50% { opacity: 0; }
+          }
+          @keyframes build-spin {
+            to { transform: rotate(360deg); }
           }
           .build-terminal-scroll::-webkit-scrollbar {
             width: 6px;
