@@ -1,20 +1,19 @@
 "use client";
 
-import "@/lib/shapeTypes";
 import {
   ShapeUtil,
   HTMLContainer,
-  Geometry2d,
+  type Geometry2d,
   Rectangle2d,
   T,
-  type TLShape,
+  type CanvasShape,
   type RecordProps,
-  type TLResizeInfo,
+  type ResizeInfo,
   resizeBox,
-} from "tldraw";
+} from "@/lib/canvas";
 import { wobblyCircle, seededRandom } from "@/lib/variationSeed";
 
-type TeamAvatarsShape = TLShape<"team-avatars">;
+type TeamAvatarsShape = CanvasShape<"team-avatars">;
 
 export class TeamAvatarsShapeUtil extends ShapeUtil<TeamAvatarsShape> {
   static override type = "team-avatars" as const;
@@ -49,7 +48,7 @@ export class TeamAvatarsShapeUtil extends ShapeUtil<TeamAvatarsShape> {
     return true;
   }
 
-  override onResize(shape: TeamAvatarsShape, info: TLResizeInfo<TeamAvatarsShape>) {
+  override onResize(shape: TeamAvatarsShape, info: ResizeInfo) {
     return resizeBox(shape, info);
   }
 

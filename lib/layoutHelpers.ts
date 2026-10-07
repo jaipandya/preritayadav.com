@@ -1,4 +1,4 @@
-import type { Editor } from "tldraw";
+import type { Editor } from "@/lib/canvas";
 import { bind, withContent } from "./contentOverrides";
 
 export const CANVAS_W = 560;

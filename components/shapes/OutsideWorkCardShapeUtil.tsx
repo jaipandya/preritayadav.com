@@ -1,20 +1,19 @@
 "use client";
 
-import "@/lib/shapeTypes";
 import {
   ShapeUtil,
   HTMLContainer,
-  Geometry2d,
+  type Geometry2d,
   Rectangle2d,
   T,
-  type TLShape,
+  type CanvasShape,
   type RecordProps,
-  type TLResizeInfo,
+  type ResizeInfo,
   resizeBox,
-} from "tldraw";
+} from "@/lib/canvas";
 import { wobblyRect, wobblyLine, wobblyCircle } from "@/lib/variationSeed";
 
-type OutsideWorkCardShape = TLShape<"outside-work-card">;
+type OutsideWorkCardShape = CanvasShape<"outside-work-card">;
 
 const stroke = "#1a1a1a";
 const sw = 1.3;
@@ -444,7 +443,7 @@ export class OutsideWorkCardShapeUtil extends ShapeUtil<OutsideWorkCardShape> {
     return true;
   }
 
-  override onResize(shape: OutsideWorkCardShape, info: TLResizeInfo<OutsideWorkCardShape>) {
+  override onResize(shape: OutsideWorkCardShape, info: ResizeInfo) {
     return resizeBox(shape, info);
   }
 

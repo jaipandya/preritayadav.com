@@ -1,20 +1,19 @@
 "use client";
 
-import "@/lib/shapeTypes";
 import {
   ShapeUtil,
   HTMLContainer,
-  Geometry2d,
+  type Geometry2d,
   Rectangle2d,
   T,
-  type TLShape,
+  type CanvasShape,
   type RecordProps,
-  type TLResizeInfo,
+  type ResizeInfo,
   resizeBox,
-} from "tldraw";
+} from "@/lib/canvas";
 import { wobblyCircle, wobblyLine, wobblyRect, seededRandom } from "@/lib/variationSeed";
 
-type IllustrationShape = TLShape<"hand-drawn-illustration">;
+type IllustrationShape = CanvasShape<"hand-drawn-illustration">;
 
 const stroke = "#1a1a1a";
 const sw = 1.3;
@@ -470,7 +469,7 @@ export class HandDrawnIllustrationShapeUtil extends ShapeUtil<IllustrationShape>
     return true;
   }
 
-  override onResize(shape: IllustrationShape, info: TLResizeInfo<IllustrationShape>) {
+  override onResize(shape: IllustrationShape, info: ResizeInfo) {
     return resizeBox(shape, info);
   }
 

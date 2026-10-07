@@ -1,21 +1,10 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
-import { createTLStore, getSnapshot, inlineBase64AssetStore, loadSnapshot, type TLAssetStore } from "tldraw";
-import { customShapeUtils, customBindingUtils } from "@/lib/shapes";
+import { Store } from "@quickdrawjs/core";
+import { parseCanvas, type Editor, type LoadedCanvas } from "@/lib/canvas";
 import { debounce } from "@/lib/debounce";
-import { optimizedImageUrl } from "@/lib/canvasAssets";
 import { WIP_STORAGE_PREFIX, clearOverrides } from "@/lib/contentOverrides";
-
-/** Canvas images are shown through the Next.js image optimizer at their on-screen size (see lib/canvasAssets.ts). */
-const canvasAssetStore: TLAssetStore = {
-  ...inlineBase64AssetStore,
-  resolve(asset, ctx) {
-    const src = asset.props.src;
-    if (!src || asset.type !== "image" || ctx.shouldResolveToOriginal) return src;
-    return optimizedImageUrl(src, asset.props.w, ctx.steppedScreenScale, ctx.dpr);
-  },
-};
 
 export type LoadingState =
   | { status: "loading" }
@@ -45,56 +34,58 @@ function pruneSupersededCanvases(currentKey: string) {
 export function useCanvasPersistence(pageKey: string) {
   const persistenceKey = `${WIP_STORAGE_PREFIX}${pageKey}`;
 
-  const [store] = useState(() => 
-    createTLStore({
-      shapeUtils: customShapeUtils,
-      bindingUtils: customBindingUtils,
-      assets: canvasAssetStore,
-    })
-  );
+  const [store] = useState(() => new Store());
   const [loadingState, setLoadingState] = useState<LoadingState>({
     status: "loading",
   });
   const [needsInitialLayout, setNeedsInitialLayout] = useState(false);
+  /** Page meta and camera of the saved canvas, handed to the editor when it mounts. */
+  const [initial, setInitial] = useState<Pick<LoadedCanvas, "pageMeta" | "camera"> | null>(null);
   const cancelSaveRef = useRef<() => void>(() => {});
 
   useEffect(() => {
-    const s = store;
-
     pruneSupersededCanvases(persistenceKey);
 
-    const persisted = localStorage.getItem(persistenceKey);
-
-    if (persisted) {
-      try {
-        const snapshot = JSON.parse(persisted);
-        loadSnapshot(s, snapshot);
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setLoadingState({ status: "ready" });
-      } catch (e: unknown) {
-        const msg = e instanceof Error ? e.message : "Unknown error";
-        console.error("Failed to load persisted snapshot:", msg);
-        setNeedsInitialLayout(true);
-        setLoadingState({ status: "ready" });
-      }
-    } else {
-      setNeedsInitialLayout(true);
-      setLoadingState({ status: "ready" });
+    let loaded: LoadedCanvas | null = null;
+    try {
+      const persisted = localStorage.getItem(persistenceKey);
+      loaded = persisted ? parseCanvas(JSON.parse(persisted)) : null;
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "Unknown error";
+      console.error("Failed to load persisted snapshot:", msg);
     }
 
-    const debouncedSave = debounce(() => {
-      const snapshot = getSnapshot(s);
-      localStorage.setItem(persistenceKey, JSON.stringify(snapshot));
-    }, 500);
-
-    const cleanup = s.listen(debouncedSave);
-    cancelSaveRef.current = debouncedSave.cancel;
-
-    return () => {
-      cleanup();
-      debouncedSave.cancel();
-    };
+    if (loaded) {
+      store.loadSnapshot({ document: { store: Object.fromEntries(loaded.records.map((r) => [r.id, r])) } } as never);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setInitial({ pageMeta: loaded.pageMeta, camera: loaded.camera });
+    } else {
+      setNeedsInitialLayout(true);
+    }
+    setLoadingState({ status: "ready" });
   }, [persistenceKey, store]);
+
+  /** Save the canvas (shapes, page meta, camera) shortly after every change. Returns a cleanup function. */
+  const attach = useCallback(
+    (editor: Editor) => {
+      const save = debounce(() => {
+        try {
+          localStorage.setItem(persistenceKey, JSON.stringify(editor.getSnapshot()));
+        } catch {
+          // Storage full or unavailable: the canvas keeps working, edits just are not kept.
+        }
+      }, 500);
+      const off = editor.on("document", save);
+      cancelSaveRef.current = save.cancel;
+      // A fresh layout is saved too, so Build knows which fields and items it created.
+      save();
+      return () => {
+        off();
+        save.cancel();
+      };
+    },
+    [persistenceKey]
+  );
 
   /**
    * Forget every saved edit, then let the caller put the default layout back in the live editor.
@@ -116,5 +107,5 @@ export function useCanvasPersistence(pageKey: string) {
     applyDefaults();
   }, []);
 
-  return { store, loadingState, reset, needsInitialLayout };
+  return { store, initial, loadingState, reset, needsInitialLayout, attach };
 }

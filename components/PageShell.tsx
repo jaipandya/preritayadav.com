@@ -1,6 +1,6 @@
 "use client";
 
-import type { Editor } from "tldraw";
+import type { Editor } from "@/lib/canvas";
 import { WipCanvas } from "@/components/canvas/WipCanvas";
 import { AccessibleNav } from "@/components/ui/AccessibleNav";
 import { BuildButton } from "@/components/ui/BuildOverlay";

@@ -1,6 +1,6 @@
 # Content overrides: WIP edits carried to the rendered site
 
-Goal: text edited on the WIP (tldraw) site shows up on the rendered site after the visitor clicks **Build**, in the same browser only. Everyone else sees the defaults from the content modules in `lib/`.
+Goal: text edited on the WIP (canvas) site shows up on the rendered site after the visitor clicks **Build**, in the same browser only. Everyone else sees the defaults from the content modules in `lib/`.
 
 Status:
 
@@ -15,7 +15,7 @@ lib/*Content.ts, lib/workData.ts          defaults (single source of truth)
         ├─► lib/create*Layout.ts          creates canvas shapes, binds editable text to a content key
         │        meta.content = [{ key, prop, base, part?, prefix?, list?, head? }]
         │
-        │   user edits text on canvas ──► tldraw snapshot in localStorage  (prerita-wip-<page>)
+        │   user edits text on canvas ──► canvas snapshot in localStorage  (prerita-wip-<page>)
         │
         │   click Build ─► commitOverridesFromCanvases()
         │        diff every bound shape against its default hash

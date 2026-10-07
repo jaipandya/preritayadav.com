@@ -1,6 +1,6 @@
 # preritayadav.com
 
-A portfolio for Prerita Yadav in two worlds. The **sketch** (work in progress) is an interactive hand-drawn canvas powered by [tldraw](https://tldraw.dev). The **rendered** site under `/rendered` is the same content built as a minimal, fast, accessible set of normal pages. Text edited on the sketch can be carried to the rendered pages in the same browser (see `docs/content-overrides.md`).
+A portfolio for Prerita Yadav in two worlds. The **sketch** (work in progress) is an interactive hand-drawn canvas built on [Quickdraw](https://tryquickdraw.com) (MIT). The **rendered** site under `/rendered` is the same content built as a minimal, fast, accessible set of normal pages. Text edited on the sketch can be carried to the rendered pages in the same browser (see `docs/content-overrides.md`).
 
 Live at: **wip.preritayadav.com**
 
@@ -13,7 +13,7 @@ Live at: **wip.preritayadav.com**
 | Framework | [Next.js 16](https://nextjs.org) (App Router) |
 | Language | TypeScript |
 | Styling | [Tailwind CSS v4](https://tailwindcss.com) + global CSS |
-| Canvas | [tldraw v4](https://tldraw.dev) |
+| Canvas | [Quickdraw](https://tryquickdraw.com) (`@quickdrawjs/core`, MIT) with the site's own canvas layer in `lib/canvas/` (see `docs/canvas.md`) |
 | Fonts | Sketch: Loranthus (custom, self-hosted in `public/fonts/`). Rendered: Geist and Geist Mono via `next/font` |
 | Package manager | [Bun](https://bun.sh) |
 | Hosting | Vercel (auto-deploy from `main`) |
@@ -23,7 +23,7 @@ Live at: **wip.preritayadav.com**
 
 ## How the site works
 
-Every route outside `/rendered` renders a `WipCanvas`, a full-screen tldraw canvas. Instead of HTML content, each page's content (project cards, text, images, buttons) is represented as **custom tldraw shapes** positioned on the canvas. Visitors can pan around, zoom, draw, erase, and click on interactive shapes to navigate between pages.
+Every route outside `/rendered` renders a `WipCanvas`, a full-screen canvas. Instead of HTML content, each page's content (project cards, text, images, buttons) is represented as **custom canvas shapes** positioned on the canvas. Visitors can pan around, zoom, draw, erase, and click on interactive shapes to navigate between pages.
 
 ### Routing
 
@@ -56,7 +56,7 @@ Each canvas page calls `WipCanvas` with a `pageKey` (used for localStorage persi
 
 ### `components/canvas/WipCanvas.tsx`
 The core component. It:
-- Mounts a `<Tldraw>` instance with custom shapes and tools
+- Mounts a `<QuickdrawCanvas>` (`components/canvas/QuickdrawCanvas.tsx`) with the custom shapes
 - Loads/saves canvas state via `useCanvasPersistence`
 - Sets the default tool to `browse` on mount
 - Listens for pointer events to detect clicks on navigable shapes and routes via Next.js router
@@ -66,16 +66,16 @@ The core component. It:
 A decorative browser-window frame wrapping the canvas. Renders the top bar with traffic-light dots and a fake URL bar. The canvas itself sits inside this frame.
 
 ### `components/canvas/CanvasUI.tsx`
-The floating tool toolbar rendered on top of the canvas (via tldraw's `InFrontOfTheCanvas` slot). Shows tool buttons (Browse, Select, Draw, Text, Eraser) and Undo/Redo/Reset. Fixed-position so it always appears at the bottom center regardless of canvas pan/zoom.
+The floating tool toolbar rendered on top of the canvas (a child of `QuickdrawCanvas`, portaled to `body`). Shows tool buttons (Browse, Select, Draw, Text, Eraser) and Undo/Redo/Reset. Fixed-position so it always appears at the bottom center regardless of canvas pan/zoom.
 
 ### `components/canvas/useCanvasPersistence.ts`
-Persists the tldraw store to `localStorage` keyed by `pageKey`. On first load for a page it triggers `onCreateLayout` to place the initial shapes. Exposes `reset()` to wipe and re-run the layout.
+Persists the canvas (Quickdraw store, page meta and camera) to `localStorage` keyed by `pageKey`. On first load for a page it triggers `onCreateLayout` to place the initial shapes. Exposes `reset()` to wipe and re-run the layout. Saves from the old tldraw version are not loaded: the page starts from its default layout.
 
 ---
 
 ## Custom shapes
 
-All custom shapes live in `components/shapes/` and are registered in `lib/shapes.ts`. Each shape follows tldraw's `ShapeUtil` pattern: define the shape's data type, default props, and a `component()` method returning the JSX to render.
+All custom shapes live in `components/shapes/` and are registered in `lib/shapes.ts`. Each shape extends `ShapeUtil` from `lib/canvas`: define the shape's data type, default props, a hit area (`getGeometry`) and a `component()` method returning the JSX to render. Quickdraw selects, moves, resizes and erases them like its own shapes.
 
 | File | What it renders |
 |---|---|
@@ -86,9 +86,10 @@ All custom shapes live in `components/shapes/` and are registered in `lib/shapes
 | `TeamAvatarsShapeUtil.tsx` | Row of avatar images for a team |
 | `ImagePlaceholderShapeUtil.tsx` | Placeholder image frame |
 | `BrowserFrameShapeUtil.tsx` | Mini browser-window frame as a canvas shape |
+| `CanvasImageShapeUtil.tsx` | Case study screenshot, served through the Next.js image optimizer at its on-screen size |
 
 Shared behaviour across shapes is centralised in `lib/useShapeInteraction.ts`:
-- **`useShapeHover(editor, shapeId, enabled?)`** — tracks hover/press state via tldraw's event system, active only in browse mode so shapes don't react when drawing tools are selected.
+- **`useShapeHover(editor, shapeId, enabled?)`** — tracks hover/press state from the editor's pointer events (`editor.on("event")`), active only in browse mode so shapes don't react when drawing tools are selected.
 - **`useFocusOnEdit(isEditing, ref)`** — auto-focuses and selects an input/textarea when editing begins.
 
 Link detection uses `isNavigable(shape)` from `lib/canvasMeta.ts` everywhere (rather than inline `meta.href` checks).
@@ -119,40 +120,37 @@ lib/
 
 `lib/layoutHelpers.ts` exports the shared canvas width, padding, camera centering, and a `createBackButton` helper used by all layouts that include a "← Back home" button.
 
-**To change what appears on a page**, edit the relevant `create*Layout.ts` file. Shape coordinates are in tldraw's canvas space (origin top-left, x increases right, y increases down).
+**To change what appears on a page**, edit the relevant `create*Layout.ts` file. Shape coordinates are in canvas page space (origin top-left, x increases right, y increases down).
 
 ---
 
-## Custom tools
+## Tools
 
-### `lib/BrowseTool.ts`
-The default tool. Acts as a read-only viewer — pan/scroll works, cursor is the default arrow, and clicking a navigable shape triggers Next.js routing. Shapes cannot be selected or modified in this mode.
+The toolbar offers `browse`, `select`, `draw`, `text` and `eraser`, plus undo, redo and reset (`hand` is on the `h` key). Quickdraw's other tools (arrow, note, shapes, laser, highlighter) are not offered: their shortcuts are blocked in `lib/canvas/engine.ts`.
 
-### Built-in tldraw tools (enabled)
-The toolbar exposes a curated subset of tldraw's built-in tools: `select`, `draw`, `text`, `eraser`, `hand`. All others are hidden via `uiOverrides` in `WipCanvas.tsx`.
+- **Browse** is the default. It is Quickdraw's hand tool (drag pans) plus link handling in `WipCanvas.tsx`: clicking a navigable shape triggers Next.js routing. Shapes cannot be selected or modified in this mode.
+- **Select, draw, text, eraser, hand** are Quickdraw's own tools. They work on custom shapes too: select, move, resize, delete, erase, undo. Double click (or Enter, or the "Edit text" button on touch screens) edits a shape's text in place. With the text tool, clicking existing text edits it too; clicking anywhere else adds new text.
 
 ---
 
 ## Custom cursors
 
-Custom SVG cursors are defined in `app/globals.css`. They use the `data-state` attribute that tldraw sets on `.tl-container` to know which tool is active (e.g. `data-state="eraser.idle"`).
-
-**Important:** The cursor must be set with `!important` directly on `.tl-container`, not via tldraw's `--tl-cursor` CSS variable. This is because tldraw's `cursor: var(--tl-cursor)` rule is on the inner `.tl-canvas` child element, not the container. The inherit rule is scoped to `.tl-canvas` and `.tl-canvas *` (not all descendants of `.tl-container`) so that the toolbar buttons in `.tl-canvas__in-front` retain their own `cursor: pointer`.
+Custom SVG cursors are defined in `app/globals.css`. They use the `data-tool` attribute the editor sets on `.cv-container` (e.g. `data-tool="eraser"`). The cursor is set with `!important` on the container and inherited by everything in it, so Quickdraw's own cursors never show for these tools. The toolbar is portaled to `body`, so its buttons keep `cursor: pointer`.
 
 | Tool | Cursor |
 |---|---|
-| Browse | OS default arrow |
-| Select | tldraw default |
+| Browse | OS default arrow (pointer over links) |
+| Select | Quickdraw default (move and resize cursors over the selection) |
 | Draw | Pencil SVG (hotspot at tip, lower-left) |
 | Text | T-shape SVG matching the toolbar icon |
 | Eraser | Monochrome eraser rectangle SVG |
-| Hand | tldraw grab/grabbing hand |
+| Hand | Grab/grabbing hand |
 
 ---
 
 ## Navigation between pages
 
-Navigable shapes are identified by a `canvasMeta.href` field in their props (see `lib/canvasMeta.ts`). In `browse` mode, `WipCanvas` listens for `pointer_up` events, checks if the pointer is over a shape with an `href`, and either calls `router.push(href)` (internal) or `window.open(href, '_blank')` (external). The cursor changes to a pointer when hovering over a navigable shape in browse mode.
+Navigable shapes are identified by an `href` field in their `meta` (see `lib/canvasMeta.ts`). In `browse` mode, `WipCanvas` listens for `pointer_up` events, checks if the pointer is over a shape with an `href`, and either calls `router.push(href)` (internal) or `window.open(href, '_blank')` (external). The cursor changes to a pointer when hovering over a navigable shape in browse mode.
 
 ---
 

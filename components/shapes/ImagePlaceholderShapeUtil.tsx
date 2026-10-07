@@ -1,20 +1,19 @@
 "use client";
 
-import "@/lib/shapeTypes";
 import {
   ShapeUtil,
   HTMLContainer,
-  Geometry2d,
+  type Geometry2d,
   Rectangle2d,
   T,
-  type TLShape,
+  type CanvasShape,
   type RecordProps,
-  type TLResizeInfo,
+  type ResizeInfo,
   resizeBox,
-} from "tldraw";
+} from "@/lib/canvas";
 import { wobblyRect, wobblyLine } from "@/lib/variationSeed";
 
-type ImagePlaceholderShape = TLShape<"image-placeholder">;
+type ImagePlaceholderShape = CanvasShape<"image-placeholder">;
 
 export class ImagePlaceholderShapeUtil extends ShapeUtil<ImagePlaceholderShape> {
   static override type = "image-placeholder" as const;
@@ -43,7 +42,7 @@ export class ImagePlaceholderShapeUtil extends ShapeUtil<ImagePlaceholderShape> 
     return true;
   }
 
-  override onResize(shape: ImagePlaceholderShape, info: TLResizeInfo<ImagePlaceholderShape>) {
+  override onResize(shape: ImagePlaceholderShape, info: ResizeInfo) {
     return resizeBox(shape, info);
   }
 

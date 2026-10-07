@@ -1,79 +1,46 @@
 "use client";
 
-import { useCallback, useRef, useMemo, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  Tldraw,
-  type Editor,
-  type TLAssetId,
-  type TLUiOverrides,
-  type TLEditorComponents,
-  DefaultSizeStyle,
-} from "tldraw";
-import "tldraw/tldraw.css";
+import type { CanvasPointerEvent, Editor } from "@/lib/canvas";
 import { customShapeUtils } from "@/lib/shapes";
-import { BrowseTool } from "@/lib/BrowseTool";
 import { useCanvasPersistence } from "./useCanvasPersistence";
 import { CanvasUI } from "./CanvasUI";
 import { BrowserChrome } from "./BrowserChrome";
+import { QuickdrawCanvas } from "./QuickdrawCanvas";
+import { canvasImageUrl } from "@/components/shapes/CanvasImageShapeUtil";
 import { getHref, isNavigable } from "@/lib/canvasMeta";
 import { BOUND_KEYS_META, ITEM_KEYS_META, boundKeysOf, itemKeysOf } from "@/lib/contentOverrides";
 import { CANVAS_W } from "@/lib/layoutHelpers";
 import { sounds } from "@/lib/sounds";
 import { attachCanvasSounds } from "@/lib/canvasSounds";
-import { attachNonPassiveTouch } from "@/lib/nonPassiveTouch";
 
 const DRAG_THRESHOLD = 5;
 
 /**
- * Start downloading the canvas images once the page is idle. tldraw only requests an image when its
- * shape scrolls into view, so without this a screenshot starts loading at the moment you reach it.
- * Uses the same URL tldraw will ask for, so the browser cache serves it.
+ * Start downloading the canvas images once the page is idle. An image is only requested when its shape renders,
+ * so without this a screenshot starts loading at the moment you reach it.
+ * Uses the same URL the shape will ask for, so the browser cache serves it.
  */
 function warmCanvasImages(editor: Editor) {
   const run = () => {
     const zoom = editor.getZoomLevel();
     for (const shape of editor.getCurrentPageShapes()) {
-      if (shape.type !== "image") continue;
-      const { assetId, w } = shape.props as { assetId: TLAssetId | null; w: number };
-      const asset = assetId && editor.getAsset(assetId);
-      if (!asset || asset.type !== "image") continue;
-      editor
-        .resolveAssetUrl(asset.id, { screenScale: zoom * (w / asset.props.w) })
-        .then((url) => {
-          if (!url) return;
-          const img = new Image();
-          img.fetchPriority = "low";
-          img.decoding = "async";
-          img.src = url;
-        });
+      if (shape.type !== "canvas-image") continue;
+      const img = new Image();
+      img.fetchPriority = "low";
+      img.decoding = "async";
+      img.src = canvasImageUrl(shape as Parameters<typeof canvasImageUrl>[0], zoom, window.devicePixelRatio || 1);
     }
   };
   if ("requestIdleCallback" in window) window.requestIdleCallback(run, { timeout: 2000 });
   else setTimeout(run, 500);
 }
 
-const uiOverrides: TLUiOverrides = {
-  tools(_editor, tools) {
-    const allowed = new Set(["select", "draw", "text", "eraser", "hand"]);
-    for (const key of Object.keys(tools)) {
-      if (!allowed.has(key)) {
-        delete tools[key];
-      }
-    }
-    return tools;
-  },
-};
-
-const customTools = [BrowseTool];
-
 /** Remember which text fields and removable items the layout created, so Build can tell when one is erased from the canvas. */
 function recordBoundKeys(editor: Editor) {
   const shapes = editor.getCurrentPageShapes();
-  editor.updatePage({
-    id: editor.getCurrentPageId(),
-    meta: { [BOUND_KEYS_META]: boundKeysOf(shapes), [ITEM_KEYS_META]: itemKeysOf(shapes) },
-  });
+  editor.setPageMeta({ [BOUND_KEYS_META]: boundKeysOf(shapes), [ITEM_KEYS_META]: itemKeysOf(shapes) });
 }
 
 /** On mobile, zoom out so the canvas content fits better on the small screen. */
@@ -92,7 +59,7 @@ export function WipCanvas({
   onCreateLayout?: (editor: Editor) => void;
 }) {
   const router = useRouter();
-  const { store, loadingState, reset, needsInitialLayout } =
+  const { store, initial, loadingState, reset, needsInitialLayout, attach } =
     useCanvasPersistence(pageKey);
   const layoutCreated = useRef(false);
   const prefetched = useRef(new Set<string>());
@@ -105,10 +72,9 @@ export function WipCanvas({
     reset(() => {
       const editor = editorRef.current;
       if (!editor) return;
+      editor.setEditingShape(null);
       editor.run(() => {
-        editor.setEditingShape(null);
-        editor.deleteShapes([...editor.getCurrentPageShapeIds()]);
-        editor.deleteAssets(editor.getAssets());
+        editor.store.clear();
         onCreateLayout?.(editor);
         recordBoundKeys(editor);
       });
@@ -118,26 +84,19 @@ export function WipCanvas({
     });
   }, [reset, onCreateLayout]);
 
-  const components = useMemo<TLEditorComponents>(
-    () => ({
-      InFrontOfTheCanvas: () => <CanvasUI onReset={handleReset} />,
-    }),
-    [handleReset]
-  );
-
   const handleMount = useCallback(
     (editor: Editor) => {
       editorRef.current = editor;
+      const cleanups = [attach(editor)];
       if (needsInitialLayout && onCreateLayout && !layoutCreated.current) {
         layoutCreated.current = true;
         onCreateLayout(editor);
         recordBoundKeys(editor);
+        // The default layout is not an edit: undo starts from here.
+        editor.clearHistory();
       }
 
-      // Set thin stroke for the draw tool
-      editor.setStyleForNextShapes(DefaultSizeStyle, "s");
-
-      // Set browse as the default tool
+      // Browse is the default tool (the pen is already set to a thin stroke).
       editor.setCurrentTool("browse");
 
       applyMobileCamera(editor);
@@ -156,16 +115,16 @@ export function WipCanvas({
         }
       };
       document.addEventListener("keydown", handleKeyDown);
+      cleanups.push(() => document.removeEventListener("keydown", handleKeyDown));
 
-      attachNonPassiveTouch(editor);
-      attachCanvasSounds(editor);
+      cleanups.push(attachCanvasSounds(editor));
       warmCanvasImages(editor);
 
       // Listen for pointer events to handle navigation in browse mode
-      editor.on("event", (event) => {
+      cleanups.push(editor.on("event", (event: CanvasPointerEvent) => {
         // Update cursor when hovering over navigable shapes
-        if (event.type === "pointer" && event.name === "pointer_move") {
-          const container = document.querySelector(".tl-container") as HTMLElement | null;
+        if (event.name === "pointer_move") {
+          const container = editor.getContainer();
           if (editor.getCurrentToolId() !== "browse") {
             // Clean up any inline cursor left by browse mode
             container?.style.removeProperty("cursor");
@@ -194,11 +153,11 @@ export function WipCanvas({
           }
         }
 
-        if (event.type === "pointer" && event.name === "pointer_down") {
+        if (event.name === "pointer_down") {
           pointerDownPos.current = { x: event.point.x, y: event.point.y };
         }
 
-        if (event.type === "pointer" && event.name === "pointer_up") {
+        if (event.name === "pointer_up") {
           const toolId = editor.getCurrentToolId();
           if (toolId === "select" && editor.getSelectedShapeIds().length > 0) {
             sounds.play("select");
@@ -233,11 +192,12 @@ export function WipCanvas({
             }
           }
         }
-      });
+      }));
 
       setCanvasReady(true);
+      return () => cleanups.forEach((cleanup) => cleanup());
     },
-    [router, needsInitialLayout, onCreateLayout]
+    [router, needsInitialLayout, onCreateLayout, attach]
   );
 
   if (loadingState.status === "loading" || !store) {
@@ -286,15 +246,9 @@ export function WipCanvas({
         role="application"
         aria-label="Prerita Yadav's interactive portfolio canvas"
       >
-        <Tldraw
-          store={store}
-          shapeUtils={customShapeUtils}
-          tools={customTools}
-          hideUi
-          onMount={handleMount}
-          overrides={uiOverrides}
-          components={components}
-        />
+        <QuickdrawCanvas store={store} shapeUtils={customShapeUtils} initial={initial} onMount={handleMount}>
+          <CanvasUI onReset={handleReset} />
+        </QuickdrawCanvas>
       </div>
     </BrowserChrome>
   );

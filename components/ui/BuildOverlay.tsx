@@ -39,7 +39,7 @@ const BUILD_LINES: BuildLine[] = [
   { text: "", delay: 500 },
 
   { text: "▸ Reading the sketch...", delay: 700 },
-  { text: "  Reading tldraw shape tree from createLandingLayout.ts", delay: 550 },
+  { text: "  Reading Quickdraw shape tree from createLandingLayout.ts", delay: 550 },
   { text: "  ✓ Hero: greeting, name, two-line subtitle", delay: 280 },
   { text: "  ✓ Featured work: 3 projects, each linked to its case study", delay: 320 },
   { text: "  ✓ Writing: 5 posts with external links", delay: 300 },

@@ -9,7 +9,6 @@ const INDEXABLE_HOSTS = ["preritayadav\\.com", "www\\.preritayadav\\.com", "loca
 const OTHER_HOST = `(?!(?:${INDEXABLE_HOSTS.join("|")})$).+`;
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["tldraw"],
   devIndicators: false,
   // These two replace the old proxy.ts, which ran a function on every request. Config rules cost nothing on Vercel.
   async rewrites() {

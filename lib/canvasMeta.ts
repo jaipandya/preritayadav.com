@@ -1,4 +1,4 @@
-import type { TLShape } from "tldraw";
+import type { AnyShape } from "@/lib/canvas";
 
 export type ComponentType =
   | "project-card"
@@ -21,18 +21,18 @@ export type ShapeMeta = {
   label?: string;
 };
 
-export function getShapeMeta(shape: TLShape): ShapeMeta | null {
+export function getShapeMeta(shape: Pick<AnyShape, "meta">): ShapeMeta | null {
   const meta = shape.meta as Record<string, unknown>;
   if (!meta || typeof meta.componentType !== "string") return null;
   return meta as unknown as ShapeMeta;
 }
 
-export function isNavigable(shape: TLShape): boolean {
+export function isNavigable(shape: Pick<AnyShape, "meta">): boolean {
   const meta = getShapeMeta(shape);
   return meta !== null && typeof meta.href === "string" && meta.href.length > 0;
 }
 
-export function getHref(shape: TLShape): string | null {
+export function getHref(shape: Pick<AnyShape, "meta">): string | null {
   const meta = getShapeMeta(shape);
   return meta?.href ?? null;
 }

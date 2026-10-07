@@ -1,20 +1,19 @@
 "use client";
 
-import "@/lib/shapeTypes";
 import {
   ShapeUtil,
   HTMLContainer,
-  Geometry2d,
+  type Geometry2d,
   Rectangle2d,
   T,
-  type TLShape,
+  type CanvasShape,
   type RecordProps,
-  type TLResizeInfo,
+  type ResizeInfo,
   resizeBox,
-} from "tldraw";
+} from "@/lib/canvas";
 import { wobblyRect } from "@/lib/variationSeed";
 
-type BrowserFrameShape = TLShape<"browser-frame">;
+type BrowserFrameShape = CanvasShape<"browser-frame">;
 
 export class BrowserFrameShapeUtil extends ShapeUtil<BrowserFrameShape> {
   static override type = "browser-frame" as const;
@@ -49,7 +48,7 @@ export class BrowserFrameShapeUtil extends ShapeUtil<BrowserFrameShape> {
     return true;
   }
 
-  override onResize(shape: BrowserFrameShape, info: TLResizeInfo<BrowserFrameShape>) {
+  override onResize(shape: BrowserFrameShape, info: ResizeInfo) {
     return resizeBox(shape, info);
   }
 

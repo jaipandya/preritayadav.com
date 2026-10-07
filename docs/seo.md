@@ -10,7 +10,7 @@ The canvas site (`/`, `/work`, `/work/<slug>`, `/about`, `/contact`) is the prim
 - A share image from an `opengraph-image.tsx` next to the page, drawn with `OgTemplate` in `lib/ogTemplate.tsx` (1200x630). Next adds it to Open Graph and Twitter. Do not set `runtime = "edge"`: without it these are rendered once at build time and served as static files.
 - `app/sitemap.ts` lists the public pages (archived case studies are left out but stay reachable). `app/robots.ts` allows everything and points to the sitemap.
 - JSON-LD (render with `components/JsonLd.tsx`): `Person` with a portrait on every page (root layout), `ProfilePage` on `/about`, `ItemList` on `/work` (`app/work/(listing)/layout.tsx`, so it stays off case studies), `CreativeWork` and `BreadcrumbList` on case studies (`app/work/[slug]/layout.tsx`).
-- Case study screenshots are tldraw shapes, not `<img>` tags. They reach search engines through `images` in `app/sitemap.ts` and the `image` array of the `CreativeWork`, both from `workImageUrls` in `lib/seo.ts` (the `atAGlanceImages` of the case study).
+- Case study screenshots are canvas shapes drawn in the browser after load, not `<img>` tags in the HTML. They reach search engines through `images` in `app/sitemap.ts` and the `image` array of the `CreativeWork`, both from `workImageUrls` in `lib/seo.ts` (the `atAGlanceImages` of the case study).
 - The home page is a client component, so its canonical lives in `app/(home)/layout.tsx`. It is not in the root layout, or every page without its own metadata (rendered, blog) would inherit `/`.
 - `app/work/[slug]/layout.tsx` sets `dynamicParams = false`: an unknown slug is a real 404, not a 200 page.
 

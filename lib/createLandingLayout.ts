@@ -1,4 +1,4 @@
-import type { Editor } from "tldraw";
+import type { Editor } from "@/lib/canvas";
 import { CANVAS_W, LEFT_PAD, centerCamera } from "./layoutHelpers";
 import { getFeaturedWork } from "./workData";
 import {

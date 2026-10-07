@@ -1,25 +1,24 @@
 "use client";
 
-import "@/lib/shapeTypes";
 import {
   ShapeUtil,
   HTMLContainer,
-  Geometry2d,
+  type Geometry2d,
   Rectangle2d,
   T,
-  type TLShape,
+  type CanvasShape,
   type RecordProps,
-  type TLResizeInfo,
+  type ResizeInfo,
   resizeBox,
   useIsEditing,
   useEditor,
-} from "tldraw";
+} from "@/lib/canvas";
 import { seededRandom } from "@/lib/variationSeed";
 import { useCallback, useRef } from "react";
 import { isNavigable } from "@/lib/canvasMeta";
 import { useShapeHover, useFocusOnEdit } from "@/lib/useShapeInteraction";
 
-type AnnotationShape = TLShape<"annotation">;
+type AnnotationShape = CanvasShape<"annotation">;
 
 function AnnotationComponent({ shape }: { shape: AnnotationShape }) {
   const { w, h, text, fontSize, showArrow, arrowDirection } = shape.props;
@@ -189,7 +188,7 @@ export class AnnotationShapeUtil extends ShapeUtil<AnnotationShape> {
     return true;
   }
 
-  override onResize(shape: AnnotationShape, info: TLResizeInfo<AnnotationShape>) {
+  override onResize(shape: AnnotationShape, info: ResizeInfo) {
     return resizeBox(shape, info);
   }
 

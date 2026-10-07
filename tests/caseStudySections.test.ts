@@ -3,10 +3,9 @@
  * otherwise editing a heading on the canvas would not change the rendered page. Run with `bun test`.
  * See docs/rendered-design.md.
  */
-import { describe, expect, mock, test } from "bun:test";
-import type { Editor } from "tldraw";
+import { describe, expect, test } from "bun:test";
+import type { Editor } from "@/lib/canvas";
 
-mock.module("tldraw", () => ({ AssetRecordType: { createId: (id: string) => `asset:${id}` } }));
 
 const { createWorkDetailLayout } = await import("../lib/createWorkDetailLayout");
 const { caseStudySections } = await import("../lib/caseStudySections");

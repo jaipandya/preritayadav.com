@@ -1,24 +1,23 @@
 "use client";
 
-import "@/lib/shapeTypes";
 import {
   ShapeUtil,
   HTMLContainer,
-  Geometry2d,
+  type Geometry2d,
   Rectangle2d,
   T,
-  type TLShape,
+  type CanvasShape,
   type RecordProps,
-  type TLResizeInfo,
+  type ResizeInfo,
   resizeBox,
   useIsEditing,
   useEditor,
-} from "tldraw";
+} from "@/lib/canvas";
 import { wobblyRect } from "@/lib/variationSeed";
 import { useCallback, useRef } from "react";
 import { useShapeHover, useFocusOnEdit } from "@/lib/useShapeInteraction";
 
-type HandDrawnButtonShape = TLShape<"hand-drawn-button">;
+type HandDrawnButtonShape = CanvasShape<"hand-drawn-button">;
 
 function ButtonComponent({ shape }: { shape: HandDrawnButtonShape }) {
   const { w, h, label } = shape.props;
@@ -152,7 +151,7 @@ export class HandDrawnButtonShapeUtil extends ShapeUtil<HandDrawnButtonShape> {
     return true;
   }
 
-  override onResize(shape: HandDrawnButtonShape, info: TLResizeInfo<HandDrawnButtonShape>) {
+  override onResize(shape: HandDrawnButtonShape, info: ResizeInfo) {
     return resizeBox(shape, info);
   }
 

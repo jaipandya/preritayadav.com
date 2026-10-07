@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { track, useEditor } from "tldraw";
+import { track, useEditor, type ToolId } from "@/lib/canvas";
 import { sounds, withSound } from "@/lib/sounds";
 import { useSoundEnabled } from "@/lib/useSoundEnabled";
 import { ToolbarIconButton } from "@/components/canvas/ToolbarIconButton";
@@ -19,7 +19,7 @@ import {
   UndoIcon,
 } from "@/components/canvas/toolbarIcons";
 
-const toolItems: { id: string; label: string; icon: ReactNode }[] = [
+const toolItems: { id: ToolId; label: string; icon: ReactNode }[] = [
   { id: "browse", label: "Browse", icon: <BrowseIcon /> },
   { id: "select", label: "Select", icon: <SelectIcon /> },
   { id: "draw", label: "Draw", icon: <DrawIcon /> },
@@ -69,9 +69,7 @@ export const CanvasUI = track(function CanvasUI({
 
   const startEditing = () => {
     if (!selected) return;
-    editor.markHistoryStoppingPoint("editing shape");
     editor.setEditingShape(selected);
-    editor.setCurrentTool("select.editing_shape", { target: "shape", shape: selected });
   };
 
   const dividerStyle = {

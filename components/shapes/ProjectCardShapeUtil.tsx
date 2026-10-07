@@ -1,25 +1,24 @@
 "use client";
 
-import "@/lib/shapeTypes";
 import {
   ShapeUtil,
   HTMLContainer,
-  Geometry2d,
+  type Geometry2d,
   Rectangle2d,
   T,
-  type TLShape,
+  type CanvasShape,
   type RecordProps,
-  type TLResizeInfo,
+  type ResizeInfo,
   resizeBox,
   useIsEditing,
   useEditor,
-} from "tldraw";
+} from "@/lib/canvas";
 import { wobblyRect, wobblyLine, wobblyCircle } from "@/lib/variationSeed";
 import { useCallback, useRef } from "react";
 import { isNavigable } from "@/lib/canvasMeta";
 import { useFocusOnEdit } from "@/lib/useShapeInteraction";
 
-type ProjectCardShape = TLShape<"project-card">;
+type ProjectCardShape = CanvasShape<"project-card">;
 
 function ProjectIllustration({ id, mediaType, size }: { id: string; mediaType: string; size: number }) {
   const s = size;
@@ -362,7 +361,7 @@ export class ProjectCardShapeUtil extends ShapeUtil<ProjectCardShape> {
     return true;
   }
 
-  override onResize(shape: ProjectCardShape, info: TLResizeInfo<ProjectCardShape>) {
+  override onResize(shape: ProjectCardShape, info: ResizeInfo) {
     return resizeBox(shape, info);
   }
 

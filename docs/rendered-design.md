@@ -1,7 +1,7 @@
 # Rendered site: design spec and redesign plan
 
 Scope: everything under `/rendered` (`app/rendered/**`, `components/rendered/**`, `app/rendered/rendered.css`).
-The WIP (tldraw) site is out of scope except where a content field changes (see "Content wiring").
+The WIP (canvas) site is out of scope except where a content field changes (see "Content wiring").
 
 Status: **implemented**, pending review. See "6. Decisions" for the answers to the open questions.
 

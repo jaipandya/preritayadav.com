@@ -14,6 +14,8 @@
  * `work.<slug>.keyContributions` (a list), `about.paragraphs.0`, `landing.hero.name`.
  */
 
+import { isSavedCanvas } from "./canvas/snapshot";
+
 export const CONTENT_OVERRIDES_KEY = "prerita-content-overrides";
 export const CONTENT_OVERRIDES_EVENT = "prerita-content-overrides-change";
 export const WIP_STORAGE_PREFIX = "prerita-wip-";
@@ -248,7 +250,7 @@ function listItemsOf(text: string, prefix?: string): string[] {
 }
 
 /**
- * Diff bound shapes in the given tldraw snapshots against their defaults.
+ * Diff bound shapes in the given canvas snapshots against their defaults.
  * Fields seen in a snapshot are set when edited and removed when back to default.
  * Fields not seen in any snapshot (page never visited, canvas reset) keep their previous override.
  */
@@ -334,7 +336,11 @@ export function collectOverrides(snapshots: unknown[], previous: ContentOverride
   return next;
 }
 
-/** Read every saved WIP canvas from localStorage and store the resulting overrides. Returns how many fields are overridden. */
+/**
+ * Read every saved WIP canvas from localStorage and store the resulting overrides. Returns how many fields are overridden.
+ * Only canvases in the current format count: an old save (from the tldraw version of the site) is not what the canvas
+ * shows, and it is replaced the next time its page is opened.
+ */
 export function commitOverridesFromCanvases(): number {
   try {
     const snapshots: unknown[] = [];
@@ -342,7 +348,8 @@ export function commitOverridesFromCanvases(): number {
       const storageKey = localStorage.key(i);
       if (!storageKey?.startsWith(WIP_STORAGE_PREFIX)) continue;
       try {
-        snapshots.push(JSON.parse(localStorage.getItem(storageKey) ?? "null"));
+        const snapshot: unknown = JSON.parse(localStorage.getItem(storageKey) ?? "null");
+        if (isSavedCanvas(snapshot)) snapshots.push(snapshot);
       } catch {
         // Skip corrupt snapshots.
       }

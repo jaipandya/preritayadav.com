@@ -1,20 +1,19 @@
 "use client";
 
-import "@/lib/shapeTypes";
 import {
   ShapeUtil,
   HTMLContainer,
-  Geometry2d,
+  type Geometry2d,
   Rectangle2d,
   T,
-  type TLShape,
+  type CanvasShape,
   type RecordProps,
-  type TLResizeInfo,
+  type ResizeInfo,
   resizeBox,
-} from "tldraw";
+} from "@/lib/canvas";
 import { wobblyCircle, seededRandom } from "@/lib/variationSeed";
 
-type CompanyLogosShape = TLShape<"company-logos">;
+type CompanyLogosShape = CanvasShape<"company-logos">;
 
 const stroke = "#1a1a1a";
 const sw = 2.2;
@@ -290,7 +289,7 @@ export class CompanyLogosShapeUtil extends ShapeUtil<CompanyLogosShape> {
     return true;
   }
 
-  override onResize(shape: CompanyLogosShape, info: TLResizeInfo<CompanyLogosShape>) {
+  override onResize(shape: CompanyLogosShape, info: ResizeInfo) {
     return resizeBox(shape, info);
   }
 

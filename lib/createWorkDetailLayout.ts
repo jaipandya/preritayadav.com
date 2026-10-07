@@ -1,4 +1,4 @@
-import { AssetRecordType, type Editor } from "tldraw";
+import type { Editor } from "@/lib/canvas";
 import { CANVAS_W, LEFT_PAD, centerCamera, createBackButton } from "./layoutHelpers";
 import { getWorkBySlug, type WorkItem } from "./workData";
 import { bind, bindList, contentKey, itemIds, withContent, withItem, type ContentBinding } from "./contentOverrides";
@@ -257,27 +257,12 @@ function imageGallery(editor: Editor, data: WorkItem, y: number): number {
     let x = LEFT_PAD;
 
     for (const { image, index } of images) {
-      const assetId = AssetRecordType.createId(`${data.slug}-glance-${index}`);
-      editor.createAssets([{
-        id: assetId,
-        typeName: "asset",
-        type: "image",
-        props: {
-          name: image.src.split("/").pop() ?? image.alt,
-          src: image.src,
-          w: image.width,
-          h: image.height,
-          mimeType: "image/webp",
-          isAnimated: false,
-        },
-        meta: {},
-      }]);
       const w = h * image.width / image.height;
       editor.createShape({
-        type: "image",
+        type: "canvas-image",
         x,
         y,
-        props: { w, h, assetId, altText: image.alt },
+        props: { w, h, src: image.src, naturalWidth: image.width, altText: image.alt },
         meta: withItem(
           { componentType: "case-study-image", variationId: `${data.slug}-glance-${index}` },
           itemIds.caseStudyImage(data.slug, index)

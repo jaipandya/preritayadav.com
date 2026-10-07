@@ -1,11 +1,11 @@
-import { type Editor } from "tldraw";
+import type { Editor } from "@/lib/canvas";
 import { sounds } from "./sounds";
 
 /**
  * Attaches canvas-specific sound effects to the editor.
  * - Draw / erase: plays on pointer down and while dragging.
- *   Uses document-level listeners because tldraw's draw tool calls
- *   setPointerCapture(), which redirects pointermove away from .tl-canvas.
+ *   Uses document-level listeners because Quickdraw captures the pointer
+ *   while drawing, which redirects pointermove away from the canvas.
  * - Typewriter: plays on each printable keypress while a text shape is open.
  *
  * Returns a cleanup function to remove all listeners.
@@ -14,8 +14,7 @@ export function attachCanvasSounds(editor: Editor): () => void {
   let isPointerDown = false;
 
   const onPointerDown = (e: PointerEvent) => {
-    const container = document.querySelector(".tl-container");
-    if (!container?.contains(e.target as Node)) return;
+    if (!editor.getContainer().contains(e.target as Node)) return;
     isPointerDown = true;
     const tool = editor.getCurrentToolId();
     if (tool === "draw") sounds.play("draw");

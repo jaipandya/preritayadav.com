@@ -1,7 +1,7 @@
 "use client";
 
 import { use } from "react";
-import type { Editor } from "tldraw";
+import type { Editor } from "@/lib/canvas";
 import { PageShell } from "@/components/PageShell";
 import { createWorkDetailLayout } from "@/lib/createWorkDetailLayout";
 import { getWorkBySlug } from "@/lib/workData";

@@ -1,7 +1,7 @@
 "use client";
 
 import { use, useCallback } from "react";
-import type { Editor } from "tldraw";
+import type { Editor } from "@/lib/canvas";
 import { PageShell } from "@/components/PageShell";
 import { createBlogLayout } from "@/lib/createBlogLayout";
 

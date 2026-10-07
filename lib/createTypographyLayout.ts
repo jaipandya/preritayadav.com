@@ -1,4 +1,4 @@
-import type { Editor } from "tldraw";
+import type { Editor } from "@/lib/canvas";
 import { CANVAS_W, LEFT_PAD, centerCamera, createBackButton } from "./layoutHelpers";
 
 export function createTypographyLayout(editor: Editor) {

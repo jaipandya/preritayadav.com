@@ -3,11 +3,9 @@
  * Runs against the real layout creators with a fake editor. Run with `bun test`.
  * See docs/content-overrides.md.
  */
-import { describe, expect, mock, test } from "bun:test";
-import type { Editor } from "tldraw";
+import { describe, expect, test } from "bun:test";
+import type { Editor } from "@/lib/canvas";
 
-// The layouts only use AssetRecordType from tldraw; skip loading the whole library.
-mock.module("tldraw", () => ({ AssetRecordType: { createId: (id: string) => `asset:${id}` } }));
 
 const { createWorkDetailLayout } = await import("../lib/createWorkDetailLayout");
 const { createAboutLayout } = await import("../lib/createAboutLayout");
@@ -156,7 +154,7 @@ describe("work page edits", () => {
       expect(list(f)).toEqual(defaults.filter((_, i) => i !== 1));
     });
 
-    test("duplicate a bullet: tldraw copies meta and offsets x, so the copy follows its source", () => {
+    test("duplicate a bullet: the canvas copies meta and offsets x, so the copy follows its source", () => {
       const f = setup();
       const source = bullets(f)[0];
       f.shapes.push({ ...structuredClone(source), x: source.x + 530, props: { ...source.props, text: "· A duplicate" } });

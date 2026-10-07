@@ -1,21 +1,20 @@
 "use client";
 
-import "@/lib/shapeTypes";
 import {
   ShapeUtil,
   HTMLContainer,
-  Geometry2d,
+  type Geometry2d,
   Rectangle2d,
   T,
-  type TLShape,
+  type CanvasShape,
   type RecordProps,
-  type TLResizeInfo,
+  type ResizeInfo,
   resizeBox,
-} from "tldraw";
+} from "@/lib/canvas";
 import { wobblyRect, wobblyCircle, seededRandom } from "@/lib/variationSeed";
 import { contactMe } from "@/lib/landingContent";
 
-type ContactMeShape = TLShape<"contact-me">;
+type ContactMeShape = CanvasShape<"contact-me">;
 
 const stroke = "#1a1a1a";
 const sw = 2;
@@ -199,7 +198,7 @@ export class ContactMeShapeUtil extends ShapeUtil<ContactMeShape> {
     return true;
   }
 
-  override onResize(shape: ContactMeShape, info: TLResizeInfo<ContactMeShape>) {
+  override onResize(shape: ContactMeShape, info: ResizeInfo) {
     return resizeBox(shape, info);
   }
 

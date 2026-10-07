@@ -1,21 +1,20 @@
 "use client";
 
-import "@/lib/shapeTypes";
 import {
   ShapeUtil,
   HTMLContainer,
-  Geometry2d,
+  type Geometry2d,
   Rectangle2d,
   T,
-  type TLShape,
+  type CanvasShape,
   type RecordProps,
-  type TLResizeInfo,
+  type ResizeInfo,
   resizeBox,
-} from "tldraw";
+} from "@/lib/canvas";
 import { wobblyRect, seededRandom } from "@/lib/variationSeed";
 import { isNavigable } from "@/lib/canvasMeta";
 
-type SkillIconShape = TLShape<"skill-icon">;
+type SkillIconShape = CanvasShape<"skill-icon">;
 
 export class SkillIconShapeUtil extends ShapeUtil<SkillIconShape> {
   static override type = "skill-icon" as const;
@@ -48,7 +47,7 @@ export class SkillIconShapeUtil extends ShapeUtil<SkillIconShape> {
     return true;
   }
 
-  override onResize(shape: SkillIconShape, info: TLResizeInfo<SkillIconShape>) {
+  override onResize(shape: SkillIconShape, info: ResizeInfo) {
     return resizeBox(shape, info);
   }
 

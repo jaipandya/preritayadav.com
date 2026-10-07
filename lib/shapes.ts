@@ -1,5 +1,4 @@
-import "@/lib/shapeTypes";
-import { defaultShapeUtils, defaultBindingUtils } from "tldraw";
+import type { ShapeUtilConstructor } from "@/lib/canvas";
 import { ProjectCardShapeUtil } from "@/components/shapes/ProjectCardShapeUtil";
 import { HandDrawnButtonShapeUtil } from "@/components/shapes/HandDrawnButtonShapeUtil";
 import { AnnotationShapeUtil } from "@/components/shapes/AnnotationShapeUtil";
@@ -11,9 +10,10 @@ import { HandDrawnIllustrationShapeUtil } from "@/components/shapes/HandDrawnIll
 import { OutsideWorkCardShapeUtil } from "@/components/shapes/OutsideWorkCardShapeUtil";
 import { CompanyLogosShapeUtil } from "@/components/shapes/CompanyLogosShapeUtil";
 import { ContactMeShapeUtil } from "@/components/shapes/ContactMeShapeUtil";
+import { CanvasImageShapeUtil } from "@/components/shapes/CanvasImageShapeUtil";
 
-export const customShapeUtils = [
-  ...defaultShapeUtils,
+/** The site's custom shapes. Quickdraw's own (pen strokes, text) need no util. */
+export const customShapeUtils: readonly ShapeUtilConstructor[] = [
   ProjectCardShapeUtil,
   HandDrawnButtonShapeUtil,
   AnnotationShapeUtil,
@@ -25,6 +25,5 @@ export const customShapeUtils = [
   OutsideWorkCardShapeUtil,
   CompanyLogosShapeUtil,
   ContactMeShapeUtil,
+  CanvasImageShapeUtil,
 ];
-
-export const customBindingUtils = [...defaultBindingUtils];

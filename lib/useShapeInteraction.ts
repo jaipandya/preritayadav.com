@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, type RefObject } from "react";
-import type { Editor, TLEventInfo, TLShapeId } from "tldraw";
+import type { CanvasPointerEvent, Editor, ShapeId } from "@/lib/canvas";
 
 /**
  * Tracks hover and press states for a shape, but only in browse mode.
@@ -9,7 +9,7 @@ import type { Editor, TLEventInfo, TLShapeId } from "tldraw";
  */
 export function useShapeHover(
   editor: Editor,
-  shapeId: TLShapeId,
+  shapeId: ShapeId,
   enabled = true
 ): { hovered: boolean; pressed: boolean } {
   const [hovered, setHovered] = useState(false);
@@ -18,8 +18,7 @@ export function useShapeHover(
   useEffect(() => {
     if (!enabled) return;
 
-    const handleEvent = (event: TLEventInfo) => {
-      if (event.type !== "pointer") return;
+    const handleEvent = (event: CanvasPointerEvent) => {
       if (editor.getCurrentToolId() !== "browse") {
         setHovered(false);
         setPressed(false);
@@ -53,12 +52,7 @@ export function useShapeHover(
       }
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    editor.on("event", handleEvent as any);
-    return () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      editor.off("event", handleEvent as any);
-    };
+    return editor.on("event", handleEvent);
   }, [editor, shapeId, enabled]);
 
   return { hovered, pressed };

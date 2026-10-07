@@ -10,6 +10,10 @@ Always use `bun` instead of `npm`, `yarn`, or `pnpm` for all operations (install
 
 ## Architecture Principles
 
+### Canvas engine
+
+The sketch canvas is Quickdraw (`@quickdrawjs/core`, MIT) with the site's own layer in `lib/canvas/` for custom HTML shapes, the browse tool, editing and saving. Import canvas APIs from `@/lib/canvas`, never from Quickdraw directly (except the `Store` in the persistence hook). How it fits together, and the Quickdraw internals it overrides, is in `docs/canvas.md`. Do not add tldraw back: it needs a license key in production.
+
 ### Reuse before creating
 
 Always check for existing shared hooks, helpers, and components before writing new code. Build on top of what already exists:
@@ -17,7 +21,7 @@ Always check for existing shared hooks, helpers, and components before writing n
 - **Shape interaction hooks** — `lib/useShapeInteraction.ts` exports `useShapeHover` (browse-only hover/press tracking) and `useFocusOnEdit` (auto-focus on edit). Use these in any new shape that needs hover effects or inline editing.
 - **Link detection** — Always use `isNavigable(shape)` from `lib/canvasMeta.ts` to check if a shape has a link. Never check `shape.meta.href` inline.
 - **Layout helpers** — `lib/layoutHelpers.ts` exports `CANVAS_W`, `LEFT_PAD`, `centerCamera`, and `createBackButton`. Use these in all layout creators instead of duplicating constants or boilerplate.
-- **Page shell** — `components/PageShell.tsx` wraps every page with the common structure: accessible nav, sr-only semantic HTML article, and tldraw canvas. Use this for any new page instead of assembling the pieces manually.
+- **Page shell** — `components/PageShell.tsx` wraps every page with the common structure: accessible nav, sr-only semantic HTML article, and the canvas. Use this for any new page instead of assembling the pieces manually.
 
 ### Single source of truth for page content
 
@@ -30,7 +34,7 @@ All page text content lives in shared data modules under `lib/`:
 - `lib/workData.ts` — all work/project case study content (already existed)
 - `lib/workPageContent.ts` — default labels of a case study page (headings, Role/Duration/Tools, buttons)
 
-Both the **tldraw layout creators** (`lib/create*Layout.ts`) and the **semantic HTML layers** (in each `app/*/page.tsx`) import from these modules. This ensures crawlers, screen readers, and the visual canvas all render the same content.
+Both the **canvas layout creators** (`lib/create*Layout.ts`) and the **semantic HTML layers** (in each `app/*/page.tsx`) import from these modules. This ensures crawlers, screen readers, and the visual canvas all render the same content.
 
 **When adding or changing content:**
 1. Edit the relevant content module in `lib/` — never hardcode text in a layout creator or page component.

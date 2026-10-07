@@ -23,70 +23,118 @@ body {
   padding: 0;
 }
 
-/* Lock viewport scrolling only on tldraw canvas pages */
+/* Lock viewport scrolling only on canvas pages */
 body:has(#main-content) {
   overflow: hidden;
 }
 
-/* Override tldraw text shapes to use Loranthus */
-.tl-text-shape__wrapper,
-.tl-text,
-.tl-text-input {
-  font-family: "Loranthus", cursive !important;
+/* ── Canvas (components/canvas/QuickdrawCanvas.tsx) ──
+   Layers, back to front: custom HTML shapes, the Quickdraw engine (transparent canvas), the shape being edited. */
+.cv-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  /* Clean white canvas background */
+  background-color: #ffffff;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
-
-/* Clean white canvas background */
-.tl-background {
-  background-color: #ffffff !important;
+.cv-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
 }
-
-/* Hide tldraw default UI chrome */
-.tlui-menu-zone,
-.tlui-menu-zone__controls,
-.tlui-debug-panel,
-.tlui-navigation-panel,
-.tlui-layout,
-.tl-watermark_SEE-LICENSE {
-  display: none !important;
+.cv-engine {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
 }
-
-/* Ensure shapes render crisply */
-.tl-shape {
+.cv-engine.qd-root {
+  background: transparent;
+}
+.cv-layer--front {
+  z-index: 2;
+}
+.cv-camera {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+}
+.cv-shape {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: visible;
+  transform-origin: center;
+  contain: size layout;
+  /* Ensure shapes render crisply */
   will-change: transform;
+}
+.cv-shape[data-editing] {
+  -webkit-user-select: text;
+  user-select: text;
+}
+/* Root of a custom shape's component. Shapes may override the position and pointer events inline. */
+.cv-html-container {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  color: hsl(0, 0%, 18%);
+}
+.cv-indicator {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: visible;
+  transform-origin: center;
+  fill: none;
+  stroke: #2f80ed;
+  stroke-width: 1.5;
+}
+.cv-indicator * {
+  vector-effect: non-scaling-stroke;
+}
+
+/* Text typed with the text tool uses Loranthus (the font is set on the Quickdraw engine, lib/canvas/engine.ts) */
+.cv-container .qd-text-edit {
+  font-family: "Loranthus", cursive;
 }
 
 /* Browse tool cursor: default pointer */
-.tl-container[data-state="browse"] {
+.cv-container[data-tool="browse"] {
   cursor: default !important;
 }
 
 /* Eraser tool cursor: monochrome eraser icon, locked so it never changes on hover.
-   Must set cursor directly on .tl-container (not via CSS var) because tldraw's
-   cursor: var(--tl-cursor) lives on .tl-canvas (a child), not .tl-container itself.
-   With cursor set on the container, children can safely inherit it. */
-.tl-container[data-state^="eraser"] {
+   Set on the container and inherited by everything in it, so Quickdraw's own cursors do not show. */
+.cv-container[data-tool="eraser"] {
   cursor: url("data:image/svg+xml,<svg height='32' width='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'><defs><filter id='shadow' y='-40%' x='-40%' width='180px' height='180%' color-interpolation-filters='sRGB'><feDropShadow dx='1' dy='1' stdDeviation='1.2' flood-opacity='.5'/></filter></defs><g filter='url(%23shadow)'><rect x='9' y='13' width='14' height='7' rx='1.5' fill='white' stroke='black' stroke-width='1'/><rect x='9' y='13' width='5' height='7' rx='1.5' fill='%23555' stroke='black' stroke-width='1'/><line x1='14' y1='13' x2='14' y2='20' stroke='black' stroke-width='0.8'/></g></svg>") 16 17, auto !important;
 }
-.tl-container[data-state^="eraser"] .tl-canvas,
-.tl-container[data-state^="eraser"] .tl-canvas * {
+.cv-container[data-tool="eraser"] * {
   cursor: inherit !important;
 }
 
 /* Draw/pencil tool cursor: pencil icon pointing to lower-left (hotspot at tip) */
-.tl-container[data-state^="draw"] {
+.cv-container[data-tool="draw"] {
   cursor: url("data:image/svg+xml,<svg height='32' width='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'><defs><filter id='shadow' y='-40%' x='-40%' width='180px' height='180%' color-interpolation-filters='sRGB'><feDropShadow dx='1' dy='1' stdDeviation='1.2' flood-opacity='.5'/></filter></defs><g transform='rotate(45 16 16)' filter='url(%23shadow)'><rect x='13' y='7' width='6' height='14' rx='0.5' fill='white' stroke='black' stroke-width='1'/><rect x='13' y='7' width='6' height='4' rx='0.5' fill='%23ddd' stroke='none'/><rect x='13' y='10' width='6' height='2' fill='%23aaa' stroke='none'/><polygon points='13,21 19,21 16,25' fill='%23eee' stroke='black' stroke-width='1' stroke-linejoin='round'/><polygon points='14.5,23.5 17.5,23.5 16,25' fill='%23333'/></g></svg>") 10 22, crosshair !important;
 }
-.tl-container[data-state^="draw"] .tl-canvas,
-.tl-container[data-state^="draw"] .tl-canvas * {
+.cv-container[data-tool="draw"] * {
   cursor: inherit !important;
 }
 
 /* Text tool cursor: T-shape matching the tool icon, locked */
-.tl-container[data-state^="text"] {
+.cv-container[data-tool="text"] {
   cursor: url("data:image/svg+xml,<svg height='32' width='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'><defs><filter id='shadow' y='-40%' x='-40%' width='180px' height='180%' color-interpolation-filters='sRGB'><feDropShadow dx='1' dy='1' stdDeviation='1.2' flood-opacity='.5'/></filter></defs><g fill='none' filter='url(%23shadow)'><line x1='10' y1='10' x2='22' y2='10' stroke='white' stroke-width='3.5' stroke-linecap='round'/><line x1='16' y1='10' x2='16' y2='22' stroke='white' stroke-width='3.5' stroke-linecap='round'/><line x1='13' y1='22' x2='19' y2='22' stroke='white' stroke-width='3.5' stroke-linecap='round'/><line x1='10' y1='10' x2='22' y2='10' stroke='%23231f1f' stroke-width='1.8' stroke-linecap='round'/><line x1='16' y1='10' x2='16' y2='22' stroke='%23231f1f' stroke-width='1.8' stroke-linecap='round'/><line x1='13' y1='22' x2='19' y2='22' stroke='%23231f1f' stroke-width='1.8' stroke-linecap='round'/></g></svg>") 16 10, text !important;
 }
-.tl-container[data-state^="text"] .tl-canvas,
-.tl-container[data-state^="text"] .tl-canvas * {
+.cv-container[data-tool="text"] * {
   cursor: inherit !important;
 }
 
@@ -119,7 +167,7 @@ body:has(#main-content) {
   border: 0;
 }
 
-/* Fade in tldraw canvas once loaded */
+/* Fade in the canvas once loaded */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -163,7 +211,7 @@ body.is-building .build-button {
 /* Placeholder behind canvas images (case study screenshots). It is the same box as the image,
    so nothing shifts when the image arrives and covers it. The shimmer runs a few times and stops,
    so it never repaints behind an image that has loaded. */
-.tl-shape[data-shape-type="image"] .tl-html-container {
+.cv-shape[data-shape-type="canvas-image"] .cv-html-container {
   background-color: #ececea;
   background-image: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.55) 50%, transparent 100%);
   background-size: 200% 100%;
@@ -175,5 +223,5 @@ body.is-building .build-button {
   to { background-position: -100% 0; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .tl-shape[data-shape-type="image"] .tl-html-container { animation: none; }
+  .cv-shape[data-shape-type="canvas-image"] .cv-html-container { animation: none; }
 }
