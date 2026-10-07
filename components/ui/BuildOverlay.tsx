@@ -1,10 +1,24 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { commitOverridesFromCanvases } from "@/lib/contentOverrides";
+import {
+  dismissBuild,
+  getSnapshot,
+  hideBuild,
+  openBuild,
+  startBuild,
+  stopBuild,
+  takeTrigger,
+  useBuildSession,
+  wasBuiltBefore,
+  type BuildLine,
+  type BuildPhase,
+  type BuildSnapshot,
+} from "@/lib/buildSession";
 
-const BUILD_LINES: Array<{ text: string; delay: number }> = [
+const BUILD_LINES: BuildLine[] = [
   { text: "▸ Launching build agent...", delay: 0 },
   { text: "  Agent: prerita-portfolio-builder v0.2", delay: 500 },
   { text: "  Mode: sketch → minimal render", delay: 350 },
@@ -111,7 +125,7 @@ const BUILD_LINES: Array<{ text: string; delay: number }> = [
   { text: "✓ Build complete. Ready to view.", delay: 500 },
 ];
 
-const CACHED_LINES: Array<{ text: string; delay: number }> = [
+const CACHED_LINES: BuildLine[] = [
   { text: "▸ Launching build agent...", delay: 0 },
   { text: "  Agent: prerita-portfolio-builder v0.2", delay: 400 },
   { text: "", delay: 400 },
@@ -132,85 +146,62 @@ const CACHED_LINES: Array<{ text: string; delay: number }> = [
 ];
 
 /** Lines that appear when the user stops a build. Fake, like the build itself. */
-const STOP_LINES: Array<{ text: string; delay: number }> = [
+const STOP_LINES: BuildLine[] = [
   { text: "^C", delay: 0 },
   { text: "", delay: 200 },
   { text: "▸ Stop requested...", delay: 300 },
   { text: "  Cancelling queued steps", delay: 380 },
   { text: "  Releasing file handles", delay: 340 },
-  { text: "  Discarding partial output, nothing was written", delay: 420 },
+  { text: "  Discarding partial output", delay: 400 },
   { text: "  Your sketch and edits are untouched", delay: 320 },
   { text: "", delay: 250 },
   { text: "■ Build stopped.", delay: 350 },
 ];
 
-type BuildStatus = "running" | "stopping" | "stopped" | "done";
-
-const STATUS_TEXT: Record<BuildStatus, string> = {
+const STATUS_TEXT: Record<BuildPhase, string> = {
+  idle: "",
   running: "Building...",
   stopping: "Stopping...",
-  stopped: "Stopped. Nothing was written.",
+  stopped: "Stopped",
   done: "Ready",
 };
 
-export function BuildOverlay({
-  onComplete,
-  onClose,
-  cached = false,
+function lineColor(line: string): string | undefined {
+  if (line.startsWith("■")) return "#d7857a";
+  if (line === "^C") return "#e8e4dc";
+  if (line.startsWith("✓ Build") || line.startsWith("✓ 13 pages")) return "#D4A853";
+  if (line.startsWith("  ✓")) return "#7a9e6a";
+  if (line.startsWith("  →") || line.startsWith("  [")) return "#8a9eb5";
+  if (line.startsWith("  font-") || line.startsWith("  palette") || line.startsWith("    --r-") || line.startsWith("    sans:") || line.startsWith("    mono:")) return "#b89a6a";
+  if (line.startsWith("$") || line.startsWith("  ○")) return "#706c64";
+  if (line.startsWith("▸")) return "#e8e4dc";
+  if (line.startsWith("  ƒ") || line.startsWith("  ●")) return "#8a9eb5";
+  return undefined;
+}
+
+/**
+ * The modal. Backdrop clicks do nothing: a running build ends with Stop, or goes on in the background
+ * ("Run in background", the red dot or Escape) and comes back through the Build button.
+ */
+function BuildOverlay({
+  snap,
+  onVisit,
 }: {
-  onComplete: () => void;
-  onClose: () => void;
-  cached?: boolean;
+  snap: BuildSnapshot;
+  onVisit: () => void;
 }) {
-  const [status, setStatus] = useState<BuildStatus>("running");
-  const [lines, setLines] = useState<string[]>([]);
-  const [progress, setProgress] = useState(0);
+  const { phase, lines, progress } = snap;
   const scrollRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
   const actionRef = useRef<HTMLButtonElement>(null);
-  const mountedRef = useRef(true);
-  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
-  const statusRef = useRef<BuildStatus>("running");
+  const live = phase === "running" || phase === "stopping";
+  const halted = phase === "stopping" || phase === "stopped";
 
-  const updateStatus = useCallback((next: BuildStatus) => {
-    statusRef.current = next;
-    setStatus(next);
-  }, []);
-
-  useEffect(() => {
-    mountedRef.current = true;
-    const source = cached ? CACHED_LINES : BUILD_LINES;
-    let totalDelay = 0;
-    const totalLines = source.length;
-    const timers = timersRef.current;
-
-    source.forEach((line, i) => {
-      totalDelay += line.delay;
-      const timer = setTimeout(() => {
-        if (!mountedRef.current) return;
-        setLines((prev) => [...prev, line.text]);
-        setProgress(Math.min(((i + 1) / totalLines) * 100, 100));
-
-        if (i === totalLines - 1) {
-          if (!cached) {
-            try { sessionStorage.setItem("prerita-build-done", "1"); } catch {}
-          }
-          updateStatus("done");
-        }
-      }, totalDelay);
-      timers.push(timer);
-    });
-
-    return () => {
-      mountedRef.current = false;
-      timers.forEach(clearTimeout);
-      timers.length = 0;
-    };
-  }, [cached, updateStatus]);
-
-  useEffect(() => {
-    document.body.classList.add("is-building");
-    return () => document.body.classList.remove("is-building");
-  }, []);
+  // Hide while the build goes on, or close for good once it has ended.
+  const leave = useCallback(() => {
+    if (live) hideBuild();
+    else dismissBuild();
+  }, [live]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -218,47 +209,39 @@ export function BuildOverlay({
     }
   }, [lines]);
 
-  // The footer button changes meaning (Stop, Stopping, Close, Visit), so keep keyboard focus on it.
+  // Focus the safe button (never Stop: a Space key-up from opening the modal would press it), and again
+  // whenever the footer changes.
   useEffect(() => {
     actionRef.current?.focus({ preventScroll: true });
-  }, [status]);
-
-  const stopBuild = useCallback(() => {
-    if (statusRef.current !== "running") return;
-    updateStatus("stopping");
-    timersRef.current.forEach(clearTimeout);
-    timersRef.current.length = 0;
-
-    let delay = 0;
-    STOP_LINES.forEach((line, i) => {
-      delay += line.delay;
-      timersRef.current.push(
-        setTimeout(() => {
-          if (!mountedRef.current) return;
-          setLines((prev) => [...prev, line.text]);
-          if (i === STOP_LINES.length - 1) updateStatus("stopped");
-        }, delay),
-      );
-    });
-  }, [updateStatus]);
-
-  // Backdrop, the red dot and Escape do what the footer button does: stop a running build,
-  // ignore the click while it is stopping, otherwise close.
-  const dismiss = useCallback(() => {
-    const current = statusRef.current;
-    if (current === "running") stopBuild();
-    else if (current !== "stopping") onClose();
-  }, [stopBuild, onClose]);
+  }, [phase]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") dismiss();
+      if (e.key === "Escape") {
+        leave();
+        return;
+      }
+      if (e.key !== "Tab" || !cardRef.current) return;
+      // Backdrop clicks do nothing and the page behind is inert, so keep Tab inside the dialog.
+      const focusable = Array.from(cardRef.current.querySelectorAll<HTMLElement>("button:not(:disabled)"));
+      if (focusable.length === 0) {
+        e.preventDefault();
+        return;
+      }
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement;
+      if (e.shiftKey && (active === first || !cardRef.current.contains(active))) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && (active === last || !cardRef.current.contains(active))) {
+        e.preventDefault();
+        first.focus();
+      }
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, [dismiss]);
-
-  const halted = status === "stopping" || status === "stopped";
+  }, [leave]);
 
   return (
     <div
@@ -274,14 +257,13 @@ export function BuildOverlay({
         alignItems: "center",
         justifyContent: "center",
       }}
-      onClick={dismiss}
     >
       <div
+        ref={cardRef}
         className="build-card"
         role="dialog"
         aria-modal="true"
         aria-label="Build output"
-        onClick={(e) => e.stopPropagation()}
         style={{
           width: "100%",
           maxWidth: 640,
@@ -313,17 +295,10 @@ export function BuildOverlay({
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <div style={{ display: "flex", gap: 6, paddingLeft: 4 }}>
               <button
-                onClick={dismiss}
-                aria-label={status === "running" ? "Stop build" : "Close build output"}
-                style={{
-                  width: 12,
-                  height: 12,
-                  borderRadius: "50%",
-                  background: "#ff5f56",
-                  border: "none",
-                  padding: 0,
-                  cursor: "pointer",
-                }}
+                className="build-dot"
+                onClick={leave}
+                aria-label={live ? "Hide build output (the build keeps running)" : "Close build output"}
+                title={live ? "Hide (the build keeps running)" : "Close"}
               />
               <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#ffbd2e" }} />
               <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#27c93f" }} />
@@ -368,34 +343,14 @@ export function BuildOverlay({
                 height: line === "" ? 6 : "auto",
                 whiteSpace: "pre-wrap",
                 wordBreak: "break-word",
-                color: line.startsWith("■")
-                  ? "#d7857a"
-                  : line === "^C"
-                  ? "#e8e4dc"
-                  : line.startsWith("✓ Build") || line.startsWith("✓ 13 pages")
-                  ? "#D4A853"
-                  : line.startsWith("  ✓")
-                  ? "#7a9e6a"
-                  : line.startsWith("  →") || line.startsWith("  [")
-                  ? "#8a9eb5"
-                  : line.startsWith("  font-") || line.startsWith("  palette") || line.startsWith("    --r-") || line.startsWith('    sans:') || line.startsWith('    mono:')
-                  ? "#b89a6a"
-                  : line.startsWith("$")
-                  ? "#706c64"
-                  : line.startsWith("▸")
-                  ? "#e8e4dc"
-                  : line.startsWith("  ○")
-                  ? "#706c64"
-                  : line.startsWith("  ƒ") || line.startsWith("  ●")
-                  ? "#8a9eb5"
-                  : undefined,
+                color: lineColor(line),
                 fontWeight: line.startsWith("▸") || line.startsWith("✓") || line.startsWith("■") || line === "^C" ? 600 : 400,
               }}
             >
               {line}
             </div>
           ))}
-          {(status === "running" || status === "stopping") && lines.length > 0 && (
+          {live && lines.length > 0 && (
             <span
               style={{
                 display: "inline-block",
@@ -410,60 +365,38 @@ export function BuildOverlay({
           )}
         </div>
 
-        {/* Footer: always there. Stop while building, a disabled spinner while stopping, Close once stopped. */}
+        {/* Footer: always there. Stop while building, a disabled spinner while stopping, Close once it has ended. */}
         <div className="build-actions">
-          <span className="build-status" role="status" data-status={status}>
-            {STATUS_TEXT[status]}
+          <span className="build-status" data-status={phase}>
+            {STATUS_TEXT[phase]}
           </span>
-          {status === "running" && (
-            <button
-              ref={actionRef}
-              className="build-btn build-btn-stop"
-              onClick={(e) => {
-                e.stopPropagation();
-                stopBuild();
-              }}
-            >
+          {phase === "running" && (
+            <button className="build-btn build-btn-stop" onClick={() => stopBuild(STOP_LINES)}>
               Stop build
             </button>
           )}
-          {status === "stopping" && (
+          {phase === "stopping" && (
             <button className="build-btn build-btn-stop" disabled aria-busy="true">
               <span className="build-spinner" aria-hidden="true" />
               Stopping...
             </button>
           )}
-          {status === "stopped" && (
-            <button
-              ref={actionRef}
-              className="build-btn build-btn-ghost"
-              onClick={(e) => {
-                e.stopPropagation();
-                onClose();
-              }}
-            >
+          {live && (
+            <button ref={actionRef} className="build-btn build-btn-ghost" onClick={hideBuild}>
+              Run in background
+            </button>
+          )}
+          {phase === "stopped" && (
+            <button ref={actionRef} className="build-btn build-btn-ghost" onClick={dismissBuild}>
               Close
             </button>
           )}
-          {status === "done" && (
+          {phase === "done" && (
             <>
-              <button
-                ref={actionRef}
-                className="build-btn build-btn-primary"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onComplete();
-                }}
-              >
+              <button ref={actionRef} className="build-btn build-btn-primary" onClick={onVisit}>
                 Visit rendered page →
               </button>
-              <button
-                className="build-btn build-btn-ghost"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onClose();
-                }}
-              >
+              <button className="build-btn build-btn-ghost" onClick={dismissBuild}>
                 Close
               </button>
             </>
@@ -476,11 +409,24 @@ export function BuildOverlay({
             max-height: 420px;
             color-scheme: dark;
           }
+          .build-dot {
+            position: relative;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff5f56;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+          }
+          /* The dot is 12px; the tap area is not. */
+          .build-dot::after { content: ""; position: absolute; inset: -8px; }
+          .build-dot:focus-visible { outline: 2px solid #D4A853; outline-offset: 3px; }
           .build-actions {
             flex-shrink: 0;
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 12px;
             padding: 12px 16px;
             border-top: 1px solid #1e1d1a;
             background: #141311;
@@ -552,6 +498,7 @@ export function BuildOverlay({
               font-size: 13px;
               padding-bottom: env(safe-area-inset-bottom);
             }
+            .build-dot::after { inset: -14px; }
             .build-terminal-scroll { padding: 12px !important; }
             .build-actions {
               flex-direction: column;
@@ -566,9 +513,6 @@ export function BuildOverlay({
           }
           @keyframes blink {
             50% { opacity: 0; }
-          }
-          @keyframes build-spin {
-            to { transform: rotate(360deg); }
           }
           .build-terminal-scroll::-webkit-scrollbar {
             width: 6px;
@@ -593,103 +537,225 @@ export function BuildOverlay({
   );
 }
 
-export function BuildButton({ 
-  variant = "floating",
-  className = ""
-}: { 
-  variant?: "floating" | "inline",
-  className?: string
-}) {
+/**
+ * Mounted once per page (in BrowserChrome), because the desktop and phone Build buttons both exist in the DOM.
+ * Shows the modal while the session is open and keeps the page's side effects (body class, focus, announcements).
+ */
+export function BuildOverlayHost() {
   const router = useRouter();
   const pathname = usePathname();
-  const [building, setBuilding] = useState(false);
-  const [isCached, setIsCached] = useState(false);
-  const renderedPath = `/rendered${pathname === "/" ? "" : pathname}`;
+  const snap = useBuildSession();
+  const wasOpen = useRef(false);
 
-  const handleComplete = useCallback(() => {
+  // Hides toolbars and the Build button while the modal is up, and gives them back when it is hidden.
+  useEffect(() => {
+    if (!snap.open) return;
+    document.body.classList.add("is-building");
+    return () => document.body.classList.remove("is-building");
+  }, [snap.open]);
+
+  // Back to the button that opened the modal, once it is visible again.
+  useEffect(() => {
+    if (wasOpen.current && !snap.open) {
+      const el = takeTrigger();
+      if (el) requestAnimationFrame(() => el.focus({ preventScroll: true }));
+    }
+    wasOpen.current = snap.open;
+  }, [snap.open]);
+
+  const visit = useCallback(() => {
     // Canvas saves are debounced, so collect again now that the build has run for a few seconds.
     commitOverridesFromCanvases();
-    router.push(renderedPath);
-  }, [router, renderedPath]);
+    // End the session first, or the modal would be waiting open when the visitor comes back to the sketch.
+    dismissBuild();
+    router.push(`/rendered${pathname === "/" ? "" : pathname}`);
+  }, [router, pathname]);
 
-  const handleClick = useCallback(() => {
-    let cached = false;
-    try { cached = sessionStorage.getItem("prerita-build-done") === "1"; } catch {}
-    setIsCached(cached);
-    commitOverridesFromCanvases();
-    setBuilding(true);
-  }, []);
+  // A build that ends while the modal is hidden is announced, since nothing else on screen is read out.
+  const announcement = snap.open
+    ? ""
+    : snap.phase === "done"
+    ? "Build ready. Use the Build button to view it."
+    : snap.phase === "stopped"
+    ? "Build stopped."
+    : "";
 
   return (
     <>
-      <button
-        className={`build-button ${className}`}
-        onClick={handleClick}
-        style={variant === "floating" ? {
-          position: "fixed",
-          bottom: 48,
-          right: 24,
-          zIndex: 600,
-          pointerEvents: "auto",
-          alignItems: "center",
-          gap: 7,
-          fontFamily: "'Loranthus', sans-serif",
-          fontSize: 13,
-          color: "#1a1a1a",
-          background: "#fff",
-          border: "1.5px solid #1a1a1a",
-          borderRadius: 8,
-          padding: "8px 16px",
-          cursor: "pointer",
-          transition: "background 0.15s, transform 0.15s, box-shadow 0.15s",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-        } : {
-          alignItems: "center",
-          gap: 5,
-          height: "100%",
-          padding: "0 8px",
-          border: "none",
-          borderLeft: "1px solid #1a1a1a",
-          background: "#fff",
-          color: "#1a1a1a",
-          fontSize: 11,
-          fontFamily: "'Loranthus', sans-serif",
-          cursor: "pointer",
-          borderTopRightRadius: 2,
-          borderBottomRightRadius: 2,
-          transition: "background 0.15s",
-          pointerEvents: "auto",
-        }}
-        onMouseEnter={(e) => {
-          if (variant === "floating") {
-            e.currentTarget.style.background = "#f5f5f0";
-            e.currentTarget.style.transform = "translateY(-1px)";
-            e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.12)";
-          } else {
-            e.currentTarget.style.background = "#f5f5f0";
-          }
-        }}
-        onMouseLeave={(e) => {
-          if (variant === "floating") {
-            e.currentTarget.style.background = "#fff";
-            e.currentTarget.style.transform = "translateY(0)";
-            e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.08)";
-          } else {
-            e.currentTarget.style.background = "#fff";
-          }
-        }}
-        title="Build high-fidelity version"
-      >
-        <svg width={variant === "floating" ? 14 : 12} height={variant === "floating" ? 14 : 12} viewBox="0 0 14 14" fill="none" stroke="#1a1a1a" strokeWidth={1.3} strokeLinecap="round" strokeLinejoin="round">
+      <div role="status" aria-live="polite" className="sr-only">
+        {announcement}
+      </div>
+      {snap.open && <BuildOverlay snap={snap} onVisit={visit} />}
+    </>
+  );
+}
+
+function BuildSpinner({ size }: { size: number }) {
+  // Same box as the icons, so swapping them never changes the button's height.
+  return (
+    <span style={{ width: size, height: size, display: "inline-flex", alignItems: "center", justifyContent: "center", flex: "none" }} aria-hidden="true">
+      <span className="build-button-spinner" />
+    </span>
+  );
+}
+
+function BuildCheck({ size }: { size: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 14 14" fill="none" stroke="#1a1a1a" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M2.5 7.5l3 3 6-6.5" />
+    </svg>
+  );
+}
+
+function buttonText(phase: BuildPhase, progress: number, variant: "floating" | "inline") {
+  const pct = `${Math.round(progress)}%`;
+  switch (phase) {
+    case "running":
+      return variant === "floating" ? `Building ${pct}` : pct;
+    case "stopping":
+      return "Stopping...";
+    case "stopped":
+      return variant === "floating" ? "Build stopped" : "Stopped";
+    case "done":
+      return variant === "floating" ? "Build ready" : "Ready";
+    default:
+      return "Build";
+  }
+}
+
+function buttonDescription(phase: BuildPhase, progress: number) {
+  switch (phase) {
+    case "running":
+      return `Build running, ${Math.round(progress)} percent. Show build output`;
+    case "stopping":
+      return "Build is stopping. Show build output";
+    case "stopped":
+      return "Build stopped. Show build output";
+    case "done":
+      return "Build ready. Show build output";
+    default:
+      return "Build high-fidelity version";
+  }
+}
+
+/**
+ * Starts a build, or, while one is running or finished, brings its window back. The label follows the build.
+ * The modal itself is `BuildOverlayHost`.
+ */
+export function BuildButton({
+  variant = "floating",
+  className = "",
+}: {
+  variant?: "floating" | "inline";
+  className?: string;
+}) {
+  const snap = useBuildSession();
+  const { phase, progress } = snap;
+  const idle = phase === "idle";
+  const busy = phase === "running" || phase === "stopping";
+
+  const handleClick = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      const from = e.currentTarget;
+      if (getSnapshot().phase !== "idle") {
+        openBuild(from);
+        return;
+      }
+      commitOverridesFromCanvases();
+      const cached = wasBuiltBefore();
+      startBuild(cached ? CACHED_LINES : BUILD_LINES, cached, from);
+    },
+    [],
+  );
+
+  const iconSize = variant === "floating" ? 14 : 12;
+
+  return (
+    <button
+      className={`build-button ${className}`}
+      data-phase={phase}
+      data-variant={variant}
+      onClick={handleClick}
+      aria-label={buttonDescription(phase, progress)}
+      title={buttonDescription(phase, progress)}
+      style={variant === "floating" ? {
+        position: "fixed",
+        bottom: 48,
+        right: 24,
+        zIndex: 600,
+        pointerEvents: "auto",
+        // Compact while idle. It widens once when a build starts, to fit the longest label ("Build stopped"),
+        // and keeps that width until the build is dismissed. Content is left aligned, so changing text moves nothing.
+        width: idle ? 90 : 146,
+        height: 38,
+        boxSizing: "border-box",
+        justifyContent: "flex-start",
+        whiteSpace: "nowrap",
+        alignItems: "center",
+        gap: 7,
+        fontFamily: "'Loranthus', sans-serif",
+        fontSize: 13,
+        fontVariantNumeric: "tabular-nums",
+        color: "#1a1a1a",
+        background: "#fff",
+        border: "1.5px solid #1a1a1a",
+        borderRadius: 8,
+        padding: "0 14px",
+        cursor: "pointer",
+        transition: "background 0.15s, transform 0.15s, box-shadow 0.15s, width 0.2s ease",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+      } : {
+        // Same rule: one widening when a build starts (wide enough for "Stopping..."), then no change.
+        width: idle ? 60 : 84,
+        boxSizing: "border-box",
+        justifyContent: "flex-start",
+        whiteSpace: "nowrap",
+        flexShrink: 0,
+        alignItems: "center",
+        gap: 5,
+        height: "100%",
+        padding: "0 8px",
+        border: "none",
+        borderLeft: "1px solid #1a1a1a",
+        background: "#fff",
+        color: "#1a1a1a",
+        fontSize: 11,
+        fontVariantNumeric: "tabular-nums",
+        fontFamily: "'Loranthus', sans-serif",
+        cursor: "pointer",
+        borderTopRightRadius: 2,
+        borderBottomRightRadius: 2,
+        transition: "background 0.15s, width 0.2s ease",
+        pointerEvents: "auto",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.background = "#f5f5f0";
+        if (variant === "floating") {
+          e.currentTarget.style.transform = "translateY(-1px)";
+          e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.12)";
+        }
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.background = "#fff";
+        if (variant === "floating") {
+          e.currentTarget.style.transform = "translateY(0)";
+          e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.08)";
+        }
+      }}
+    >
+      {busy ? (
+        <BuildSpinner size={iconSize} />
+      ) : phase === "done" ? (
+        <BuildCheck size={iconSize} />
+      ) : (
+        <svg width={iconSize} height={iconSize} viewBox="0 0 14 14" fill="none" stroke="#1a1a1a" strokeWidth={1.3} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <rect x="1.5" y="3" width="11" height="8.5" rx="1" />
           <path d="M4.5 6l2 1.5-2 1.5" />
           <path d="M8 9h2" />
           <path d="M1.5 5.5h11" />
         </svg>
-        Build
-      </button>
-
-      {building && <BuildOverlay onComplete={handleComplete} onClose={() => setBuilding(false)} cached={isCached} />}
-    </>
+      )}
+      <span>{buttonText(phase, progress, variant)}</span>
+    </button>
   );
 }

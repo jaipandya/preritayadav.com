@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import { TopNav } from "@/components/ui/TopNav";
 import { Footer } from "@/components/ui/Footer";
-import { BuildButton } from "@/components/ui/BuildOverlay";
+import { BuildButton, BuildOverlayHost } from "@/components/ui/BuildOverlay";
 
 const BROWSER_MAX_WIDTH = 840;
 const MARGIN_Y = 24;
@@ -21,6 +21,7 @@ export function BrowserChrome({ children }: { children: React.ReactNode }) {
   const displayUrl = pathnameToUrl(pathname);
 
   return (
+    <>
     <div
       style={{
         position: "fixed",
@@ -117,5 +118,8 @@ export function BrowserChrome({ children }: { children: React.ReactNode }) {
         <Footer />
       </div>
     </div>
+    {/* One modal for the page, outside the chrome frame so it takes pointer events. The desktop and phone Build buttons both open it. */}
+    <BuildOverlayHost />
+    </>
   );
 }
