@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { ContentItem } from "@/components/rendered/Content";
 
 export interface CaseStudyImage {
   src: string;
@@ -8,14 +9,20 @@ export interface CaseStudyImage {
   row?: number;
 }
 
-export function CaseStudyGallery({ images }: { images: CaseStudyImage[] }) {
+type Indexed = CaseStudyImage & { index: number };
+
+/**
+ * `itemId` (rendered site only) makes each image removable from the WIP canvas: it maps an image index to the item id
+ * `createWorkDetailLayout` gave that image's shape. See docs/content-overrides.md.
+ */
+export function CaseStudyGallery({ images, itemId }: { images: CaseStudyImage[]; itemId?: (index: number) => string }) {
   if (images.length === 0) return null;
 
-  const rows = new Map<number, CaseStudyImage[]>();
+  const rows = new Map<number, Indexed[]>();
   images.forEach((image, index) => {
     const row = image.row ?? index;
     const rowImages = rows.get(row) ?? [];
-    rowImages.push(image);
+    rowImages.push({ ...image, index });
     rows.set(row, rowImages);
   });
 
@@ -28,7 +35,7 @@ export function CaseStudyGallery({ images }: { images: CaseStudyImage[] }) {
             const fraction = (image.width / image.height) / totalRatio;
             const gapWidth = 12 * (rowImages.length - 1);
             const sizes = `(max-width: 540px) calc(${fraction * 100}vw - ${(80 + gapWidth) * fraction}px), ${Math.ceil((460 - gapWidth) * fraction)}px`;
-            return (
+            const link = (
             <a
               key={image.src}
               href={image.src}
@@ -50,6 +57,13 @@ export function CaseStudyGallery({ images }: { images: CaseStudyImage[] }) {
                 style={{ display: "block", width: "100%", height: "auto" }}
               />
             </a>
+            );
+            return itemId ? (
+              <ContentItem key={image.src} id={itemId(image.index)}>
+                {link}
+              </ContentItem>
+            ) : (
+              link
             );
           })}
         </div>

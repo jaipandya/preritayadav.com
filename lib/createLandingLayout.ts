@@ -12,7 +12,7 @@ import {
   viewAllWorkLabel,
   blogHeading,
 } from "./landingContent";
-import { bind, contentKey, withContent } from "./contentOverrides";
+import { bind, contentKey, itemIds, withContent, withItem } from "./contentOverrides";
 
 export function createLandingLayout(editor: Editor) {
   let y = 30;
@@ -124,10 +124,14 @@ export function createLandingLayout(editor: Editor) {
         description: item.tagline,
         mediaType: item.illustrationType,
       },
+      // Company and tagline are shared with the case study page, so deleting the card hides the row, not those fields.
       meta: withContent(
-        { componentType: "project-card", variationId: `work-${item.slug}`, href: `/work/${item.slug}` },
-        bind(contentKey("work", item.slug, "company"), item.company, { prop: "title" }),
-        bind(contentKey("work", item.slug, "tagline"), item.tagline, { prop: "description" })
+        withItem(
+          { componentType: "project-card", variationId: `work-${item.slug}`, href: `/work/${item.slug}` },
+          itemIds.featuredWork(item.slug)
+        ),
+        bind(contentKey("work", item.slug, "company"), item.company, { prop: "title", noErase: true }),
+        bind(contentKey("work", item.slug, "tagline"), item.tagline, { prop: "description", noErase: true })
       ),
     });
 
@@ -179,11 +183,14 @@ export function createLandingLayout(editor: Editor) {
         arrowDirection: "right",
       },
       meta: withContent(
-        {
-          componentType: "annotation",
-          variationId: `blog-${post.title.toLowerCase().replace(/\s+/g, "-")}`,
-          href: post.href,
-        },
+        withItem(
+          {
+            componentType: "annotation",
+            variationId: `blog-${post.title.toLowerCase().replace(/\s+/g, "-")}`,
+            href: post.href,
+          },
+          itemIds.blogPost(i)
+        ),
         bind(`landing.blogPosts.${i}.title`, post.title)
       ),
     });
@@ -203,7 +210,10 @@ export function createLandingLayout(editor: Editor) {
         arrowDirection: "right",
       },
       meta: withContent(
-        { componentType: "annotation", variationId: `blog-desc-${post.title.toLowerCase().replace(/\s+/g, "-")}` },
+        withItem(
+          { componentType: "annotation", variationId: `blog-desc-${post.title.toLowerCase().replace(/\s+/g, "-")}` },
+          itemIds.blogPost(i)
+        ),
         bind(`landing.blogPosts.${i}.description`, post.description)
       ),
     });
@@ -245,10 +255,10 @@ export function createLandingLayout(editor: Editor) {
         description: item.description,
         illustration: item.illustration,
       },
-      meta: {
-        componentType: "outside-work-card",
-        variationId: `outside-work-${item.number}`,
-      },
+      meta: withItem(
+        { componentType: "outside-work-card", variationId: `outside-work-${item.number}` },
+        itemIds.outsideWork(item.number)
+      ),
     });
 
     y += 190;
@@ -283,7 +293,7 @@ export function createLandingLayout(editor: Editor) {
       h: 260,
       companies: teamsWorkedWith.companies.join(","),
     },
-    meta: { componentType: "company-logos", variationId: "teams-logos" },
+    meta: withItem({ componentType: "company-logos", variationId: "teams-logos" }, itemIds.teamLogos),
   });
 
   y += 290;

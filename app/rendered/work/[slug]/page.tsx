@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { getWorkBySlug, workItems } from "@/lib/workData";
+import { itemIds } from "@/lib/contentOverrides";
 import { workPageLabels } from "@/lib/workPageContent";
 import { caseStudySections } from "@/lib/caseStudySections";
 import { renderedCaseStudyNavLabel } from "@/lib/renderedChrome";
@@ -123,7 +124,7 @@ export default async function RenderedWorkDetail({ params }: { params: Promise<{
                 <Content k={section.heading.key} fallback={section.heading.fallback} />
               </h2>
               <div className="r-tray">
-                <CaseStudyGallery images={section.images} />
+                <CaseStudyGallery images={section.images} itemId={(i) => itemIds.caseStudyImage(slug, i)} />
               </div>
             </section>
           );

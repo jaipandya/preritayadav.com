@@ -6,8 +6,9 @@ import {
   contactBackLabel,
   socials,
 } from "@/lib/contactContent";
-import { Content, ContentEmailRow } from "@/components/rendered/Content";
+import { Content, ContentEmailRow, ContentItem } from "@/components/rendered/Content";
 import { SocialIcon } from "@/components/rendered/SocialIcon";
+import { itemIds } from "@/lib/contentOverrides";
 import { newTabLabel } from "@/lib/renderedChrome";
 import { ExtArrow } from "@/components/rendered/ExtArrow";
 import { BackLink } from "@/components/rendered/BackLink";
@@ -43,23 +44,25 @@ export default function RenderedContactPage() {
               <SocialIcon name="Email" />
             </span>
           </ContentEmailRow>
-          {socials.map((s) => (
-            <a key={s.label} href={s.url} target="_blank" rel="noopener noreferrer" className="r-row">
-              <span className="r-row-lead">
-                <span className="r-mark" aria-hidden="true">
-                  <SocialIcon name={s.label} />
-                </span>
-                <span className="r-row-main">
-                  <span className="r-row-title">
-                    {s.label}
-                    <span className="sr-only"> ({newTabLabel})</span>
+          <ContentItem id={itemIds.contactSocials}>
+            {socials.map((s) => (
+              <a key={s.label} href={s.url} target="_blank" rel="noopener noreferrer" className="r-row">
+                <span className="r-row-lead">
+                  <span className="r-mark" aria-hidden="true">
+                    <SocialIcon name={s.label} />
                   </span>
-                  <span className="r-row-desc">{displayUrl(s.url)}</span>
+                  <span className="r-row-main">
+                    <span className="r-row-title">
+                      {s.label}
+                      <span className="sr-only"> ({newTabLabel})</span>
+                    </span>
+                    <span className="r-row-desc">{displayUrl(s.url)}</span>
+                  </span>
                 </span>
-              </span>
-              <span className="r-row-trail"><ExtArrow /></span>
-            </a>
-          ))}
+                <span className="r-row-trail"><ExtArrow /></span>
+              </a>
+            ))}
+          </ContentItem>
         </div>
       </div>
     </div>

@@ -26,7 +26,7 @@ const archived = getArchivedWork();
 
 export default function WorkPage() {
   return (
-    <PageShell navLinks={navLinks} pageKey="work-listing-v3" onCreateLayout={createWorkListingLayout}>
+    <PageShell navLinks={navLinks} pageKey="work-listing-v4" onCreateLayout={createWorkListingLayout}>
       <h1>{workTitle}</h1>
       <p>{workSubtitle}</p>
 

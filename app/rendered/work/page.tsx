@@ -8,24 +8,27 @@ import {
   workListingBackLabel,
   workListingCtaLabel,
 } from "@/lib/workListingContent";
+import { itemIds } from "@/lib/contentOverrides";
 import { getMainWork, getArchivedWork, type WorkItem } from "@/lib/workData";
-import { Content, CardTitle } from "@/components/rendered/Content";
+import { Content, CardTitle, ContentItem } from "@/components/rendered/Content";
 import { Mark } from "@/components/rendered/Mark";
 import { BackLink } from "@/components/rendered/BackLink";
 
 function WorkRow({ item }: { item: WorkItem }) {
   return (
-    <Link href={`/rendered/work/${item.slug}`} className="r-row">
-      <span className="r-row-lead">
-        <Mark slug={item.slug} company={item.company} />
-        <span className="r-row-main">
-          <CardTitle slug={item.slug} company={item.company} title={item.title} />
-          <span className="r-row-desc">
-            <Content k={`work.${item.slug}.tagline`} fallback={item.tagline} />
+    <ContentItem id={itemIds.listingRow(item.slug)}>
+      <Link href={`/rendered/work/${item.slug}`} className="r-row">
+        <span className="r-row-lead">
+          <Mark slug={item.slug} company={item.company} />
+          <span className="r-row-main">
+            <CardTitle slug={item.slug} company={item.company} title={item.title} />
+            <span className="r-row-desc">
+              <Content k={`work.${item.slug}.tagline`} fallback={item.tagline} />
+            </span>
           </span>
         </span>
-      </span>
-    </Link>
+      </Link>
+    </ContentItem>
   );
 }
 

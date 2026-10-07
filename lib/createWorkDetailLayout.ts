@@ -1,7 +1,7 @@
 import { AssetRecordType, type Editor } from "tldraw";
 import { CANVAS_W, LEFT_PAD, centerCamera, createBackButton } from "./layoutHelpers";
 import { getWorkBySlug, type WorkItem } from "./workData";
-import { bind, bindList, contentKey, withContent, type ContentBinding } from "./contentOverrides";
+import { bind, bindList, contentKey, itemIds, withContent, withItem, type ContentBinding } from "./contentOverrides";
 import { workPageLabels, type WorkPageLabel } from "./workPageContent";
 
 export function createWorkDetailLayout(editor: Editor, slug: string) {
@@ -278,7 +278,10 @@ function imageGallery(editor: Editor, data: WorkItem, y: number): number {
         x,
         y,
         props: { w, h, assetId, altText: image.alt },
-        meta: { componentType: "case-study-image", variationId: `${data.slug}-glance-${index}` },
+        meta: withItem(
+          { componentType: "case-study-image", variationId: `${data.slug}-glance-${index}` },
+          itemIds.caseStudyImage(data.slug, index)
+        ),
       });
       x += w + gap;
     }

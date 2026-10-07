@@ -43,7 +43,10 @@ Design decisions:
 - **Overrides are stored separately from the canvas snapshot.** The snapshot is discarded when a layout version changes; overrides survive. Build only updates keys it saw in a snapshot.
 - **Edit detection uses a hash of the default** (`binding.base`), not a copy of the text. A shape that was never edited produces no override, so changing a default in `lib/` still reaches users with an old canvas.
 - **Editing text back to the default removes the override.**
-- **Erasing a text shape hides that text on the rendered site.** When a layout is created, `WipCanvas` records the text fields it made in the page record's meta (`boundKeys`). Build treats a recorded field that no saved canvas has any more as erased and stores `""` for it (a split field drops just that paragraph). The rendered site hides empty headings, paragraphs and links with CSS `:empty`. A field that is still on another canvas (a shared key) is not treated as erased, and bringing the shape back (undo) removes the override. Canvases saved before this existed have no record, so erasing on them has no effect until the page is Reset.
+- **Erasing a text shape hides that text on the rendered site.** When a layout is created, `WipCanvas` records the text fields it made in the page record's meta (`boundKeys`). Build treats a recorded field that no saved canvas has any more as erased and stores `""` for it (a split field drops just that paragraph). The rendered site hides empty headings, paragraphs, list items and links with CSS `:empty`, and the wrappers that would be left holding only empty text (button wrappers, the "View all work" row, a meta item whose label and value are both gone, a section with nothing left) with a few `:has()` rules next to it in `rendered.css`. A field that is still on another canvas (a shared key) is not treated as erased, and bringing the shape back (undo) removes the override. Canvases saved before this existed have no record, so erasing on them has no effect until the page is Reset.
+- **Deleting a whole item hides it on the rendered site.** A card, row or image is more than its text: the rendered row also has a logo and a link, which no text field covers. Shapes that stand for such an item carry an item id (`withItem(meta, id)` in the layout creator, ids built in `itemIds` in `lib/contentOverrides.ts`). `WipCanvas` records the ids in the page record's meta (`itemKeys`, next to `boundKeys`). Build adds an id to the `hidden` override (a list of ids) when no saved canvas has a shape with it any more, and removes it again when the shape is back. The rendered site wraps the item in `ContentItem` (`components/rendered/Content.tsx`), which renders nothing for a hidden id. An item with several shapes (a blog post has a title and a description) is hidden only when all of them are gone.
+  - The text bindings of an item shape that are **shared with other shapes or pages** (the company and tagline of a featured card are also on the case study page, the listing and the neighbour links) are bound with `noErase: true`. Deleting the card hides the row but must not blank those fields everywhere.
+  - Removable items: `landing.featured.<slug>`, `landing.blogPosts.<i>`, `landing.outsideWork.<n>`, `landing.teamsWorkedWith.logos`, `workListing.rows.<slug>` (main and archive), `contact.socials`, `work.<slug>.glance.<i>` (case study images).
 - **Scalar fields** are stored as strings. A multi-paragraph field is one string with paragraphs joined by a blank line (`\n\n`).
 - **List fields** (bullets) are stored as `string[]` and can be edited, deleted, duplicated, reordered and split (see below).
 
@@ -57,6 +60,7 @@ Keys mirror the property path in the content module.
 | Landing | `landing.hero.greeting`, `.hero.name`, `.hero.subtitle`, `.hero.cta.label`, `landing.featuredWorkHeading`, `landing.viewAllWorkLabel`, `landing.blogHeading`, `landing.blogPosts.<i>.title`, `landing.blogPosts.<i>.description`, `landing.outsideWork.heading`, `landing.teamsWorkedWith.heading`, `landing.footerClosing`, `landing.footerCta.label`. Featured work cards reuse `work.<slug>.company` and `work.<slug>.tagline`. |
 | About | `about.title`, `about.paragraphs.<i>`, `about.outro`, `about.footerText`, `about.cta.label` |
 | Contact | `contact.title`, `contact.subtitle`, `contact.email`, `contact.backLabel` |
+| Hidden items | `hidden`: a list of item ids (see "Deleting a whole item"). Written by Build only, never edited by hand. |
 | Work listing | `workListing.title`, `.subtitle`, `.archiveTitle`, `.archiveSubtitle`, `.backLabel`, `.ctaLabel`, `workListing.cards.<slug>` (card title, default `listingCardTitle(item)` = "Company: Title"), card description reuses `work.<slug>.tagline` |
 
 Rules for headings on a work page: if the work item has its own title field (`overviewTitle`, `challengeTitle`, `processTitle`, `additionalSections.<i>.title`) the heading uses that key. Otherwise it uses `work.<slug>.labels.<name>`, defaulting to `workPageLabels[name]`. Labels are per case study so editing "Overview" on one page does not change the other pages.
@@ -90,7 +94,7 @@ Floating bar labels (`Home`, `Work`, `About`, `Let's talk`), the outside work it
 
 ## What is not editable (and so has no key)
 
-Shapes that the canvas cannot edit as text: outside-work cards, company logos, social icons, images, illustrations, the decorative browser frame, step numbers. Links (`href`) are not editable either.
+Shapes that the canvas cannot edit as text: outside-work cards, company logos, social icons, images, illustrations, the decorative browser frame, step numbers. Links (`href`) are not editable either. Of these, the ones the rendered site draws one to one (outside-work cards, team logos, social links, case study images) can be **deleted** (see "Deleting a whole item"). Shapes with no rendered counterpart (the hero illustration, about illustrations, image placeholders, the browser frame, the contact page frame, the case study hero card) are decoration: deleting them changes nothing on the rendered site.
 
 ## Adding a new editable text shape (WIP side)
 
@@ -191,7 +195,19 @@ How it works:
 
 Verified in a browser by sampling every frame, on a hard load (rendered page in an iframe with overrides set) and on the real flow (edit on the canvas, Build, "Visit rendered page"): the first visible frame already shows the override and no frame shows default text.
 
-### 3. Testing checklist
+### 3. Removable items
+
+Wrap anything the canvas can delete as a whole in `ContentItem`, with the id from `itemIds`:
+
+```tsx
+<ContentItem id={itemIds.featuredWork(item.slug)}>
+  <Link href={...} className="r-row">...</Link>
+</ContentItem>
+```
+
+It renders no element of its own. Ids must match the ones the layout creator gave the shapes (both import `itemIds`), and each id belongs to one page's canvas (`tests/contentOverrides.test.ts` checks that). Wrapping at the card level is also what removes the logo and the link, which a text field cannot do. Only make a shape an item when the rendered site has a one to one counterpart.
+
+### 4. Testing checklist
 
 1. Open a WIP page and click Reset.
 2. On the canvas: edit a paragraph, a heading and a button label; edit a bullet, duplicate one (Cmd+D), delete one, drag one to reorder. Wait one second (saves are debounced).
@@ -199,6 +215,7 @@ Verified in a browser by sampling every frame, on a hard load (rendered page in 
 4. Open the rendered site in a private window. It shows the defaults.
 5. Click Reset on the WIP site. The rendered site shows the defaults again.
 6. Edit text back to its original wording and Build. The override is removed from `localStorage["prerita-content-overrides"]`.
+7. Select a featured work card on the home canvas and delete it, Build, visit the rendered site. The whole row (logo included) is gone, and that case study still has its company and tagline. Undo, Build: it is back.
 
 ## Tests
 
@@ -209,7 +226,9 @@ Verified in a browser by sampling every frame, on a hard load (rendered page in 
 Saved canvases only get bindings (and new shapes) when they are created, so every page that has bindings carries a layout version in its page key:
 
 - Work items: `layoutVersion` in `lib/workData.ts` (page key `work-<slug>-v<n>`).
-- Static pages: `landing-v4`, `about-v3`, `contact-v3`, `work-listing-v3` (set in each `app/**/page.tsx`).
+- Static pages: `landing-v5`, `about-v3`, `contact-v4`, `work-listing-v4` (set in each `app/**/page.tsx`).
+
+Adding or removing an item id (`withItem`) is a structure change too: older canvases have no `itemKeys` record, so deleting on them would hide nothing.
 
 **When a layout creator changes shape structure, bump that page's version** (and bind any new text). Otherwise users keep their old canvas and the new shapes never appear. `useCanvasPersistence` deletes saved canvases of older versions of the same page on load, so Build never merges text from two different layouts.
 
@@ -218,5 +237,6 @@ Saved canvases only get bindings (and new shapes) when they are created, so ever
 - Overrides are per browser. There is no server or sync.
 - The Build click collects from saved canvases, which are written about 500 ms after the last edit. Collecting again on "Visit rendered page" catches anything the first pass missed.
 - An override is stored for fields seen in a canvas. If a page's canvas is discarded (layout version bump), its earlier overrides remain until Reset. The canvas edits themselves are lost, so the WIP page shows the defaults while the rendered site still shows the override.
-- Structure other than bullet lists cannot change: process steps, blog posts and about paragraphs keep their count.
+- Deleting a hidden item's shapes on a page whose canvas is later discarded (layout version bump) leaves its `hidden` entry until Reset, like other overrides.
+- Structure other than bullet lists and deletable items cannot change: process steps, blog posts and about paragraphs keep their count.
 - Bullets with text pasted as multiple lines become multiple items.

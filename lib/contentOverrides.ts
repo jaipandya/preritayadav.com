@@ -19,6 +19,10 @@ export const CONTENT_OVERRIDES_EVENT = "prerita-content-overrides-change";
 export const WIP_STORAGE_PREFIX = "prerita-wip-";
 /** Page record meta holding the text fields the layout created, so Build can tell which ones were erased. */
 export const BOUND_KEYS_META = "boundKeys";
+/** Page record meta holding the removable items (cards, rows, images) the layout created, so Build can tell which ones were deleted. */
+export const ITEM_KEYS_META = "itemKeys";
+/** Override key holding the ids of items deleted on the canvas (a list). The rendered site does not draw them. */
+export const HIDDEN_KEY = "hidden";
 
 /** A scalar field is stored as a string, a list field (bullets) as an array of strings. */
 export type ContentValue = string | string[];
@@ -43,6 +47,11 @@ export type ContentBinding = {
   list?: boolean;
   /** The list heading: marks that the list exists on the canvas (even when every bullet was deleted) but is not an item. */
   head?: boolean;
+  /**
+   * Deleting the shape must not erase this field: the shape is an item (see `withItem`) and deleting it hides the
+   * whole item instead. Needed when the field is shared with other shapes or pages (a card and its case study).
+   */
+  noErase?: boolean;
 };
 
 export function contentKey(...parts: Array<string | number>): string {
@@ -59,11 +68,12 @@ export function hashText(text: string): string {
 export function bind(
   key: string,
   value: string,
-  opts: { prop?: string; part?: number; prefix?: string } = {}
+  opts: { prop?: string; part?: number; prefix?: string; noErase?: boolean } = {}
 ): ContentBinding {
   const binding: ContentBinding = { key, prop: opts.prop ?? "text", base: hashText(value) };
   if (opts.part !== undefined) binding.part = opts.part;
   if (opts.prefix) binding.prefix = opts.prefix;
+  if (opts.noErase) binding.noErase = true;
   return binding;
 }
 
@@ -83,6 +93,29 @@ export function bindList(
 export function withContent<M extends Record<string, unknown>>(meta: M, ...bindings: ContentBinding[]) {
   return bindings.length ? { ...meta, content: bindings.map((b) => ({ ...b })) } : meta;
 }
+
+/**
+ * Mark a shape as (part of) a removable item that the rendered site draws as a whole: a card, a row, an image.
+ * Deleting every shape of an item on the canvas hides the item on the rendered site. `id` mirrors the content key
+ * of the item, e.g. `landing.featured.<slug>`, and must be unique to one page.
+ */
+export function withItem<M extends Record<string, unknown>>(meta: M, id: string) {
+  return { ...meta, item: id };
+}
+
+/**
+ * Ids of the removable items. Layout creators (`withItem`) and rendered pages (`ContentItem`) both build them here,
+ * so the two sides cannot drift apart. Each id belongs to exactly one page's canvas.
+ */
+export const itemIds = {
+  featuredWork: (slug: string) => contentKey("landing", "featured", slug),
+  blogPost: (index: number) => contentKey("landing", "blogPosts", index),
+  outsideWork: (number: string) => contentKey("landing", "outsideWork", number),
+  teamLogos: "landing.teamsWorkedWith.logos",
+  listingRow: (slug: string) => contentKey("workListing", "rows", slug),
+  contactSocials: "contact.socials",
+  caseStudyImage: (slug: string, index: number) => contentKey("work", slug, "glance", index),
+} as const;
 
 // ─── Reading and writing overrides ──────────────────────────────
 
@@ -136,6 +169,11 @@ export function resolveContentList(overrides: ContentOverrides, key: string, fal
   return Array.isArray(value) ? value : fallback;
 }
 
+/** Ids of the items deleted on the canvas. */
+export function hiddenItems(overrides: ContentOverrides): string[] {
+  return resolveContentList(overrides, HIDDEN_KEY, []);
+}
+
 // ─── Collecting overrides from canvas snapshots ─────────────────
 
 type SnapshotShape = {
@@ -143,7 +181,7 @@ type SnapshotShape = {
   x?: number;
   y?: number;
   props?: Record<string, unknown>;
-  meta?: { content?: unknown };
+  meta?: { content?: unknown; item?: unknown };
 };
 
 function shapesOf(snapshot: unknown): SnapshotShape[] {
@@ -164,20 +202,31 @@ export function boundKeysOf(shapes: Array<Pick<SnapshotShape, "meta">>): string[
   const keys = new Set<string>();
   for (const shape of shapes) {
     for (const b of bindingsOf(shape)) {
-      if (!b.list) keys.add(b.part === undefined ? b.key : `${b.key}#${b.part}`);
+      if (!b.list && !b.noErase) keys.add(b.part === undefined ? b.key : `${b.key}#${b.part}`);
     }
   }
   return [...keys];
 }
 
-function expectedKeysOf(snapshot: unknown): string[] {
+function itemOf(shape: Pick<SnapshotShape, "meta">): string | undefined {
+  const id = shape.meta?.item;
+  return typeof id === "string" && id ? id : undefined;
+}
+
+/** Removable items (`withItem`) that the shapes of a freshly created layout carry. */
+export function itemKeysOf(shapes: Array<Pick<SnapshotShape, "meta">>): string[] {
+  return [...new Set(shapes.map(itemOf).filter((id): id is string => !!id))];
+}
+
+/** Strings the layout recorded in its page record's meta under `metaKey`, across the page records of a snapshot. */
+function recordedOf(snapshot: unknown, metaKey: string): string[] {
   const store = (snapshot as { document?: { store?: Record<string, { typeName?: string; meta?: Record<string, unknown> }> } } | null)
     ?.document?.store;
   if (!store) return [];
   return Object.values(store)
     .filter((r) => r?.typeName === "page")
     .flatMap((page) => {
-      const keys = page.meta?.[BOUND_KEYS_META];
+      const keys = page.meta?.[metaKey];
       return Array.isArray(keys) ? keys.filter((k): k is string => typeof k === "string") : [];
     });
 }
@@ -207,12 +256,17 @@ export function collectOverrides(snapshots: unknown[], previous: ContentOverride
   const fields = new Map<string, Map<number, Slot>>();
   const lists = new Map<string, ListField[]>();
   const expected = new Set<string>();
+  const expectedItems = new Set<string>();
+  const presentItems = new Set<string>();
 
   for (const snapshot of snapshots) {
-    expectedKeysOf(snapshot).forEach((k) => expected.add(k));
+    recordedOf(snapshot, BOUND_KEYS_META).forEach((k) => expected.add(k));
+    recordedOf(snapshot, ITEM_KEYS_META).forEach((id) => expectedItems.add(id));
     const snapshotLists = new Map<string, ListField>();
 
     for (const shape of shapesOf(snapshot)) {
+      const item = itemOf(shape);
+      if (item) presentItems.add(item);
       for (const b of bindingsOf(shape)) {
         const raw = shape.props?.[b.prop];
         if (typeof raw !== "string") continue;
@@ -249,6 +303,16 @@ export function collectOverrides(snapshots: unknown[], previous: ContentOverride
   }
 
   const next = { ...previous };
+
+  // An item the layout created that no canvas has any more was deleted: the rendered page drops it too.
+  // Items of pages that were never opened (or reset) are not in expectedItems and keep their previous state.
+  const hidden = new Set(hiddenItems(previous));
+  for (const id of expectedItems) {
+    if (presentItems.has(id)) hidden.delete(id);
+    else hidden.add(id);
+  }
+  if (hidden.size) next[HIDDEN_KEY] = [...hidden];
+  else delete next[HIDDEN_KEY];
 
   for (const [key, parts] of fields) {
     const slots = [...parts.entries()].sort(([a], [b]) => a - b).map(([, s]) => s);

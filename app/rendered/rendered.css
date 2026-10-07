@@ -627,7 +627,16 @@ a.r-row:active { background: #f3f3f3; }
 .r-portrait img { width: 100%; height: auto; }
 
 /* A field erased on the WIP canvas renders as empty text: hide the element instead of leaving a gap. */
-.rendered-root :is(h1, h2, h3, h4, p, a):empty {
+.rendered-root :is(h1, h2, h3, h4, p, a, li):empty {
+  display: none;
+}
+/* ...and the wrappers that would be left holding nothing but empty text. */
+.rendered-root .r-btn-wrap:has(> a:empty),
+.rendered-root .r-row:has(> .r-row-plain:empty),
+.rendered-root .r-meta-item:has(dt:empty):has(dd > span:empty),
+.rendered-root .r-tray div:empty,
+.rendered-root .r-tray:not(:has(img)),
+.rendered-root .r-block:not(:has(h2:not(:empty), p:not(:empty), li:not(:empty), img)) {
   display: none;
 }
 

@@ -9,8 +9,7 @@ import {
   workListingBackLabel,
   workListingCtaLabel,
 } from "./workListingContent";
-import { bind, withContent } from "./contentOverrides";
-import { contentKey } from "./contentOverrides";
+import { bind, contentKey, itemIds, withContent, withItem } from "./contentOverrides";
 
 export function createWorkListingLayout(editor: Editor) {
   let y = 40;
@@ -69,9 +68,12 @@ export function createWorkListingLayout(editor: Editor) {
         mediaType: item.illustrationType,
       },
       meta: withContent(
-        { componentType: "project-card", variationId: `work-${item.slug}`, href: `/work/${item.slug}` },
-        bind(contentKey("workListing", "cards", item.slug), listingCardTitle(item), { prop: "title" }),
-        bind(contentKey("work", item.slug, "tagline"), item.tagline, { prop: "description" })
+        withItem(
+          { componentType: "project-card", variationId: `work-${item.slug}`, href: `/work/${item.slug}` },
+          itemIds.listingRow(item.slug)
+        ),
+        bind(contentKey("workListing", "cards", item.slug), listingCardTitle(item), { prop: "title", noErase: true }),
+        bind(contentKey("work", item.slug, "tagline"), item.tagline, { prop: "description", noErase: true })
       ),
     });
 
@@ -131,9 +133,12 @@ export function createWorkListingLayout(editor: Editor) {
         mediaType: item.illustrationType,
       },
       meta: withContent(
-        { componentType: "project-card", variationId: `archive-${item.slug}`, href: `/work/${item.slug}` },
-        bind(contentKey("workListing", "cards", item.slug), listingCardTitle(item), { prop: "title" }),
-        bind(contentKey("work", item.slug, "tagline"), item.tagline, { prop: "description" })
+        withItem(
+          { componentType: "project-card", variationId: `archive-${item.slug}`, href: `/work/${item.slug}` },
+          itemIds.listingRow(item.slug)
+        ),
+        bind(contentKey("workListing", "cards", item.slug), listingCardTitle(item), { prop: "title", noErase: true }),
+        bind(contentKey("work", item.slug, "tagline"), item.tagline, { prop: "description", noErase: true })
       ),
     });
 

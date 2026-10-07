@@ -42,6 +42,7 @@ Both the **tldraw layout creators** (`lib/create*Layout.ts`) and the **semantic 
 Text edited on the WIP canvas is carried to the rendered site (same browser only) through `lib/contentOverrides.ts`. Details, the key schema and how the rendered site is wired are in `docs/content-overrides.md`.
 
 - Every text shape a layout creator makes from a content module must bind its text with `withContent(meta, bind(key, value, opts))`. Bullet lists use `bindList` on the heading and every item. Keys mirror the field path in the content module (`work.<slug>.overview`, `about.outro`).
+- A shape that stands for a whole rendered item (a card, row or image) gets `withItem(meta, itemIds.x(...))`, and the rendered page wraps that item in `ContentItem` with the same id. Bind its text with `noErase: true` when the field is shared with another shape or page. Deleting the shape then hides the item instead of blanking shared text. See `docs/content-overrides.md`.
 - Anything a user can edit on the canvas must have a content-module field and a binding, including labels and button text. If it has no field, add one to a `lib/*Content.ts` module.
 - Do not put editable decoration in a shape (like a label plus value in one text). Use separate shapes.
 - When a layout creator changes shape structure, bump that page's layout version (`layoutVersion` in `workData.ts`, or the `-vN` page key on static pages).

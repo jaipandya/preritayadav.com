@@ -17,7 +17,7 @@ import { useCanvasPersistence } from "./useCanvasPersistence";
 import { CanvasUI } from "./CanvasUI";
 import { BrowserChrome } from "./BrowserChrome";
 import { getHref, isNavigable } from "@/lib/canvasMeta";
-import { BOUND_KEYS_META, boundKeysOf } from "@/lib/contentOverrides";
+import { BOUND_KEYS_META, ITEM_KEYS_META, boundKeysOf, itemKeysOf } from "@/lib/contentOverrides";
 import { CANVAS_W } from "@/lib/layoutHelpers";
 import { sounds } from "@/lib/sounds";
 import { attachCanvasSounds } from "@/lib/canvasSounds";
@@ -67,11 +67,12 @@ const uiOverrides: TLUiOverrides = {
 
 const customTools = [BrowseTool];
 
-/** Remember which text fields the layout created, so Build can tell when one is erased from the canvas. */
+/** Remember which text fields and removable items the layout created, so Build can tell when one is erased from the canvas. */
 function recordBoundKeys(editor: Editor) {
+  const shapes = editor.getCurrentPageShapes();
   editor.updatePage({
     id: editor.getCurrentPageId(),
-    meta: { [BOUND_KEYS_META]: boundKeysOf(editor.getCurrentPageShapes()) },
+    meta: { [BOUND_KEYS_META]: boundKeysOf(shapes), [ITEM_KEYS_META]: itemKeysOf(shapes) },
   });
 }
 

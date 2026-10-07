@@ -6,7 +6,7 @@ import {
   contactEmail,
   contactBackLabel,
 } from "./contactContent";
-import { bind, withContent } from "./contentOverrides";
+import { bind, itemIds, withContent, withItem } from "./contentOverrides";
 
 export function createContactLayout(editor: Editor) {
   let y = 40;
@@ -80,7 +80,7 @@ export function createContactLayout(editor: Editor) {
       w: CANVAS_W - LEFT_PAD * 2,
       h: 150,
     },
-    meta: { componentType: "contact-me", variationId: "contact-social-icons" },
+    meta: withItem({ componentType: "contact-me", variationId: "contact-social-icons" }, itemIds.contactSocials),
   });
 
   y += 200;

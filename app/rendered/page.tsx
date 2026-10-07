@@ -11,9 +11,10 @@ import {
   viewAllWorkLabel,
   blogHeading,
 } from "@/lib/landingContent";
+import { itemIds } from "@/lib/contentOverrides";
 import { newTabLabel } from "@/lib/renderedChrome";
 import { getFeaturedWork } from "@/lib/workData";
-import { Content, ContentLines } from "@/components/rendered/Content";
+import { Content, ContentItem, ContentLines } from "@/components/rendered/Content";
 import { ExtArrow } from "@/components/rendered/ExtArrow";
 import { Mark } from "@/components/rendered/Mark";
 import { TeamLogos } from "@/components/rendered/TeamLogos";
@@ -39,19 +40,21 @@ export default function RenderedHome() {
         </h2>
         <div className="r-rows">
           {featured.map((item) => (
-            <Link key={item.slug} href={`/rendered/work/${item.slug}`} className="r-row">
-              <span className="r-row-lead">
-                <Mark slug={item.slug} company={item.company} />
-                <span className="r-row-main">
-                  <span className="r-row-title">
-                    <Content k={`work.${item.slug}.company`} fallback={item.company} />
-                  </span>
-                  <span className="r-row-desc">
-                    <Content k={`work.${item.slug}.tagline`} fallback={item.tagline} />
+            <ContentItem key={item.slug} id={itemIds.featuredWork(item.slug)}>
+              <Link href={`/rendered/work/${item.slug}`} className="r-row">
+                <span className="r-row-lead">
+                  <Mark slug={item.slug} company={item.company} />
+                  <span className="r-row-main">
+                    <span className="r-row-title">
+                      <Content k={`work.${item.slug}.company`} fallback={item.company} />
+                    </span>
+                    <span className="r-row-desc">
+                      <Content k={`work.${item.slug}.tagline`} fallback={item.tagline} />
+                    </span>
                   </span>
                 </span>
-              </span>
-            </Link>
+              </Link>
+            </ContentItem>
           ))}
           <Link href="/rendered/work" className="r-row">
             <span className="r-row-plain">
@@ -67,18 +70,20 @@ export default function RenderedHome() {
         </h2>
         <div className="r-rows">
           {blogPosts.map((post, i) => (
-            <a key={post.href} href={post.href} target="_blank" rel="noopener noreferrer" className="r-row">
-              <span className="r-row-main">
-                <span className="r-row-title">
-                  <Content k={`landing.blogPosts.${i}.title`} fallback={post.title} />
-                  <span className="r-ext"><ExtArrow /></span>
-                  <span className="sr-only"> ({newTabLabel})</span>
+            <ContentItem key={post.href} id={itemIds.blogPost(i)}>
+              <a href={post.href} target="_blank" rel="noopener noreferrer" className="r-row">
+                <span className="r-row-main">
+                  <span className="r-row-title">
+                    <Content k={`landing.blogPosts.${i}.title`} fallback={post.title} />
+                    <span className="r-ext"><ExtArrow /></span>
+                    <span className="sr-only"> ({newTabLabel})</span>
+                  </span>
+                  <span className="r-row-desc">
+                    <Content k={`landing.blogPosts.${i}.description`} fallback={post.description} />
+                  </span>
                 </span>
-                <span className="r-row-desc">
-                  <Content k={`landing.blogPosts.${i}.description`} fallback={post.description} />
-                </span>
-              </span>
-            </a>
+              </a>
+            </ContentItem>
           ))}
         </div>
       </section>
@@ -89,22 +94,24 @@ export default function RenderedHome() {
         </h2>
         <div className="r-items">
           {outsideWork.items.map((item) => (
-            <article key={item.number} className="r-item">
-              <span className="r-item-num" aria-hidden="true">{item.number}</span>
-              <div>
-                <h3 className="r-row-title">{item.title}</h3>
-                <p className="r-row-desc">{item.subtitle}</p>
-                <p className="r-item-body">{item.description}</p>
-              </div>
-              <Image
-                className="r-item-thumb"
-                src={`/rendered/generated/outside-${item.illustration}.webp`}
-                alt=""
-                width={384}
-                height={384}
-                sizes="(max-width: 479px) 80px, 112px"
-              />
-            </article>
+            <ContentItem key={item.number} id={itemIds.outsideWork(item.number)}>
+              <article className="r-item">
+                <span className="r-item-num" aria-hidden="true">{item.number}</span>
+                <div>
+                  <h3 className="r-row-title">{item.title}</h3>
+                  <p className="r-row-desc">{item.subtitle}</p>
+                  <p className="r-item-body">{item.description}</p>
+                </div>
+                <Image
+                  className="r-item-thumb"
+                  src={`/rendered/generated/outside-${item.illustration}.webp`}
+                  alt=""
+                  width={384}
+                  height={384}
+                  sizes="(max-width: 479px) 80px, 112px"
+                />
+              </article>
+            </ContentItem>
           ))}
         </div>
       </section>
@@ -113,7 +120,9 @@ export default function RenderedHome() {
         <h2 className="r-label" id="teams-heading" style={{ marginBottom: 16 }}>
           <Content k="landing.teamsWorkedWith.heading" fallback={teamsWorkedWith.heading} />
         </h2>
-        <TeamLogos />
+        <ContentItem id={itemIds.teamLogos}>
+          <TeamLogos />
+        </ContentItem>
       </section>
 
       <footer className="r-end">

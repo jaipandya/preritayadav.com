@@ -14,7 +14,10 @@ const { createAboutLayout } = await import("../lib/createAboutLayout");
 const { createContactLayout } = await import("../lib/createContactLayout");
 const { createLandingLayout } = await import("../lib/createLandingLayout");
 const { createWorkListingLayout } = await import("../lib/createWorkListingLayout");
-const { collectOverrides, parseOverrides, boundKeysOf, BOUND_KEYS_META } = await import("../lib/contentOverrides");
+const { collectOverrides, parseOverrides, boundKeysOf, itemKeysOf, itemIds, BOUND_KEYS_META, ITEM_KEYS_META, HIDDEN_KEY } =
+  await import("../lib/contentOverrides");
+const { getFeaturedWork, getMainWork, getArchivedWork } = await import("../lib/workData");
+const { outsideWork, blogPosts } = await import("../lib/landingContent");
 const { workItems } = await import("../lib/workData");
 
 type Binding = { key: string; part?: number; list?: boolean; head?: boolean; prop: string };
@@ -24,7 +27,7 @@ type Shape = {
   x: number;
   y: number;
   props: Record<string, unknown> & { text?: string; label?: string; title?: string; description?: string };
-  meta?: { content?: Binding[] };
+  meta?: { content?: Binding[]; item?: string };
 };
 type Fake = { editor: Editor; shapes: Shape[] };
 
@@ -47,7 +50,10 @@ const snapshot = ({ shapes }: Fake) => ({
 const snapshotWithKeys = (f: Fake, shapes: Shape[] = f.shapes) => ({
   document: {
     store: {
-      "page:page": { typeName: "page", meta: { [BOUND_KEYS_META]: boundKeysOf(f.shapes) } },
+      "page:page": {
+        typeName: "page",
+        meta: { [BOUND_KEYS_META]: boundKeysOf(f.shapes), [ITEM_KEYS_META]: itemKeysOf(f.shapes) },
+      },
       ...Object.fromEntries(shapes.map((s, i) => [`shape:${i}`, s])),
     },
   },
@@ -266,6 +272,131 @@ describe("erased text", () => {
     const landingWithoutCard = landing.shapes.filter((s) => s !== card);
     const out = collectOverrides([snapshotWithKeys(landing, landingWithoutCard), snapshotWithKeys(detail)]);
     expect(out[key]).toBeUndefined();
+  });
+});
+
+describe("deleted items", () => {
+  const itemShapes = (f: Fake, id: string) => f.shapes.filter((s) => s.meta?.item === id);
+  /** Build with the shapes of `id` removed from the canvas. */
+  const withoutItem = (f: Fake, id: string, others: unknown[] = [], previous = {}) =>
+    collectOverrides([snapshotWithKeys(f, f.shapes.filter((s) => s.meta?.item !== id)), ...others], previous);
+
+  test("deleting a featured card hides the row and leaves the shared text alone (no case study canvas saved)", () => {
+    const f = fakeEditor();
+    createLandingLayout(f.editor);
+    const slug = getFeaturedWork()[0].slug;
+    expect(itemShapes(f, itemIds.featuredWork(slug))).toHaveLength(1);
+    expect(withoutItem(f, itemIds.featuredWork(slug))).toEqual({ [HIDDEN_KEY]: [itemIds.featuredWork(slug)] });
+  });
+
+  test("same with the case study canvas saved", () => {
+    const f = fakeEditor();
+    createLandingLayout(f.editor);
+    const slug = getFeaturedWork()[0].slug;
+    const detail = fakeEditor();
+    createWorkDetailLayout(detail.editor, slug);
+    expect(withoutItem(f, itemIds.featuredWork(slug), [snapshotWithKeys(detail)])).toEqual({
+      [HIDDEN_KEY]: [itemIds.featuredWork(slug)],
+    });
+  });
+
+  test("an edit to the card text still reaches the rendered site while the card exists", () => {
+    const f = fakeEditor();
+    createLandingLayout(f.editor);
+    const slug = getFeaturedWork()[0].slug;
+    only(f, `work.${slug}.company`, undefined).props.title = "Renamed";
+    expect(collectOverrides([snapshotWithKeys(f)])).toEqual({ [`work.${slug}.company`]: "Renamed" });
+  });
+
+  test("bringing the card back (undo) shows the row again", () => {
+    const f = fakeEditor();
+    createLandingLayout(f.editor);
+    const id = itemIds.featuredWork(getFeaturedWork()[0].slug);
+    const hidden = withoutItem(f, id);
+    expect(collectOverrides([snapshotWithKeys(f)], hidden)).toEqual({});
+  });
+
+  test("a blog post is hidden only when both of its shapes are gone", () => {
+    const f = fakeEditor();
+    createLandingLayout(f.editor);
+    const id = itemIds.blogPost(0);
+    const shapes = itemShapes(f, id);
+    expect(shapes).toHaveLength(2);
+    const one = collectOverrides([snapshotWithKeys(f, f.shapes.filter((s) => s !== shapes[0]))]);
+    expect(one[HIDDEN_KEY]).toBeUndefined();
+    expect(one["landing.blogPosts.0.title"]).toBe("");
+    expect(withoutItem(f, id)[HIDDEN_KEY]).toEqual([id]);
+    expect(blogPosts.length).toBeGreaterThan(0);
+  });
+
+  test("listing cards (main and archive) are one item per case study", () => {
+    const f = fakeEditor();
+    createWorkListingLayout(f.editor);
+    for (const item of [getMainWork()[0], getArchivedWork()[0]].filter(Boolean)) {
+      const id = itemIds.listingRow(item.slug);
+      expect(itemShapes(f, id)).toHaveLength(1);
+      expect(withoutItem(f, id)).toEqual({ [HIDDEN_KEY]: [id] });
+    }
+  });
+
+  test("outside work cards, team logos, contact socials and gallery images", () => {
+    const landing = fakeEditor();
+    createLandingLayout(landing.editor);
+    expect(withoutItem(landing, itemIds.outsideWork(outsideWork.items[0].number))[HIDDEN_KEY]).toEqual([
+      itemIds.outsideWork(outsideWork.items[0].number),
+    ]);
+    expect(withoutItem(landing, itemIds.teamLogos)[HIDDEN_KEY]).toEqual([itemIds.teamLogos]);
+
+    const contact = fakeEditor();
+    createContactLayout(contact.editor);
+    expect(withoutItem(contact, itemIds.contactSocials)[HIDDEN_KEY]).toEqual([itemIds.contactSocials]);
+
+    const withImages = workItems.find((w) => w.atAGlanceImages?.length && w.layoutFormat === "before-after")!;
+    const detail = fakeEditor();
+    createWorkDetailLayout(detail.editor, withImages.slug);
+    const first = itemIds.caseStudyImage(withImages.slug, 0);
+    expect(itemShapes(detail, first)).toHaveLength(1);
+    expect(withoutItem(detail, first)[HIDDEN_KEY]).toEqual([first]);
+  });
+
+  test("item ids are unique to one page", () => {
+    const seen = new Map<string, string>();
+    const pages: Array<[string, (e: Editor) => void]> = [
+      ["landing", createLandingLayout],
+      ["listing", createWorkListingLayout],
+      ["contact", createContactLayout],
+      ["about", createAboutLayout],
+      ...workItems.map((w): [string, (e: Editor) => void] => [w.slug, (e) => createWorkDetailLayout(e, w.slug)]),
+    ];
+    for (const [name, create] of pages) {
+      const f = fakeEditor();
+      create(f.editor);
+      for (const id of itemKeysOf(f.shapes)) {
+        expect(seen.get(id) ?? name).toBe(name);
+        seen.set(id, name);
+      }
+    }
+    expect(seen.size).toBeGreaterThan(0);
+  });
+
+  test("canvases saved before items were recorded hide nothing; unseen pages keep their state", () => {
+    const f = fakeEditor();
+    createLandingLayout(f.editor);
+    const id = itemIds.featuredWork(getFeaturedWork()[0].slug);
+    const remaining = f.shapes.filter((s) => s.meta?.item !== id);
+    expect(collectOverrides([snapshot({ ...f, shapes: remaining })])).toEqual({});
+    expect(collectOverrides([], { [HIDDEN_KEY]: ["contact.socials"] })).toEqual({ [HIDDEN_KEY]: ["contact.socials"] });
+    expect(collectOverrides([snapshotWithKeys(f)], { [HIDDEN_KEY]: ["contact.socials"] })).toEqual({
+      [HIDDEN_KEY]: ["contact.socials"],
+    });
+  });
+
+  test("deleting a card does not blank the fields it shares with other pages", () => {
+    const f = fakeEditor();
+    createWorkListingLayout(f.editor);
+    const slug = getMainWork()[0].slug;
+    const out = withoutItem(f, itemIds.listingRow(slug));
+    expect(Object.keys(out)).toEqual([HIDDEN_KEY]);
   });
 });
 
