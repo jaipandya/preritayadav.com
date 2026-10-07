@@ -164,7 +164,7 @@ Rules: no uppercase transforms, no letter-spacing on body, no italics (the About
 | Component | Notes |
 | --- | --- |
 | `Content`, `ContentParagraphs`, `ContentList`, `ContentLines`, `ContentEmailRow`, `CardTitle` | Client leaves over `useContent` / `useContentList`; the only client components that show content text (see section 4). |
-| `Mark` + `markSources.ts` | 36 / 44px logo tile, one white frame with a hairline ring. Marks are cropped to the emblem where there is one and get about 18% air (`pad`). The portfolio uses `/icon.svg`; only a company with no logo shows its initial, dark on `#f0f0f0`. The broken `epic-wiki.png` and `toppr-wiki.png` (HTML error pages saved as PNG) were deleted. |
+| `Mark` + `markSources.ts` | 36 / 44px logo tile, one white frame with a hairline ring. Marks are cropped to the emblem where there is one and get about 18% air (`pad`). The portfolio uses a small hand-drawn browser sketch (`logos/mark/portfolio-sketch.svg`, wobbly strokes like the WIP canvas) and BirdTab uses its extension icon (`logos/square/birdtab.webp`); only a company with no logo shows its initial, dark on `#f0f0f0`. The broken `epic-wiki.png` and `toppr-wiki.png` (HTML error pages saved as PNG) were deleted. |
 | `TeamLogos` | Home team logos, see 3.7. |
 | `SocialIcon` | LinkedIn, X, Medium and envelope icons, shared by the bar and the contact page. |
 | `FloatingBar` | The navigation bar. See 3.6. |
