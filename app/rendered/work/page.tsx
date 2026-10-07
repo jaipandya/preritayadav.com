@@ -73,11 +73,9 @@ export default function RenderedWorkPage() {
       </section>
 
       <div className="r-end">
-        <div className="r-rows">
-          <Link href="/rendered/contact" className="r-row">
-            <span className="r-row-plain">
-              <Content k="workListing.ctaLabel" fallback={workListingCtaLabel} />
-            </span>
+        <div className="r-btn-wrap">
+          <Link href="/rendered/contact" className="r-btn">
+            <Content k="workListing.ctaLabel" fallback={workListingCtaLabel} />
           </Link>
         </div>
       </div>

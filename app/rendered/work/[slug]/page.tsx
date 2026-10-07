@@ -144,12 +144,15 @@ export default async function RenderedWorkDetail({ params }: { params: Promise<{
             </span>
           </Link>
         ))}
-        <Link href="/rendered/contact" className="r-row">
-          <span className="r-row-plain">
-            <Content k={k("labels.contactCta")} fallback={workPageLabels.contactCta} />
-          </span>
-        </Link>
       </nav>
+
+      <div className="r-end">
+        <div className="r-btn-wrap">
+          <Link href="/rendered/contact" className="r-btn">
+            <Content k={k("labels.contactCta")} fallback={workPageLabels.contactCta} />
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

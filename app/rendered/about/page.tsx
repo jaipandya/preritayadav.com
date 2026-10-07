@@ -31,6 +31,8 @@ export default function RenderedAboutPage() {
           height={aboutPortrait.height}
           sizes="(max-width: 540px) calc(100vw - 80px), 460px"
           priority
+          placeholder="blur"
+          blurDataURL={aboutPortrait.blurDataURL}
           style={{ width: "100%", height: "auto" }}
         />
       </figure>

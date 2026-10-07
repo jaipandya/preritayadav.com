@@ -291,9 +291,9 @@ Other case study rules:
 
 #### About `/rendered/about`
 
-- h1 = `about.title` (32/700). Five paragraphs as `Prose` (17px, `#444`, 16px apart). Outro as `lede`. Footer text as body, then a dark button (`.r-btn`, same as the home footer) with `about.cta.label` ("Say hello", arrow added by CSS).
+- h1 = `about.title` (32/700). Five paragraphs as `Prose` (17px, `#444`, 16px apart). Outro as `lede`. Footer text as body, then a dark button (`.r-btn`, same as the home footer and the contact link ending the work list and each case study) with `about.cta.label` ("Say hello", arrow added by CSS).
 - The three scene illustrations are not shown (`illustrations` in `lib/aboutContent.ts` stays for the WIP canvas).
-- **Portrait** (decision 2): between the h1 and the first paragraph, one image inside the media tray at the top of the page, 16:12, `alt` describing it. It uses the existing illustrated portrait `public/rendered/generated/about-portrait.webp` (1000 by 750, about 44 KB, down from a 1.6 MB PNG that made the page wait) until a photo is supplied. The source path is a single constant in the About page so swapping to a real photo is a one-line change. The image is loaded with `priority` and explicit dimensions so there is no layout shift.
+- **Portrait** (decision 2): between the h1 and the first paragraph, one image inside the media tray at the top of the page, 16:12, `alt` describing it. It uses the existing illustrated portrait `public/rendered/generated/about-portrait.webp` (1000 by 750, about 44 KB, down from a 1.6 MB PNG that made the page wait) until a photo is supplied. The source path is a single constant in the About page so swapping to a real photo is a one-line change. The image is loaded with `priority`, explicit dimensions (no layout shift) and a 20 by 15 blur placeholder (`aboutPortrait.blurDataURL`).
 
 #### Contact `/rendered/contact`
 
